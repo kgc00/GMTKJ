@@ -29,6 +29,7 @@ public class InputHandler : MonoBehaviour
 		Debug.Assert(unit = GetComponent<Unit>());
         Debug.Assert(inputHandler = GetComponent<InputHandler>());
         unitStateHandler.onUnitSelected += DisplayMoves;
+        unitStateHandler.onMovementFinished += ResetNodesInRange;
     }
 
     // Update is called once per frame
@@ -78,7 +79,6 @@ public class InputHandler : MonoBehaviour
             // If we can move, we calculate possibilities for movement
             if (unit.currentMovementPoints > 0)
             {
-                print("thing working");
                 GeneratePossibleMoves(unit.transform.position, unit.currentMovementPoints);
                 // Update our enum so we can move
                 unit.currentUnitState = Unit.UnitState.ready;
@@ -152,5 +152,9 @@ public class InputHandler : MonoBehaviour
         }
         path.Reverse();
         gizmothing.path = path;
+    }
+
+    void ResetNodesInRange(){
+        nodesInRange = new List<Node>();
     }
 }

@@ -13,6 +13,7 @@ public class UnitStateHandler : MonoBehaviour
     WorldManager worldManager;
     public Action onUnitSelected = delegate { };
     public Action onUnitMoving = delegate { };
+    public Action onMovementFinished = delegate { };
 
     // Use this for initialization
     void Start()
@@ -26,7 +27,6 @@ public class UnitStateHandler : MonoBehaviour
 
     public void SetState(Unit.UnitState state)
     {
-        worldManager.SetAllUnitStates();
         unit.currentUnitState = state;
         if (state == Unit.UnitState.selected)
         {
@@ -47,16 +47,23 @@ public class UnitStateHandler : MonoBehaviour
         onUnitMoving();
     }
 
-    public void ConfirmMovement(int movementPointsUsed)
+    public void DestinationReached()
     {
-        unit.currentMovementPoints -= movementPointsUsed;
-        // unit.currentUnitState = Unit.UnitState.unselected;
+        print("Hi");
+        unit.currentUnitState = Unit.UnitState.unselected;
+        grid.UpdateNodeStatuses();
         foreach (Node node in grid.grid)
         {
             ResetCosts(node);
         }
         // Reset value so the next time we display the legal moves a path isn't already there
-        gizmothing.path = new List<Node>();
+        onMovementFinished();
+        ResetLists();
+    }
+    public void ConfirmMovement(int movementPointsUsed)
+    {
+        // unit.currentMovementPoints -= movementPointsUsed;        
+        DestinationReached();
     }
 
     // Called to reset state logic when user "ends their turn".
@@ -75,10 +82,9 @@ public class UnitStateHandler : MonoBehaviour
     }
 
     // Reset our lists so we get correct, clean data for gizmo draws and function calls next turn.
-    public void ResetLists(List<Node> nodesInRange)
-    {
-        nodesInRange = new List<Node>();
-        gizmothing._nodesWithinRange = nodesInRange;
+    public void ResetLists()
+    {        
+        gizmothing._nodesWithinRange = new List<Node>();
         gizmothing.path = new List<Node>();
     }
 }

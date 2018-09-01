@@ -25,7 +25,7 @@ public class SceneManager : MonoBehaviour
     public void UpdateText(int mpValue)
     {
         //movementText.text = ("Movement Points Left This Turn: " + mpValue);
-        print("Movement Points Left This Turn: " + mpValue);
+        // print("Movement Points Left This Turn: " + mpValue);
     }
 
     public void UpdateTextEndTurn()

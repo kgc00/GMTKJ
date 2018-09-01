@@ -23,6 +23,8 @@ public class MovementHandler : MonoBehaviour
     void Start()
     {
         grid = GameGrid.instance;
+        requestManager = PathRequestManager.instance;
+        gizmothing = DebugGizmo.instance;
         unit = GetComponent<Unit>();
         Debug.Assert(aStar = GetComponent<AStar>());
         inputHandler = GetComponent<InputHandler>();
@@ -33,24 +35,18 @@ public class MovementHandler : MonoBehaviour
     private void StartMovementPathLogic()
     {
         targetInfo = inputHandler.PassTargetInfo();
-        StartMovementPathCoroutine(targetInfo.startingPoint, targetInfo.targetPoint);
+        StartCoroutine(GenerateMovementPath(targetInfo.startingPoint, targetInfo.targetPoint));
+        MoveUnit();
     }
 
-    public void StartMovementPathCoroutine(Vector3 startPos, Vector3 targetPos)
-    {
-        StartCoroutine(GenerateMovementPath(startPos, targetPos));
-        Move();
-    }
-
-    public void Move()
-    {
-        StartMovementPathCoroutine(unit.transform.position, targetInfo.targetPoint);
+    // public void Move()
+    // {
+    //     StartMovementPathCoroutine(unit.transform.position, targetInfo.targetPoint);
         // stateHandler.ResetLists(new List<Node>());
-    }
+    // }
 
     public IEnumerator GenerateMovementPath(Vector3 startPos, Vector3 targetPos)
     {
-        print("test");
         Vector3[] waypoints = new Vector3[0];
         bool pathSuccess = false;
 
@@ -105,7 +101,7 @@ public class MovementHandler : MonoBehaviour
         Vector3[] waypoints = new Vector3[path.Count];
         for (int i = 0; i < path.Count; i++)
         {
-            waypoints[i] = new Vector3(path[i].worldPosition.x, path[i].worldPosition.y, -1);
+            waypoints[i] = new Vector3(path[i].worldPosition.x, path[i].worldPosition.y, unit.transform.position.z);
         }
         return waypoints;
     }

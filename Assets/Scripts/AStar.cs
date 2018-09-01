@@ -26,7 +26,7 @@ public class AStar : MonoBehaviour
     public bool PathFindingLogic(bool pathSuccess, Node startNode, Node targetNode, int currentMovementPoints)
     {
         List<Node> openSet = new List<Node>();
-        HashSet<Node> closedSet = new HashSet<Node>();
+        HashSet<Node> closedSet = new HashSet<Node>();  
         openSet.Add(startNode);
 
         // Basically we iterate through all nearby nodes in a line to the target. We calculate distance to target and 
