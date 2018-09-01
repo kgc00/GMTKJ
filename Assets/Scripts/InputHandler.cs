@@ -6,14 +6,17 @@ using UnityEngine;
 public class InputHandler : MonoBehaviour
 {
 
-    MovementHandler movementHandler;
-	Unit actor;
+    InputHandler inputHandler;
+	Unit unit;
 	public Transform target;
 	public List<Node> nodesInRange;
 	SceneManager sceneManager;
 	GameGrid grid;
 	DebugGizmo gizmothing;
 	AStar aStar;
+    Node selectedNode;
+    UnitStateHandler unitStateHandler;
+    private TargetingInformation targetInformation; 
 
     // Use this for initialization
     void Start()
@@ -21,40 +24,64 @@ public class InputHandler : MonoBehaviour
 		sceneManager = SceneManager.instance;
 		grid = GameGrid.instance;
 		gizmothing = DebugGizmo.instance;
-		Debug.Assert(aStar = GetComponentInParent<AStar>());
-		Debug.Assert(actor = GetComponentInParent<Unit>());
-        Debug.Assert(movementHandler = GetComponentInParent<MovementHandler>());
+        unitStateHandler = GetComponent<UnitStateHandler>();
+		Debug.Assert(aStar = GetComponent<AStar>());
+		Debug.Assert(unit = GetComponent<Unit>());
+        Debug.Assert(inputHandler = GetComponent<InputHandler>());
+        unitStateHandler.onUnitSelected += DisplayMoves;
     }
 
     // Update is called once per frame
     void Update()
     {
-        // If we can move, and the location we are trying to move to is valid...
-        if (actor.currentUnitState == Unit.UnitState.ready && nodesInRange.Contains(grid.NodeFromWorldPosition(target.position)))
-        {
-            // This function won't actually move, only construct the path and shows the user feedback.
-            DisplayPath(actor.transform.position, target.position);
-
-            if (Input.GetMouseButtonDown(0) && actor.currentMovementPoints > 0)
-            {
-                // Initiate move logic.
-                movementHandler.Move();
+        if (unit.currentUnitState == Unit.UnitState.unselected){
+            if (Input.GetMouseButtonDown(0)){
+                selectedNode = grid.NodeFromWorldPosition(target.position);
+                if (selectedNode.occupiedByUnit == Node.OccupiedByUnit.ally){
+                    unitStateHandler.SetState(Unit.UnitState.selected);
+                }
             }
         }
+
+        // If we can move, and the location we are trying to move to is valid...
+        if (unit.currentUnitState == Unit.UnitState.ready && 
+        nodesInRange.Contains(grid.NodeFromWorldPosition(target.position)) &&
+        grid.NodeFromWorldPosition(target.position) != grid.NodeFromWorldPosition(unit.transform.position))
+        {
+            // This function won't actually move, only construct the path and shows the user feedback.
+            DisplayPath(unit.transform.position, target.position);
+
+            if (Input.GetMouseButtonDown(0) && unit.currentMovementPoints > 0)
+            {
+                // Initiate move logic.
+                StoreTargetInfo(unit.transform.position, target.position);
+                unitStateHandler.SetState(Unit.UnitState.moving);
+            }
+        }
+    }
+
+    private void StoreTargetInfo(Vector3 startingPos, Vector3 targetPos){
+        targetInformation = new TargetingInformation(startingPos, targetPos);
+    }
+
+    public TargetingInformation PassTargetInfo(){
+        return targetInformation;
     }
 
     // This function preps for movement, dealing with state machine logic
     public void DisplayMoves()
     {
+        
         // Safety check for unit's state
-        if (actor.currentUnitState == Unit.UnitState.idle)
+        if (unit.currentUnitState == Unit.UnitState.selected)
         {
             // If we can move, we calculate possibilities for movement
-            if (actor.currentMovementPoints > 0)
+            if (unit.currentMovementPoints > 0)
             {
-                GeneratePossibleMoves(actor.transform.position, actor.currentMovementPoints);
+                print("thing working");
+                GeneratePossibleMoves(unit.transform.position, unit.currentMovementPoints);
                 // Update our enum so we can move
-                actor.currentUnitState = Unit.UnitState.ready;
+                unit.currentUnitState = Unit.UnitState.ready;
                 // We need to set this to true to draw the path for player to see.
                 gizmothing.playerRequestingPath = true;
             }
@@ -81,7 +108,7 @@ public class InputHandler : MonoBehaviour
         foreach (Node node in grid.GetRange(targetNode, range))
         {
             // Check and see if the path from that node to the actor is under acceptable limits 
-            if (aStar.PathFindingLogic(false, targetNode, node, actor.currentMovementPoints))
+            if (aStar.PathFindingLogic(false, targetNode, node, range))
             {
                 // If within range add to a list we'll use later
                 nodesInRange.Add(node);
@@ -104,7 +131,7 @@ public class InputHandler : MonoBehaviour
         // Make sure we're clicking on valid targets
         if (startNode.walkable && targetNode.walkable && startNode != targetNode)
         {
-            pathSuccess = aStar.PathFindingLogic(pathSuccess, startNode, targetNode, actor.currentMovementPoints);
+            pathSuccess = aStar.PathFindingLogic(pathSuccess, startNode, targetNode, unit.currentMovementPoints);
         }
         if (pathSuccess)
         {

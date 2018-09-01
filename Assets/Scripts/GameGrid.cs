@@ -10,6 +10,8 @@ public class GameGrid : MonoBehaviour
     public Vector2 gridWorldSize;
     public float nodeRadius, nodeDiameter;
     public LayerMask obstacleMask;
+    public LayerMask enemyMask;
+    public LayerMask allyMask;
     public Node[,] grid;
     [SerializeField]
 
@@ -46,7 +48,20 @@ public class GameGrid : MonoBehaviour
                 // Store our world point so we can access nodes later, and set the value of walkable or not walkable, also create the node
                 Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.up * (y * nodeDiameter + nodeRadius);
                 bool walkable = !(Physics.CheckSphere(worldPoint, nodeRadius, obstacleMask));
-                grid[x, y] = new Node(walkable, worldPoint, x, y);
+                
+                if ((Physics.CheckSphere(worldPoint, nodeRadius, allyMask)))
+                {
+                    Node.OccupiedByUnit occupiedByUnit = Node.OccupiedByUnit.ally;
+                    grid[x, y] = new Node(walkable, worldPoint, x, y, Node.NodeType.plains, occupiedByUnit);
+                } else if ((Physics.CheckSphere(worldPoint, nodeRadius, enemyMask)))
+                {
+                    Node.OccupiedByUnit occupiedByUnit = Node.OccupiedByUnit.enemy;
+                    grid[x, y] = new Node(walkable, worldPoint, x, y, Node.NodeType.plains, occupiedByUnit);
+                }
+                else
+                {
+                    grid[x, y] = new Node(walkable, worldPoint, x, y, Node.NodeType.plains, Node.OccupiedByUnit.noUnit);
+                }
             }
         }
     }
@@ -84,7 +99,7 @@ public class GameGrid : MonoBehaviour
     }
 
     public List<Node> GetRange(Node node, int range)
-    {        
+    {
         List<Node> nodesWithinRange = new List<Node>();
         for (int x = -range; x <= range; x++)
         {

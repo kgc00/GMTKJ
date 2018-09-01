@@ -6,41 +6,51 @@ using System;
 [RequireComponent(typeof(Unit))]
 public class MovementHandler : MonoBehaviour
 {
-    public Unit actor;
+    public Unit unit;
     public Transform target;
-    private UnitStateHandler stateHandler;
     GameGrid grid;
     PathRequestManager requestManager;
     AStar aStar;
-	DebugGizmo gizmothing;
+    DebugGizmo gizmothing;
+    InputHandler inputHandler;
+    TargetingInformation targetInfo;
+    private Vector3[] path;
+    UnitStateHandler unitStateHandler;
+    private int targetIndex;
+    private float speed = 5f;
+
     // Use this for initialization
     void Start()
     {
         grid = GameGrid.instance;
-		actor = GetComponentInParent<Unit>();
-        Debug.Assert(aStar = GetComponentInParent<AStar>());
-        Debug.Assert(stateHandler = GetComponentInParent<UnitStateHandler>());
+        unit = GetComponent<Unit>();
+        Debug.Assert(aStar = GetComponent<AStar>());
+        inputHandler = GetComponent<InputHandler>();
+        unitStateHandler = GetComponent<UnitStateHandler>();
+        unitStateHandler.onUnitMoving += StartMovementPathLogic;
     }
 
-    // We make a void so we can call our coroutine more flexibly
-    public void StartMovementPathLogic(Vector3 startPos, Vector3 targetPos)
+    private void StartMovementPathLogic()
+    {
+        targetInfo = inputHandler.PassTargetInfo();
+        StartMovementPathCoroutine(targetInfo.startingPoint, targetInfo.targetPoint);
+    }
+
+    public void StartMovementPathCoroutine(Vector3 startPos, Vector3 targetPos)
     {
         StartCoroutine(GenerateMovementPath(startPos, targetPos));
         Move();
     }
-    // Initiate actual movement of the unit
+
     public void Move()
     {
-        // Keeps statemachine in sync
-        stateHandler.SetMoving(true, 0);
-        StartMovementPathLogic(actor.transform.position, target.position);
-        stateHandler.ResetLists(new List<Node>());
+        StartMovementPathCoroutine(unit.transform.position, targetInfo.targetPoint);
+        // stateHandler.ResetLists(new List<Node>());
     }
 
-    // This pathfinding method returns an actual array of vector 3's with which to move our actor.
-    // It's called by the pathRequestManager & unitActor.
     public IEnumerator GenerateMovementPath(Vector3 startPos, Vector3 targetPos)
     {
+        print("test");
         Vector3[] waypoints = new Vector3[0];
         bool pathSuccess = false;
 
@@ -50,7 +60,7 @@ public class MovementHandler : MonoBehaviour
         // Make sure we're clicking on valid targets
         if (startNode.walkable && targetNode.walkable && startNode != targetNode)
         {
-            pathSuccess = aStar.PathFindingLogic(pathSuccess, startNode, targetNode, actor.currentMovementPoints);
+            pathSuccess = aStar.PathFindingLogic(pathSuccess, startNode, targetNode, unit.currentMovementPoints);
         }
         yield return null;
         if (pathSuccess)
@@ -98,5 +108,53 @@ public class MovementHandler : MonoBehaviour
             waypoints[i] = new Vector3(path[i].worldPosition.x, path[i].worldPosition.y, -1);
         }
         return waypoints;
+    }
+
+    public void MoveUnit()
+    {
+        PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, this);
+    }
+
+    // When the path is successfully found by AStar script, we start our coroutine to move our unit through the waypoints to the end node.
+    // We stop previous move coroutines for safety.
+    public void OnPathFound(Vector3[] newPath, bool pathSuccessful)
+    {
+        if (pathSuccessful)
+        {
+            path = newPath;
+            targetIndex = 0;
+            StopCoroutine("FollowPath");
+            StartCoroutine("FollowPath");
+            // unitStateHandler.SetMoving(true, 0);
+        }
+    }
+
+    // The function which sets our unit's vector3's closer to each target waypoint
+    IEnumerator FollowPath()
+    {
+        // Store our target as the first waypoint
+        Vector3 currentWaypoint = path[0];
+        while (true)
+        {
+            // If we are at the current waypoint
+            if (transform.position == currentWaypoint)
+            {
+                // Find next waypoint
+                targetIndex++;
+                // If our waypoint is the last one in the list, we've reached our target, 
+                // and we proceed our statemachine and break the loop
+                if (targetIndex >= path.Length)
+                {
+                    // Moves state logic forward, decrements movement points dynamically
+                    unitStateHandler.ConfirmMovement(path.Length);
+                    yield break;
+                }
+                // Else set current waypoint to the increased index
+                currentWaypoint = path[targetIndex];
+            }
+            // Move toward current waypoint
+            transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, speed * Time.deltaTime);
+            yield return null;
+        }
     }
 }

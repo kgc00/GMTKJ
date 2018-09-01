@@ -17,7 +17,7 @@ public class AStar : MonoBehaviour
 
     private void InitialAssignment()
     {        
-        requestManager = GetComponent<PathRequestManager>();
+        requestManager = FindObjectOfType<PathRequestManager>();
         grid = GameGrid.instance;
     }
 

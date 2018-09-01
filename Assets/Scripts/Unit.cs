@@ -4,16 +4,14 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
-    public enum UnitState { ready, idle, moving };
+    public enum UnitState { ready, idle, moving, unselected, selected };
     [SerializeField]
     public UnitState currentUnitState;
     public int maxMovementPointsPerTurn, currentMovementPoints, movementCost;
 
     void Start()
     {
-        // Set enum so we can have some control over player actions
-        currentUnitState = UnitState.idle;
-        // Movementvariables declared here
+        currentUnitState = UnitState.unselected;
         movementCost = 0;
         maxMovementPointsPerTurn = 6;
         currentMovementPoints = maxMovementPointsPerTurn;

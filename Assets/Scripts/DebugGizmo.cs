@@ -11,7 +11,7 @@ public class DebugGizmo : MonoBehaviour
     public static DebugGizmo instance;
     public bool playerRequestingPath;
 
-    void Start()
+    void Awake()
     {
         grid = GameGrid.instance;
         if (instance == null)
@@ -49,14 +49,6 @@ public class DebugGizmo : MonoBehaviour
                 }
                 Gizmos.DrawCube(n.worldPosition, Vector3.one * (grid.nodeDiameter - .1f));
             }
-        }
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            print(grid.NodeFromWorldPosition(new Vector3(3, 3, 0)));
         }
     }
 }

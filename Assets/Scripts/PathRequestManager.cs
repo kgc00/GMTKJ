@@ -10,13 +10,20 @@ public class PathRequestManager : MonoBehaviour
     Queue<PathRequest> pathRequestQueue = new Queue<PathRequest>();
     PathRequest currentPathRequest;
 
-    static PathRequestManager instance;
+    public static PathRequestManager instance;
 
     bool isProcessingPath;
 
     void Awake()
     {
-        instance = this;
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(this);
+        }
     }
 
 	// Our method which requests to start a new path find from AStar.  For optimization, we use callbacks
