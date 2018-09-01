@@ -5,47 +5,58 @@ using UnityEngine;
 public class DebugGizmo : MonoBehaviour
 {
 
-	Vector2 gridWorldSizeX;
-    // Use this for initialization
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     public List<Node> path;
     public List<Node> _nodesWithinRange;
+    GameGrid grid;
+    public static DebugGizmo instance;
+    public bool playerRequestingPath;
 
-    // void OnDrawGizmos()
-    // {
-    //     Gizmos.DrawWireCube(transform.position, new Vector3(gridWorldSize.x, gridWorldSize.y, 1));
+    void Start()
+    {
+        grid = GameGrid.instance;
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(this);
+        }
+    }
 
-    //     if (grid != null)
-    //     {
-    //         foreach (Node n in grid)
-    //         {
-    //             Gizmos.color = (n.walkable) ? Color.white : Color.red;
-    //             if (_nodesWithinRange != null)
-    //             {
-    //                 if (_nodesWithinRange.Contains(n) && n.walkable)
-    //                 {
-    //                     Gizmos.color = Color.green;
-    //                 }
-    //             }
-    //             // if (path != null && playerRequestingPath)
-    //             // {
-    //             //     if (path.Contains(n))
-    //             //     {
-    //             //         Gizmos.color = Color.black;
-    //             //     }
-    //             // }
-    //             // Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter - .1f));
-    //         }
-    //     }
-    // }
+
+    void OnDrawGizmos()
+    {
+        if (grid != null)
+        {
+            Gizmos.DrawWireCube(transform.position, new Vector3(grid.gridWorldSize.x, grid.gridWorldSize.y, 2));
+            foreach (Node n in grid.grid)
+            {
+                Gizmos.color = (n.walkable) ? Color.white : Color.red;
+                if (_nodesWithinRange != null)
+                {
+                    if (_nodesWithinRange.Contains(n) && n.walkable)
+                    {
+                        Gizmos.color = Color.green;
+                    }
+                }
+                if (path != null && playerRequestingPath)
+                {
+                    if (path.Contains(n))
+                    {
+                        Gizmos.color = Color.black;
+                    }
+                }
+                Gizmos.DrawCube(n.worldPosition, Vector3.one * (grid.nodeDiameter - .1f));
+            }
+        }
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            print(grid.NodeFromWorldPosition(new Vector3(3, 3, 0)));
+        }
+    }
 }

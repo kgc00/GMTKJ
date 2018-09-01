@@ -6,6 +6,7 @@ using UnityEngine;
 public class GameGrid : MonoBehaviour
 {
 
+    public static GameGrid instance;
     public Vector2 gridWorldSize;
     public float nodeRadius, nodeDiameter;
     public LayerMask obstacleMask;
@@ -13,18 +14,17 @@ public class GameGrid : MonoBehaviour
     [SerializeField]
 
     int gridSizeX, gridSizeY;
-    public bool playerRequestingPath = false;
-
-    public int maxHeapSize
-    {
-        get
-        {
-            return gridSizeX * gridSizeY;
-        }
-    }
 
     void Awake()
     {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(this);
+        }
         // Set our info for generating the grid
         nodeDiameter = nodeRadius * 2;
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
