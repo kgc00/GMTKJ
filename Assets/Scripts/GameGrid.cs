@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Generates and stores all nodes, also responsible for drawing gizmos
+// Generates and stores all nodes
 public class GameGrid : MonoBehaviour
 {
 
@@ -80,12 +80,9 @@ public class GameGrid : MonoBehaviour
                 }
             }
         }
-        // This is an efficient check because it solely uses math and a steady coordinate system to check.
         return neighbors;
     }
 
-    // Method to find all nodes which are within a 6 square distance.
-    // Returns a grid of 13x13 which we cull down in the ASTAR script.
     public List<Node> GetRange(Node node, int range)
     {        
         List<Node> nodesWithinRange = new List<Node>();
@@ -104,7 +101,6 @@ public class GameGrid : MonoBehaviour
         return nodesWithinRange;
     }
 
-    // An efficient check which returns wanted nodes based on their vector 3 positions.
     public Node NodeFromWorldPosition(Vector3 worldPosition)
     {
         float percentX = (worldPosition.x + gridWorldSize.x / 2) / gridWorldSize.x;
@@ -116,44 +112,5 @@ public class GameGrid : MonoBehaviour
         int y = Mathf.RoundToInt((gridSizeY - 1) * percentY);
 
         return grid[x, y];
-    }
-
-    // Lists declared for the draw gizmo function
-    public List<Node> path;
-    public List<Node> _nodesWithinRange;
-
-    // void Update(){
-    //     Debug.Log(grid[20, 20].fCost);
-    // }
-
-    // Used to help visualize the values of different data/game states.
-    // Other possible ways to visualize this include using Unity's Materials/GameObjects/Text.
-    // However, I like the fact that each node doesn't come with the memory cost of extending MonoBehavior
-    void OnDrawGizmos()
-    {
-        Gizmos.DrawWireCube(transform.position, new Vector3(gridWorldSize.x, gridWorldSize.y, 1));
-
-        if (grid != null)
-        {
-            foreach (Node n in grid)
-            {
-                Gizmos.color = (n.walkable) ? Color.white : Color.red;
-                if (_nodesWithinRange != null)
-                {
-                    if (_nodesWithinRange.Contains(n) && n.walkable)
-                    {
-                        Gizmos.color = Color.green;
-                    }
-                }
-                if (path != null && playerRequestingPath)
-                {
-                    if (path.Contains(n))
-                    {
-                        Gizmos.color = Color.black;
-                    }
-                }
-                Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter - .1f));
-            }
-        }
     }
 }
