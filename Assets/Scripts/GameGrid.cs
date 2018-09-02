@@ -131,7 +131,10 @@ public class GameGrid : MonoBehaviour
                 int checkY = node.gridY + y;
                 if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
                 {
-                    nodesWithinRange.Add(grid[checkX, checkY]);
+                    if (grid[checkX, checkY].occupiedByUnit == Node.OccupiedByUnit.noUnit)
+                    {
+                        nodesWithinRange.Add(grid[checkX, checkY]);
+                    }
                 }
             }
         }

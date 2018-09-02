@@ -13,12 +13,12 @@ public class UnitStateHandler : MonoBehaviour
     UnitTimer timer;
     WorldManager worldManager;
     public Action<Unit> onUnitSelected = delegate { };
+    public Action onUnitUnselected = delegate { };
     public Action onUnitMoving = delegate { };
     public Action onMovementFinished = delegate { };
     public Action<Unit> onUnitPlanningMovement = delegate { };
     public Action onPlanningAttack = delegate { };
 
-    // Use this for initialization
     void Start()
     {
         sceneManager = FindObjectOfType<SceneManager>().GetComponent<SceneManager>();
@@ -93,8 +93,7 @@ public class UnitStateHandler : MonoBehaviour
         {
             ResetCosts(node);
         }
-        GetComponent<InputHandler>().ResetNodesInRange();
-        ResetLists();
+        onUnitUnselected();
         unit.currentUnitState = Unit.UnitState.unselected;
     }
 
@@ -103,6 +102,7 @@ public class UnitStateHandler : MonoBehaviour
         gizmothing.playerRequestingPath = false;
         unit.currentUnitState = Unit.UnitState.moving;
         onUnitMoving();
+        ResetLists();
     }
 
     public void DestinationReached()
@@ -113,32 +113,26 @@ public class UnitStateHandler : MonoBehaviour
         {
             ResetCosts(node);
         }
-        // Reset value so the next time we display the legal moves a path isn't already there
         onMovementFinished();
         ResetLists();
     }
     public void ConfirmMovement(int movementPointsUsed)
-    {
-        // unit.currentMovementPoints -= movementPointsUsed;        
+    {      
         DestinationReached();
     }
 
-    // Called to reset state logic when user "ends their turn".
     public void NextTurn()
     {
         unit.currentMovementPoints = unit.maxMovementPointsPerTurn;
         ConfirmMovement(0);
-        sceneManager.UpdateText(unit.currentMovementPoints);
     }
 
-    // Necessary because we calculate path costs multiple times in our game.
     private static void ResetCosts(Node node)
     {
         node.gCost = 0;
         node.hCost = 0;
     }
 
-    // Reset our lists so we get correct, clean data for gizmo draws and function calls next turn.
     public void ResetLists()
     {
         gizmothing._nodesWithinRange = new List<Node>();

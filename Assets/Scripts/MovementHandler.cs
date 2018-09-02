@@ -16,6 +16,7 @@ public class MovementHandler : MonoBehaviour
     TargetingInformation targetInfo;
     private Vector3[] path;
     UnitStateHandler unitStateHandler;
+    UnitMovement unitMovement;
     private int targetIndex;
     private float speed = 5f;
 
@@ -27,6 +28,7 @@ public class MovementHandler : MonoBehaviour
         gizmothing = DebugGizmo.instance;
         unit = GetComponent<Unit>();
         Debug.Assert(aStar = GetComponent<AStar>());
+        unitMovement = GetComponent<UnitMovement>();
         inputHandler = GetComponent<InputHandler>();
         unitStateHandler = GetComponent<UnitStateHandler>();
         unitStateHandler.onUnitMoving += StartMovementPathLogic;
@@ -34,16 +36,10 @@ public class MovementHandler : MonoBehaviour
 
     private void StartMovementPathLogic()
     {
-        targetInfo = inputHandler.PassTargetInfo();
+        targetInfo = unitMovement.PassTargetInfo();
         StartCoroutine(GenerateMovementPath(targetInfo.startingPoint, targetInfo.targetPoint));
         MoveUnit();
     }
-
-    // public void Move()
-    // {
-    //     StartMovementPathCoroutine(unit.transform.position, targetInfo.targetPoint);
-        // stateHandler.ResetLists(new List<Node>());
-    // }
 
     public IEnumerator GenerateMovementPath(Vector3 startPos, Vector3 targetPos)
     {

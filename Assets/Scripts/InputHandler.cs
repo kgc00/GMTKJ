@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 [RequireComponent(typeof(Unit))]
 public class InputHandler : MonoBehaviour
@@ -20,6 +19,7 @@ public class InputHandler : MonoBehaviour
     UnitStateHandler unitStateHandler;
     private TargetingInformation targetInformation;
     public event Action<TargetingInformation> onAbilityCalled = delegate { };
+    public event Action<Vector3, Vector3> onRequestingMovementLogic = delegate { };
     void Start()
     {
         sceneManager = SceneManager.instance;
@@ -29,8 +29,6 @@ public class InputHandler : MonoBehaviour
         Debug.Assert(aStar = GetComponent<AStar>());
         Debug.Assert(unit = GetComponent<Unit>());
         Debug.Assert(inputHandler = GetComponent<InputHandler>());
-        unitStateHandler.onUnitPlanningMovement += DisplayMoves;
-        unitStateHandler.onMovementFinished += ResetNodesInRange;
     }
 
     void Update()
@@ -43,7 +41,8 @@ public class InputHandler : MonoBehaviour
 
     private void AttackLogic()
     {
-        if (unit.currentUnitState == Unit.UnitState.planningAttack){
+        if (unit.currentUnitState == Unit.UnitState.planningAttack)
+        {
             print("need to implement attack logic");
         }
     }
@@ -56,7 +55,9 @@ public class InputHandler : MonoBehaviour
             {
                 unitStateHandler.SetState(Unit.UnitState.planningMovement);
                 return;
-            } else if (Input.GetKeyDown(KeyCode.Alpha2)){
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
                 unitStateHandler.SetState(Unit.UnitState.planningAttack);
                 return;
             }
@@ -67,34 +68,19 @@ public class InputHandler : MonoBehaviour
     {
         if (unit.currentUnitState == Unit.UnitState.planningMovement)
         {
-            if (IsLegalMove())
-            {
-                DisplayPath(unit.transform.position, target.position);
-            }
-            if (IsLegalMove() && Input.GetMouseButtonDown(0) && unit.currentMovementPoints > 0)
-            {
-                StoreTargetInfo(unit.transform.position, target.position);
-                unitStateHandler.SetState(Unit.UnitState.moving);
-            }
+            onRequestingMovementLogic(unit.transform.position, target.position);
         }
-    }
-
-    private bool IsLegalMove()
-    {
-        return nodesInRange.Contains(grid.NodeFromWorldPosition(target.position)) &&
-                grid.NodeFromWorldPosition(target.position) != grid.NodeFromWorldPosition(unit.transform.position) &&
-                !grid.nodesContainingUnits.Contains(grid.NodeFromWorldPosition(target.position));
     }
 
     private void AbilityOne()
     {
-        StoreTargetInfo(unit.transform.position, target.position);
-        onAbilityCalled(PassTargetInfo());
+        // StoreTargetInfo(unit.transform.position, target.position);
+        // onAbilityCalled(PassTargetInfo());
     }
 
     private void SelectionLogic()
     {
-        if (unit.currentUnitState == Unit.UnitState.unselected)
+        if (!WorldManager.instance.AnyUnitSelected())
         {
             if (Input.GetMouseButtonDown(0))
             {
@@ -124,75 +110,18 @@ public class InputHandler : MonoBehaviour
         return affectedUnit;
     }
 
-    private void StoreTargetInfo(Vector3 startingPos, Vector3 targetPos)
-    {
-        targetInformation = new TargetingInformation(startingPos, targetPos);
-    }
+    // private void StoreTargetInfo(Vector3 startingPos, Vector3 targetPos)
+    // {
+    //     targetInformation = new TargetingInformation(startingPos, targetPos);
+    // }
 
-    public TargetingInformation PassTargetInfo()
-    {
-        return targetInformation;
-    }
+    // public TargetingInformation PassTargetInfo()
+    // {
+    //     return targetInformation;
+    // }
 
-    public void DisplayMoves(Unit _unit)
-    {
-        if (unit.currentMovementPoints > 0)
-        {
-            GeneratePossibleMoves(unit.transform.position, unit.currentMovementPoints);
-            gizmothing.playerRequestingPath = true;
-        }
-    }
-
-    private List<Node> GeneratePossibleMoves(Vector3 startPos, int range)
-    {
-        if (nodesInRange == null)
-        {
-            nodesInRange = new List<Node>();
-        }
-        Node targetNode = grid.NodeFromWorldPosition(startPos);
-        foreach (Node node in grid.GetRange(targetNode, range))
-        {
-            if (aStar.PathFindingLogic(false, targetNode, node, range))
-            {
-                nodesInRange.Add(node);
-            }
-        }
-        gizmothing._nodesWithinRange = nodesInRange;
-        return nodesInRange;
-    }
-
-    void DisplayPath(Vector3 startPos, Vector3 targetPos)
-    {
-        Node startNode = grid.NodeFromWorldPosition(startPos);
-        Node targetNode = grid.NodeFromWorldPosition(targetPos);
-        bool pathSuccess = false;
-
-        if (startNode.walkable && targetNode.walkable && startNode != targetNode)
-        {
-            pathSuccess = aStar.PathFindingLogic(pathSuccess, startNode, targetNode, unit.currentMovementPoints);
-        }
-        if (pathSuccess)
-        {
-            GetPathToDisplay(startNode, targetNode);
-        }
-    }
-
-    void GetPathToDisplay(Node startNode, Node endNode)
-    {
-        List<Node> path = new List<Node>();
-        Node currentNode = endNode;
-
-        while (currentNode != startNode)
-        {
-            path.Add(currentNode);
-            currentNode = currentNode.parent;
-        }
-        path.Reverse();
-        gizmothing.path = path;
-    }
-
-    public void ResetNodesInRange()
-    {
-        nodesInRange = new List<Node>();
-    }
+    // public void ResetNodesInRange()
+    // {
+    //     nodesInRange = new List<Node>();
+    // }
 }

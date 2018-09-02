@@ -32,7 +32,8 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-    public void UnitSelected(Unit selectedUnit){
+    public void UnitSelected(Unit selectedUnit)
+    {
         DeselectOtherUnits(selectedUnit);
     }
 
@@ -47,15 +48,34 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-    public void UnitDestroyed(Unit destroyedUnit){
+    public void UnitDestroyed(Unit destroyedUnit)
+    {
         destroyedUnit.GetComponent<UnitStateHandler>().onUnitSelected -= DeselectOtherUnits;
         destroyedUnit.OnUnitDeath -= UnitDestroyed;
-        print("wooo");
     }
 
-    // Update is called once per frame
-    void Update()
+    public bool AnyUnitSelected()
     {
+        foreach (Unit unit in allUnits)
+        {
 
+            if (unit.currentUnitState != Unit.UnitState.unselected)
+            {
+                if (unit.currentUnitState == Unit.UnitState.cooldown ||
+                unit.currentUnitState == Unit.UnitState.moving ||
+                unit.currentUnitState == Unit.UnitState.attacking)
+                {
+                    break;
+                }
+                return true;
+            }
+        }
+        return false;
     }
+
+    // void Update(){
+    //     if (Input.GetKeyDown(KeyCode.Space)){
+    //         print(AnyUnitSelected());
+    //     }
+    // }
 }
