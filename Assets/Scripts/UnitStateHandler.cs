@@ -63,7 +63,6 @@ public class UnitStateHandler : MonoBehaviour
 
     public void DestinationReached()
     {
-        print("Hi");
         SetOnCooldown();
         grid.UpdateNodeStatuses();
         foreach (Node node in grid.grid)

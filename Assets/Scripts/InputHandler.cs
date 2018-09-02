@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,26 +8,26 @@ public class InputHandler : MonoBehaviour
 {
 
     InputHandler inputHandler;
-	Unit unit;
-	public Transform target;
-	public List<Node> nodesInRange;
-	SceneManager sceneManager;
-	GameGrid grid;
-	DebugGizmo gizmothing;
-	AStar aStar;
+    Unit unit;
+    public Transform target;
+    public List<Node> nodesInRange;
+    SceneManager sceneManager;
+    GameGrid grid;
+    DebugGizmo gizmothing;
+    AStar aStar;
     Node selectedNode;
     UnitStateHandler unitStateHandler;
-    private TargetingInformation targetInformation; 
+    private TargetingInformation targetInformation;
 
     // Use this for initialization
     void Start()
     {
-		sceneManager = SceneManager.instance;
-		grid = GameGrid.instance;
-		gizmothing = DebugGizmo.instance;
+        sceneManager = SceneManager.instance;
+        grid = GameGrid.instance;
+        gizmothing = DebugGizmo.instance;
         unitStateHandler = GetComponent<UnitStateHandler>();
-		Debug.Assert(aStar = GetComponent<AStar>());
-		Debug.Assert(unit = GetComponent<Unit>());
+        Debug.Assert(aStar = GetComponent<AStar>());
+        Debug.Assert(unit = GetComponent<Unit>());
         Debug.Assert(inputHandler = GetComponent<InputHandler>());
         unitStateHandler.onUnitSelected += DisplayMoves;
         unitStateHandler.onMovementFinished += ResetNodesInRange;
@@ -35,17 +36,24 @@ public class InputHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (unit.currentUnitState == Unit.UnitState.unselected){
-            if (Input.GetMouseButtonDown(0)){
+        if (unit.currentUnitState == Unit.UnitState.unselected)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
                 selectedNode = grid.NodeFromWorldPosition(target.position);
-                if (selectedNode.occupiedByUnit == Node.OccupiedByUnit.ally){
+                print("lul");
+                if (selectedNode.occupiedByUnit == Node.OccupiedByUnit.ally &&
+                UnitFromNode(selectedNode) == unit)
+                {
+                    print("did it");
                     unitStateHandler.SetState(Unit.UnitState.selected);
                 }
             }
+
         }
 
         // If we can move, and the location we are trying to move to is valid...
-        if (unit.currentUnitState == Unit.UnitState.ready && 
+        if (unit.currentUnitState == Unit.UnitState.ready &&
         nodesInRange.Contains(grid.NodeFromWorldPosition(target.position)) &&
         grid.NodeFromWorldPosition(target.position) != grid.NodeFromWorldPosition(unit.transform.position))
         {
@@ -61,18 +69,35 @@ public class InputHandler : MonoBehaviour
         }
     }
 
-    private void StoreTargetInfo(Vector3 startingPos, Vector3 targetPos){
+    private Unit UnitFromNode(Node _selectedNode)
+    {
+        Unit affectedUnit = null;
+        Collider[] hitColliders = Physics.OverlapSphere(_selectedNode.worldPosition, grid.nodeRadius, grid.allyMask);
+        foreach (Collider collider in hitColliders)
+        {
+            affectedUnit = collider.gameObject.GetComponentInParent<Unit>();
+            if (affectedUnit != null)
+            {
+                return affectedUnit;
+            }
+        }
+        return affectedUnit;
+    }
+
+    private void StoreTargetInfo(Vector3 startingPos, Vector3 targetPos)
+    {
         targetInformation = new TargetingInformation(startingPos, targetPos);
     }
 
-    public TargetingInformation PassTargetInfo(){
+    public TargetingInformation PassTargetInfo()
+    {
         return targetInformation;
     }
 
     // This function preps for movement, dealing with state machine logic
     public void DisplayMoves()
     {
-        
+
         // Safety check for unit's state
         if (unit.currentUnitState == Unit.UnitState.selected)
         {
@@ -154,7 +179,8 @@ public class InputHandler : MonoBehaviour
         gizmothing.path = path;
     }
 
-    void ResetNodesInRange(){
+    void ResetNodesInRange()
+    {
         nodesInRange = new List<Node>();
     }
 }
