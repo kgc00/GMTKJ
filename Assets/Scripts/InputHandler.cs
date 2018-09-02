@@ -20,7 +20,7 @@ public class InputHandler : MonoBehaviour
     private TargetingInformation targetInformation;
     public event Action<TargetingInformation> onAbilityCalled = delegate { };
     public event Action<Vector3, Vector3> onRequestingMovementLogic = delegate { };
-    public event Action<TargetingInformation> onRequestingAttackLogic = delegate { };
+    public event Action<Vector3, Vector3> onRequestingAttackLogic = delegate { };
     void Start()
     {
         sceneManager = SceneManager.instance;
@@ -30,6 +30,7 @@ public class InputHandler : MonoBehaviour
         Debug.Assert(aStar = GetComponent<AStar>());
         Debug.Assert(unit = GetComponent<Unit>());
         Debug.Assert(inputHandler = GetComponent<InputHandler>());
+        target = FindObjectOfType<TargetPosition>().transform;
     }
 
     void Update()
@@ -44,7 +45,7 @@ public class InputHandler : MonoBehaviour
     {
         if (unit.currentUnitState == Unit.UnitState.planningAttack)
         {
-            // onRequestingAttackLogic();
+            onRequestingAttackLogic(unit.transform.position, target.position);
         }
     }
 
@@ -71,12 +72,6 @@ public class InputHandler : MonoBehaviour
         {
             onRequestingMovementLogic(unit.transform.position, target.position);
         }
-    }
-
-    private void AbilityOne()
-    {
-        // StoreTargetInfo(unit.transform.position, target.position);
-        // onAbilityCalled(PassTargetInfo());
     }
 
     private void SelectionLogic()

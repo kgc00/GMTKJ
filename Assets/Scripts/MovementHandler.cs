@@ -26,6 +26,7 @@ public class MovementHandler : MonoBehaviour
         requestManager = PathRequestManager.instance;
         gizmothing = DebugGizmo.instance;
         unit = GetComponent<Unit>();
+        target = FindObjectOfType<TargetPosition>().transform;
         Debug.Assert(aStar = GetComponent<AStar>());
         unitMovement = GetComponent<UnitMovement>();
         inputHandler = GetComponent<InputHandler>();

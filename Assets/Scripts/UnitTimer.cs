@@ -20,6 +20,7 @@ public class UnitTimer : MonoBehaviour
     {
         unitStateHandler = GetComponent<UnitStateHandler>();
         unitStateHandler.onMovementFinished += AddTimeToTimerMovement;
+        unitStateHandler.onAttackFinished += AddTimeToTimerAttack;
     }
 
     private void EndTimer()
@@ -58,6 +59,13 @@ public class UnitTimer : MonoBehaviour
         cooldownTimeRemaining += 2.5f;
         CheckStartTimer();
     }
+
+    private void AddTimeToTimerAttack()
+    {
+        cooldownTimeRemaining += 3.5f;
+        CheckStartTimer();
+    }
+
     private void CheckStartTimer()
     {
         if (cooldownTimeRemaining > 0)

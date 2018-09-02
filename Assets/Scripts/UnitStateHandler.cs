@@ -18,6 +18,8 @@ public class UnitStateHandler : MonoBehaviour
     public Action onMovementFinished = delegate { };
     public Action<Unit> onUnitPlanningMovement = delegate { };
     public Action onPlanningAttack = delegate { };
+    public Action onAttacking = delegate { };
+    public Action onAttackFinished = delegate { };
 
     void Start()
     {
@@ -80,6 +82,7 @@ public class UnitStateHandler : MonoBehaviour
     private void SetAttacking()
     {
         unit.currentUnitState = Unit.UnitState.attacking;
+        onAttacking();
     }
 
     private void SetOnCooldown()
@@ -103,6 +106,12 @@ public class UnitStateHandler : MonoBehaviour
         unit.currentUnitState = Unit.UnitState.moving;
         onUnitMoving();
         ResetLists();
+    }
+
+    public void AttackFinished(){
+        onAttackFinished();
+        ResetLists();
+        SetState(Unit.UnitState.cooldown);
     }
 
     public void DestinationReached()

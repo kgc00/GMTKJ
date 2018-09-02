@@ -9,7 +9,7 @@ public class Unit : MonoBehaviour
     selected, cooldown, attacking, planningAttack };
     [SerializeField]
     public UnitState currentUnitState;
-    public int maxMovementPointsPerTurn, currentMovementPoints, movementCost;
+    public int maxMovementPointsPerTurn, currentMovementPoints, movementCost, attackRange, maxHealth, currentHealth, attackPower;
     public event Action<Unit> OnUnitDeath = delegate { };
 
     void Start()
@@ -17,11 +17,30 @@ public class Unit : MonoBehaviour
         currentUnitState = UnitState.unselected;
         movementCost = 0;
         maxMovementPointsPerTurn = 6;
+        maxHealth = 3;
+        currentHealth = maxHealth;
+        attackPower = 1;
+        attackRange = 1;
         currentMovementPoints = maxMovementPointsPerTurn;
     }
 
     void UnitDeath(){
         OnUnitDeath(this);
         Destroy(gameObject, 2.0f);
+    }
+
+    public void DamageTaken(int incomingDamage)
+    {
+        currentHealth -= incomingDamage;
+        print(currentHealth);
+        CheckForUnitDeath();
+    }
+
+    private void CheckForUnitDeath()
+    {
+        if (currentHealth <= 0)
+        {
+            UnitDeath();
+        }
     }
 }

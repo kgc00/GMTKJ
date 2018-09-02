@@ -70,7 +70,6 @@ public class GameGrid : MonoBehaviour
                 }
             }
         }
-        // CheckForUnits();
     }
 
     private void CheckForUnits()
@@ -139,6 +138,24 @@ public class GameGrid : MonoBehaviour
             }
         }
         return nodesWithinRange;
+    }
+
+    public List<Node> GetAttackRange(Node node, int range)
+    {
+        List<Node> nodesWithinAttackRange = new List<Node>();
+        for (int x = -range; x <= range; x++)
+        {
+            for (int y = -range; y <= range; y++)
+            {
+                int checkX = node.gridX + x;
+                int checkY = node.gridY + y;
+                if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
+                {
+                    nodesWithinAttackRange.Add(grid[checkX, checkY]);
+                }
+            }
+        }
+        return nodesWithinAttackRange;
     }
 
     public void UpdateNodeStatuses()

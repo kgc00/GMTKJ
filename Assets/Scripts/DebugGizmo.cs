@@ -6,10 +6,12 @@ public class DebugGizmo : MonoBehaviour
 {
 
     public List<Node> path;
+    public List<Node> attackTarget;
     public List<Node> _nodesWithinRange;
     GameGrid grid;
     public static DebugGizmo instance;
     public bool playerRequestingPath;
+    public bool playerRequestingTargetting;
 
     void Awake()
     {
@@ -45,6 +47,12 @@ public class DebugGizmo : MonoBehaviour
                     if (path.Contains(n))
                     {
                         Gizmos.color = Color.black;
+                    }
+                }
+                if (attackTarget != null & playerRequestingTargetting){
+                    if (attackTarget.Contains(n))
+                    {
+                        Gizmos.color = Color.magenta;
                     }
                 }
                 Gizmos.DrawCube(n.worldPosition, Vector3.one * (grid.nodeDiameter - .1f));
