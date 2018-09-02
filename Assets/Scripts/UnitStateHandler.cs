@@ -15,6 +15,8 @@ public class UnitStateHandler : MonoBehaviour
     public Action<Unit> onUnitSelected = delegate { };
     public Action onUnitMoving = delegate { };
     public Action onMovementFinished = delegate { };
+    public Action<Unit> onUnitPlanningMovement = delegate { };
+    public Action onPlanningAttack = delegate { };
 
     // Use this for initialization
     void Start()
@@ -33,17 +35,46 @@ public class UnitStateHandler : MonoBehaviour
         unit.currentUnitState = state;
         if (state == Unit.UnitState.selected)
         {
-            // display player actions
-            onUnitSelected(unit);
+            SetSelected();
         }
         else if (state == Unit.UnitState.moving)
         {
             SetMoving(true);
-        } else if (state == Unit.UnitState.cooldown){
+        }
+        else if (state == Unit.UnitState.cooldown)
+        {
             SetOnCooldown();
-        } else if (state == Unit.UnitState.attacking){
+        }
+        else if (state == Unit.UnitState.attacking)
+        {
             SetAttacking();
         }
+        else if (state == Unit.UnitState.unselected)
+        {
+            SetUnselected();
+        } else if (state == Unit.UnitState.planningMovement){
+            SetPlanningMovement();
+        } else if (state == Unit.UnitState.planningAttack){
+            SetPlanningAttack();
+        }
+    }
+
+    private void SetPlanningAttack()
+    {
+        unit.currentUnitState = Unit.UnitState.planningAttack;
+        onPlanningAttack();
+    }
+
+    private void SetPlanningMovement()
+    {
+        unit.currentUnitState = Unit.UnitState.planningMovement;
+        onUnitPlanningMovement(unit);
+    }
+
+    private void SetSelected()
+    {
+        print("selected");
+        onUnitSelected(unit);
     }
 
     private void SetAttacking()
@@ -56,7 +87,14 @@ public class UnitStateHandler : MonoBehaviour
         unit.currentUnitState = Unit.UnitState.cooldown;
     }
 
-    private void SetUnselected(){
+    private void SetUnselected()
+    {        
+        foreach (Node node in grid.grid)
+        {
+            ResetCosts(node);
+        }
+        GetComponent<InputHandler>().ResetNodesInRange();
+        ResetLists();
         unit.currentUnitState = Unit.UnitState.unselected;
     }
 
@@ -102,7 +140,7 @@ public class UnitStateHandler : MonoBehaviour
 
     // Reset our lists so we get correct, clean data for gizmo draws and function calls next turn.
     public void ResetLists()
-    {        
+    {
         gizmothing._nodesWithinRange = new List<Node>();
         gizmothing.path = new List<Node>();
     }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 [RequireComponent(typeof(Unit))]
 public class InputHandler : MonoBehaviour
@@ -18,8 +19,7 @@ public class InputHandler : MonoBehaviour
     Node selectedNode;
     UnitStateHandler unitStateHandler;
     private TargetingInformation targetInformation;
-
-    // Use this for initialization
+    public event Action<TargetingInformation> onAbilityCalled = delegate { };
     void Start()
     {
         sceneManager = SceneManager.instance;
@@ -29,51 +29,70 @@ public class InputHandler : MonoBehaviour
         Debug.Assert(aStar = GetComponent<AStar>());
         Debug.Assert(unit = GetComponent<Unit>());
         Debug.Assert(inputHandler = GetComponent<InputHandler>());
-        unitStateHandler.onUnitSelected += DisplayMoves;
+        unitStateHandler.onUnitPlanningMovement += DisplayMoves;
         unitStateHandler.onMovementFinished += ResetNodesInRange;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        NotSelectedLogic();
+        SelectionLogic();
         SelectedLogic();
+        MovementLogic();
+        AttackLogic();
+    }
+
+    private void AttackLogic()
+    {
+        if (unit.currentUnitState == Unit.UnitState.planningAttack){
+            print("need to implement attack logic");
+        }
     }
 
     private void SelectedLogic()
     {
-        // If we can move, and the location we are trying to move to is valid...
-        if (IsLegalMove())
+        if (unit.currentUnitState == Unit.UnitState.selected)
         {
-            // This function won't actually move, only construct the path and shows the user feedback.
-            DisplayPath(unit.transform.position, target.position);
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                unitStateHandler.SetState(Unit.UnitState.planningMovement);
+                return;
+            } else if (Input.GetKeyDown(KeyCode.Alpha2)){
+                unitStateHandler.SetState(Unit.UnitState.planningAttack);
+                return;
+            }
         }
-        if (IsLegalMove() && Input.GetMouseButtonDown(0) && unit.currentMovementPoints > 0)
+    }
+
+    private void MovementLogic()
+    {
+        if (unit.currentUnitState == Unit.UnitState.planningMovement)
         {
-            // Initiate move logic.
-            StoreTargetInfo(unit.transform.position, target.position);
-            unitStateHandler.SetState(Unit.UnitState.moving);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            AbilityOne();
+            if (IsLegalMove())
+            {
+                DisplayPath(unit.transform.position, target.position);
+            }
+            if (IsLegalMove() && Input.GetMouseButtonDown(0) && unit.currentMovementPoints > 0)
+            {
+                StoreTargetInfo(unit.transform.position, target.position);
+                unitStateHandler.SetState(Unit.UnitState.moving);
+            }
         }
     }
 
     private bool IsLegalMove()
     {
-        return  unit.currentUnitState == Unit.UnitState.ready &&
-                nodesInRange.Contains(grid.NodeFromWorldPosition(target.position)) &&
+        return nodesInRange.Contains(grid.NodeFromWorldPosition(target.position)) &&
                 grid.NodeFromWorldPosition(target.position) != grid.NodeFromWorldPosition(unit.transform.position) &&
                 !grid.nodesContainingUnits.Contains(grid.NodeFromWorldPosition(target.position));
     }
 
     private void AbilityOne()
     {
-
+        StoreTargetInfo(unit.transform.position, target.position);
+        onAbilityCalled(PassTargetInfo());
     }
 
-    private void NotSelectedLogic()
+    private void SelectionLogic()
     {
         if (unit.currentUnitState == Unit.UnitState.unselected)
         {
@@ -84,9 +103,9 @@ public class InputHandler : MonoBehaviour
                 UnitFromNode(selectedNode) == unit)
                 {
                     unitStateHandler.SetState(Unit.UnitState.selected);
+                    return;
                 }
             }
-
         }
     }
 
@@ -115,61 +134,39 @@ public class InputHandler : MonoBehaviour
         return targetInformation;
     }
 
-    // This function preps for movement, dealing with state machine logic
     public void DisplayMoves(Unit _unit)
     {
-
-        // Safety check for unit's state
-        if (unit.currentUnitState == Unit.UnitState.selected)
+        if (unit.currentMovementPoints > 0)
         {
-            // If we can move, we calculate possibilities for movement
-            if (unit.currentMovementPoints > 0)
-            {
-                GeneratePossibleMoves(unit.transform.position, unit.currentMovementPoints);
-                // Update our enum so we can move
-                unit.currentUnitState = Unit.UnitState.ready;
-                // We need to set this to true to draw the path for player to see.
-                gizmothing.playerRequestingPath = true;
-            }
+            GeneratePossibleMoves(unit.transform.position, unit.currentMovementPoints);
+            gizmothing.playerRequestingPath = true;
         }
     }
 
-    // This function will try to find the range the unit can move this turn
     private List<Node> GeneratePossibleMoves(Vector3 startPos, int range)
     {
-        // Initialize our list if it isn't already set
         if (nodesInRange == null)
         {
             nodesInRange = new List<Node>();
         }
-
-        // Determine our start node and add it to our range
         Node targetNode = grid.NodeFromWorldPosition(startPos);
-        // For each node in a grid determined by remaining movement points...
         foreach (Node node in grid.GetRange(targetNode, range))
         {
-            // Check and see if the path from that node to the actor is under acceptable limits 
             if (aStar.PathFindingLogic(false, targetNode, node, range))
             {
-                // If within range add to a list we'll use later
                 nodesInRange.Add(node);
             }
         }
-        // Forward the data to the grid so it can draw the correct nodes
         gizmothing._nodesWithinRange = nodesInRange;
         return nodesInRange;
     }
 
-    // Purely a visual feedback method.  Called on update if unitActor's state is ready to show feedback for user.
     void DisplayPath(Vector3 startPos, Vector3 targetPos)
     {
-        // Same old pathfinding logic.
-
         Node startNode = grid.NodeFromWorldPosition(startPos);
         Node targetNode = grid.NodeFromWorldPosition(targetPos);
         bool pathSuccess = false;
 
-        // Make sure we're clicking on valid targets
         if (startNode.walkable && targetNode.walkable && startNode != targetNode)
         {
             pathSuccess = aStar.PathFindingLogic(pathSuccess, startNode, targetNode, unit.currentMovementPoints);
@@ -180,7 +177,6 @@ public class InputHandler : MonoBehaviour
         }
     }
 
-    // Purely a visual feedback method.  Called on update if unitActor's state is ready.
     void GetPathToDisplay(Node startNode, Node endNode)
     {
         List<Node> path = new List<Node>();
@@ -195,7 +191,7 @@ public class InputHandler : MonoBehaviour
         gizmothing.path = path;
     }
 
-    void ResetNodesInRange()
+    public void ResetNodesInRange()
     {
         nodesInRange = new List<Node>();
     }

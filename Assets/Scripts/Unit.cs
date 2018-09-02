@@ -5,7 +5,8 @@ using System;
 
 public class Unit : MonoBehaviour
 {
-    public enum UnitState { ready, idle, moving, unselected, selected, cooldown, attacking };
+    public enum UnitState { planningMovement, moving, unselected, 
+    selected, cooldown, attacking, planningAttack };
     [SerializeField]
     public UnitState currentUnitState;
     public int maxMovementPointsPerTurn, currentMovementPoints, movementCost;

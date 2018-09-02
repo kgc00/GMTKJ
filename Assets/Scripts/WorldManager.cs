@@ -27,9 +27,13 @@ public class WorldManager : MonoBehaviour
         allUnits = FindObjectsOfType<Unit>();
         foreach (Unit unit in allUnits)
         {
-            unit.GetComponent<UnitStateHandler>().onUnitSelected += DeselectOtherUnits;
+            unit.GetComponent<UnitStateHandler>().onUnitSelected += UnitSelected;
             unit.OnUnitDeath += UnitDestroyed;
         }
+    }
+
+    public void UnitSelected(Unit selectedUnit){
+        DeselectOtherUnits(selectedUnit);
     }
 
     public void DeselectOtherUnits(Unit selectedUnit)
@@ -38,7 +42,7 @@ public class WorldManager : MonoBehaviour
         {
             if (unit != selectedUnit && unit.currentUnitState == Unit.UnitState.selected)
             {
-                unit.currentUnitState = Unit.UnitState.unselected;
+                unit.GetComponent<UnitStateHandler>().SetState(Unit.UnitState.unselected);
             }
         }
     }
