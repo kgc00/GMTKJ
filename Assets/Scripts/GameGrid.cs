@@ -145,7 +145,6 @@ public class GameGrid : MonoBehaviour
             if ((Physics.CheckSphere(node.worldPosition, nodeRadius, allyMask)) ||
             (Physics.CheckSphere(node.worldPosition, nodeRadius, enemyMask)))
             {
-                print("if");
                 node.occupiedByUnit = Node.OccupiedByUnit.ally;
                 nodesContainingUnits.Add(node);
             }

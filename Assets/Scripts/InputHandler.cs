@@ -36,36 +36,57 @@ public class InputHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        NotSelectedLogic();
+        SelectedLogic();
+    }
+
+    private void SelectedLogic()
+    {
+        // If we can move, and the location we are trying to move to is valid...
+        if (IsLegalMove())
+        {
+            // This function won't actually move, only construct the path and shows the user feedback.
+            DisplayPath(unit.transform.position, target.position);
+        }
+        if (IsLegalMove() && Input.GetMouseButtonDown(0) && unit.currentMovementPoints > 0)
+        {
+            // Initiate move logic.
+            StoreTargetInfo(unit.transform.position, target.position);
+            unitStateHandler.SetState(Unit.UnitState.moving);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            AbilityOne();
+        }
+    }
+
+    private bool IsLegalMove()
+    {
+        return  unit.currentUnitState == Unit.UnitState.ready &&
+                nodesInRange.Contains(grid.NodeFromWorldPosition(target.position)) &&
+                grid.NodeFromWorldPosition(target.position) != grid.NodeFromWorldPosition(unit.transform.position) &&
+                !grid.nodesContainingUnits.Contains(grid.NodeFromWorldPosition(target.position));
+    }
+
+    private void AbilityOne()
+    {
+
+    }
+
+    private void NotSelectedLogic()
+    {
         if (unit.currentUnitState == Unit.UnitState.unselected)
         {
             if (Input.GetMouseButtonDown(0))
             {
                 selectedNode = grid.NodeFromWorldPosition(target.position);
-                print("lul");
                 if (selectedNode.occupiedByUnit == Node.OccupiedByUnit.ally &&
                 UnitFromNode(selectedNode) == unit)
                 {
-                    print("did it");
                     unitStateHandler.SetState(Unit.UnitState.selected);
                 }
             }
 
-        }
-
-        // If we can move, and the location we are trying to move to is valid...
-        if (unit.currentUnitState == Unit.UnitState.ready &&
-        nodesInRange.Contains(grid.NodeFromWorldPosition(target.position)) &&
-        grid.NodeFromWorldPosition(target.position) != grid.NodeFromWorldPosition(unit.transform.position))
-        {
-            // This function won't actually move, only construct the path and shows the user feedback.
-            DisplayPath(unit.transform.position, target.position);
-
-            if (Input.GetMouseButtonDown(0) && unit.currentMovementPoints > 0)
-            {
-                // Initiate move logic.
-                StoreTargetInfo(unit.transform.position, target.position);
-                unitStateHandler.SetState(Unit.UnitState.moving);
-            }
         }
     }
 
@@ -95,7 +116,7 @@ public class InputHandler : MonoBehaviour
     }
 
     // This function preps for movement, dealing with state machine logic
-    public void DisplayMoves()
+    public void DisplayMoves(Unit _unit)
     {
 
         // Safety check for unit's state
@@ -109,11 +130,6 @@ public class InputHandler : MonoBehaviour
                 unit.currentUnitState = Unit.UnitState.ready;
                 // We need to set this to true to draw the path for player to see.
                 gizmothing.playerRequestingPath = true;
-            }
-            else
-            {
-                // Let the user know if they have no movement points left
-                // sceneManager.UpdateTextEndTurn();
             }
         }
     }

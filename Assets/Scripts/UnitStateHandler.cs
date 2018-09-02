@@ -12,7 +12,7 @@ public class UnitStateHandler : MonoBehaviour
     DebugGizmo gizmothing;
     UnitTimer timer;
     WorldManager worldManager;
-    public Action onUnitSelected = delegate { };
+    public Action<Unit> onUnitSelected = delegate { };
     public Action onUnitMoving = delegate { };
     public Action onMovementFinished = delegate { };
 
@@ -33,16 +33,22 @@ public class UnitStateHandler : MonoBehaviour
         unit.currentUnitState = state;
         if (state == Unit.UnitState.selected)
         {
-            print("selected");
             // display player actions
-            onUnitSelected();
+            onUnitSelected(unit);
         }
         else if (state == Unit.UnitState.moving)
         {
             SetMoving(true);
         } else if (state == Unit.UnitState.cooldown){
             SetOnCooldown();
+        } else if (state == Unit.UnitState.attacking){
+            SetAttacking();
         }
+    }
+
+    private void SetAttacking()
+    {
+        unit.currentUnitState = Unit.UnitState.attacking;
     }
 
     private void SetOnCooldown()

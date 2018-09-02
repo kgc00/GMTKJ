@@ -19,20 +19,35 @@ public class WorldManager : MonoBehaviour
         {
             Destroy(this);
         }
-        UpdateAllUnits();
+        FindAllUnits();
     }
 
-    private void UpdateAllUnits()
+    private void FindAllUnits()
     {
         allUnits = FindObjectsOfType<Unit>();
+        foreach (Unit unit in allUnits)
+        {
+            unit.GetComponent<UnitStateHandler>().onUnitSelected += DeselectOtherUnits;
+            unit.OnUnitDeath += UnitDestroyed;
+        }
     }
 
-	public void SetAllUnitStates(){
-		foreach (Unit unit in allUnits)
-		{
-			unit.currentUnitState = Unit.UnitState.unselected;
-		}
-	}
+    public void DeselectOtherUnits(Unit selectedUnit)
+    {
+        foreach (Unit unit in allUnits)
+        {
+            if (unit != selectedUnit && unit.currentUnitState == Unit.UnitState.selected)
+            {
+                unit.currentUnitState = Unit.UnitState.unselected;
+            }
+        }
+    }
+
+    public void UnitDestroyed(Unit destroyedUnit){
+        destroyedUnit.GetComponent<UnitStateHandler>().onUnitSelected -= DeselectOtherUnits;
+        destroyedUnit.OnUnitDeath -= UnitDestroyed;
+        print("wooo");
+    }
 
     // Update is called once per frame
     void Update()
