@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
-    public enum UnitState { ready, idle, moving, unselected, selected };
+    public enum UnitState { ready, idle, moving, unselected, selected, cooldown };
     [SerializeField]
     public UnitState currentUnitState;
     public int maxMovementPointsPerTurn, currentMovementPoints, movementCost;

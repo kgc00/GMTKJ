@@ -9,36 +9,53 @@ public class UnitTimer : MonoBehaviour
 
     UnitStateHandler unitStateHandler;
     float cooldownTimeRemaining;
-	bool coolingDown = false;
-	public Action UnitReady = delegate { };
+    bool coolingDown = false;
+    public event Action onTimerStarted = delegate { };
+    public event Action<float> onTimeChanged = delegate { };
+    public event Action onTimerRemoved = delegate { };
+    public Action UnitReady = delegate { };
 
     // Use this for initialization
     void Start()
     {
         unitStateHandler = GetComponent<UnitStateHandler>();
-        unitStateHandler.onMovementFinished += AddTimeToTimer;
+        unitStateHandler.onMovementFinished += AddTimeToTimerMovement;
+    }
+
+    private void EndTimer()
+    {
+        coolingDown = false;
+        onTimerRemoved();
     }
 
     // Update is called once per frame
     void Update()
     {
-		if (coolingDown){
-			cooldownTimeRemaining -= Time.deltaTime;
-			if (cooldownTimeRemaining <= 0)
+        if (coolingDown)
+        {
+            ModifyTime();
+            if (cooldownTimeRemaining <= 0)
             {
                 ReadyUnit();
             }
         }
     }
 
-    private void ReadyUnit()
+    private void ModifyTime()
     {
-        coolingDown = false;
-		UnitReady();
+        cooldownTimeRemaining -= Time.deltaTime;
+        // onTimeChanged(cooldownTimeRemaining);
     }
 
-    private void AddTimeToTimer()
+    private void ReadyUnit()
     {
+        EndTimer();
+        UnitReady();
+    }
+
+    private void AddTimeToTimerMovement()
+    {
+        cooldownTimeRemaining += 2.5f;
         CheckStartTimer();
     }
     private void CheckStartTimer()
@@ -51,6 +68,7 @@ public class UnitTimer : MonoBehaviour
 
     private void StartTimer()
     {
-		coolingDown = true;
+        coolingDown = true;
+        onTimerStarted();
     }
 }

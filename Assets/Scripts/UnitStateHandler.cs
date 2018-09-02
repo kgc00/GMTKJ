@@ -10,6 +10,7 @@ public class UnitStateHandler : MonoBehaviour
     SceneManager sceneManager;
     GameGrid grid;
     DebugGizmo gizmothing;
+    UnitTimer timer;
     WorldManager worldManager;
     public Action onUnitSelected = delegate { };
     public Action onUnitMoving = delegate { };
@@ -23,6 +24,8 @@ public class UnitStateHandler : MonoBehaviour
         gizmothing = DebugGizmo.instance;
         worldManager = WorldManager.instance;
         Debug.Assert(unit = GetComponent<Unit>());
+        timer = GetComponent<UnitTimer>();
+        timer.onTimerRemoved += SetUnselected;
     }
 
     public void SetState(Unit.UnitState state)
@@ -37,7 +40,18 @@ public class UnitStateHandler : MonoBehaviour
         else if (state == Unit.UnitState.moving)
         {
             SetMoving(true);
+        } else if (state == Unit.UnitState.cooldown){
+            SetOnCooldown();
         }
+    }
+
+    private void SetOnCooldown()
+    {
+        unit.currentUnitState = Unit.UnitState.cooldown;
+    }
+
+    private void SetUnselected(){
+        unit.currentUnitState = Unit.UnitState.unselected;
     }
 
     private void SetMoving(bool isMoving)
@@ -50,7 +64,7 @@ public class UnitStateHandler : MonoBehaviour
     public void DestinationReached()
     {
         print("Hi");
-        unit.currentUnitState = Unit.UnitState.unselected;
+        SetOnCooldown();
         grid.UpdateNodeStatuses();
         foreach (Node node in grid.grid)
         {
