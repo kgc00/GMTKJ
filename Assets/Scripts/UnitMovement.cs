@@ -23,7 +23,7 @@ public class UnitMovement : MonoBehaviour
         inputHandler.onRequestingMovementLogic += MovementLogic;
         unitStateHandler.onUnitPlanningMovement += DisplayMoves;
 		unitStateHandler.onMovementFinished += ResetNodesInRange;
-		unitStateHandler.onUnitUnselected += ResetNodesInRange;
+		unitStateHandler.onUnitMoving += ResetNodesInRange;
         unit = GetComponent<Unit>();
     }
     public void DisplayMoves(Unit _unit)

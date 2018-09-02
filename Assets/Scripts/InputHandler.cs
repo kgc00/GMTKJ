@@ -20,6 +20,7 @@ public class InputHandler : MonoBehaviour
     private TargetingInformation targetInformation;
     public event Action<TargetingInformation> onAbilityCalled = delegate { };
     public event Action<Vector3, Vector3> onRequestingMovementLogic = delegate { };
+    public event Action<TargetingInformation> onRequestingAttackLogic = delegate { };
     void Start()
     {
         sceneManager = SceneManager.instance;
@@ -43,7 +44,7 @@ public class InputHandler : MonoBehaviour
     {
         if (unit.currentUnitState == Unit.UnitState.planningAttack)
         {
-            print("need to implement attack logic");
+            // onRequestingAttackLogic();
         }
     }
 
@@ -109,19 +110,4 @@ public class InputHandler : MonoBehaviour
         }
         return affectedUnit;
     }
-
-    // private void StoreTargetInfo(Vector3 startingPos, Vector3 targetPos)
-    // {
-    //     targetInformation = new TargetingInformation(startingPos, targetPos);
-    // }
-
-    // public TargetingInformation PassTargetInfo()
-    // {
-    //     return targetInformation;
-    // }
-
-    // public void ResetNodesInRange()
-    // {
-    //     nodesInRange = new List<Node>();
-    // }
 }
