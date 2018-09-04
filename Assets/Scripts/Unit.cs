@@ -5,12 +5,17 @@ using System;
 
 public class Unit : MonoBehaviour
 {
-    public enum UnitState { planningMovement, moving, unselected, 
-    selected, cooldown, attacking, planningAttack };
+    public enum UnitState
+    {
+        planningMovement, moving, unselected,
+        selected, cooldown, attacking, planningAttack
+    };
     [SerializeField]
     public UnitState currentUnitState;
     public int maxMovementPointsPerTurn, currentMovementPoints, movementCost, attackRange, maxHealth, currentHealth, attackPower;
     public event Action<Unit> OnUnitDeath = delegate { };
+
+    public event Action<int, int, int> OnDamageTaken = delegate { };
 
     void Start()
     {
@@ -24,15 +29,16 @@ public class Unit : MonoBehaviour
         currentMovementPoints = maxMovementPointsPerTurn;
     }
 
-    void UnitDeath(){
+    void UnitDeath()
+    {
         OnUnitDeath(this);
         Destroy(gameObject, 2.0f);
     }
 
     public void DamageTaken(int incomingDamage)
     {
+        OnDamageTaken(currentHealth, maxHealth, incomingDamage);
         currentHealth -= incomingDamage;
-        print(currentHealth);
         CheckForUnitDeath();
     }
 

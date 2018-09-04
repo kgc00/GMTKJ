@@ -54,23 +54,18 @@ public class WorldManager : MonoBehaviour
         destroyedUnit.OnUnitDeath -= UnitDestroyed;
     }
 
-    public bool AnyUnitSelected()
+    public bool NoUnitsSelected()
     {
         foreach (Unit unit in allUnits)
         {
-
-            if (unit.currentUnitState != Unit.UnitState.unselected)
+            if (unit.currentUnitState == Unit.UnitState.selected ||
+            unit.currentUnitState == Unit.UnitState.planningAttack ||
+            unit.currentUnitState == Unit.UnitState.planningMovement)
             {
-                if (unit.currentUnitState == Unit.UnitState.cooldown ||
-                unit.currentUnitState == Unit.UnitState.moving ||
-                unit.currentUnitState == Unit.UnitState.attacking)
-                {
-                    break;
-                }
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     // void Update(){

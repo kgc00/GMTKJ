@@ -14,6 +14,7 @@ public class UnitStateHandler : MonoBehaviour
     WorldManager worldManager;
     public Action<Unit> onUnitSelected = delegate { };
     public Action onUnitUnselected = delegate { };
+    public Action onUnitPastPlanning = delegate { };
     public Action onUnitMoving = delegate { };
     public Action onMovementFinished = delegate { };
     public Action<Unit> onUnitPlanningMovement = delegate { };
@@ -35,6 +36,11 @@ public class UnitStateHandler : MonoBehaviour
     public void SetState(Unit.UnitState state)
     {
         unit.currentUnitState = state;
+
+        if (!InPrepState(state)) {
+            onUnitPastPlanning();
+        }
+
         if (state == Unit.UnitState.selected)
         {
             SetSelected();
@@ -54,61 +60,68 @@ public class UnitStateHandler : MonoBehaviour
         else if (state == Unit.UnitState.unselected)
         {
             SetUnselected();
-        } else if (state == Unit.UnitState.planningMovement){
+        }
+        else if (state == Unit.UnitState.planningMovement)
+        {
             SetPlanningMovement();
-        } else if (state == Unit.UnitState.planningAttack){
+        }
+        else if (state == Unit.UnitState.planningAttack)
+        {
             SetPlanningAttack();
         }
     }
 
+    private static bool InPrepState(Unit.UnitState state)
+    {
+        return state == Unit.UnitState.selected ||
+                state == Unit.UnitState.planningAttack ||
+                state == Unit.UnitState.planningMovement;
+    }
+
     private void SetPlanningAttack()
     {
-        unit.currentUnitState = Unit.UnitState.planningAttack;
+        ResetLists();
         onPlanningAttack();
     }
 
     private void SetPlanningMovement()
     {
-        unit.currentUnitState = Unit.UnitState.planningMovement;
+        ResetLists();
         onUnitPlanningMovement(unit);
     }
 
     private void SetSelected()
     {
-        print("selected");
         onUnitSelected(unit);
     }
 
     private void SetAttacking()
     {
-        unit.currentUnitState = Unit.UnitState.attacking;
         onAttacking();
     }
 
     private void SetOnCooldown()
     {
-        unit.currentUnitState = Unit.UnitState.cooldown;
     }
 
     private void SetUnselected()
-    {        
+    {
         foreach (Node node in grid.grid)
         {
             ResetCosts(node);
         }
         onUnitUnselected();
-        unit.currentUnitState = Unit.UnitState.unselected;
     }
 
     private void SetMoving(bool isMoving)
     {
         gizmothing.playerRequestingPath = false;
-        unit.currentUnitState = Unit.UnitState.moving;
         onUnitMoving();
         ResetLists();
     }
 
-    public void AttackFinished(){
+    public void AttackFinished()
+    {
         onAttackFinished();
         ResetLists();
         SetState(Unit.UnitState.cooldown);
@@ -126,7 +139,7 @@ public class UnitStateHandler : MonoBehaviour
         ResetLists();
     }
     public void ConfirmMovement(int movementPointsUsed)
-    {      
+    {
         DestinationReached();
     }
 
@@ -146,5 +159,6 @@ public class UnitStateHandler : MonoBehaviour
     {
         gizmothing._nodesWithinRange = new List<Node>();
         gizmothing.path = new List<Node>();
+        gizmothing.attackTarget = new List<Node>();
     }
 }
