@@ -8,7 +8,9 @@ public class WorldManager : MonoBehaviour
 
     Unit[] allUnits;
     public static WorldManager instance;
-    // Use this for initialization
+    [SerializeField]
+    private bool anyUnitSelected = false;
+    
     void Start()
     {
         if (instance == null)
@@ -19,22 +21,13 @@ public class WorldManager : MonoBehaviour
         {
             Destroy(this);
         }
-        FindAllUnits();
-    }
-
-    private void FindAllUnits()
-    {
-        allUnits = FindObjectsOfType<Unit>();
-        foreach (Unit unit in allUnits)
-        {
-            unit.GetComponent<UnitStateHandler>().onUnitSelected += UnitSelected;
-            unit.OnUnitDeath += UnitDestroyed;
-        }
+        UnitStateHandler.onUnitSelected += UnitSelected;
+        UnitStateHandler.onUnitPastPlanning += SetNoUnitsSelected;
     }
 
     public void UnitSelected(Unit selectedUnit)
     {
-        DeselectOtherUnits(selectedUnit);
+        anyUnitSelected = true;
     }
 
     public void DeselectOtherUnits(Unit selectedUnit)
@@ -48,29 +41,11 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-    public void UnitDestroyed(Unit destroyedUnit)
-    {
-        destroyedUnit.GetComponent<UnitStateHandler>().onUnitSelected -= DeselectOtherUnits;
-        destroyedUnit.OnUnitDeath -= UnitDestroyed;
+    private void SetNoUnitsSelected(Unit unit){
+        anyUnitSelected = false;
     }
 
-    public bool NoUnitsSelected()
-    {
-        foreach (Unit unit in allUnits)
-        {
-            if (unit.currentUnitState == Unit.UnitState.selected ||
-            unit.currentUnitState == Unit.UnitState.planningAttack ||
-            unit.currentUnitState == Unit.UnitState.planningMovement)
-            {
-                return false;
-            }
-        }
-        return true;
+    public bool ReturnUnitSelected(){
+        return anyUnitSelected;
     }
-
-    // void Update(){
-    //     if (Input.GetKeyDown(KeyCode.Space)){
-    //         print(AnyUnitSelected());
-    //     }
-    // }
 }

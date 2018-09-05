@@ -13,7 +13,7 @@ public class Unit : MonoBehaviour
     [SerializeField]
     public UnitState currentUnitState;
     public int maxMovementPointsPerTurn, currentMovementPoints, movementCost, attackRange, maxHealth, currentHealth, attackPower;
-    public event Action<Unit> OnUnitDeath = delegate { };
+    public static event Action<Unit> OnUnitDeath = delegate { };
 
     public event Action<int, int, int> OnDamageTaken = delegate { };
 

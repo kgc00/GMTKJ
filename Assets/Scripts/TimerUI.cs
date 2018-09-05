@@ -14,14 +14,14 @@ public class TimerUI : MonoBehaviour
         timer = GetComponentInParent<UnitTimer>();
         timer.onTimerStarted += StartTimer;
         timer.onTimerRemoved += StopTimer;
-        StopTimer();
+        StopTimer(Unit.UnitState.unselected);
     }
     void StartTimer()
     {
         hourGlass.enabled = true;
     }
 
-    void StopTimer()
+    void StopTimer(Unit.UnitState state)
     {
         hourGlass.enabled = false;
     }

@@ -12,9 +12,9 @@ public class UnitStateHandler : MonoBehaviour
     DebugGizmo gizmothing;
     UnitTimer timer;
     WorldManager worldManager;
-    public Action<Unit> onUnitSelected = delegate { };
-    public Action onUnitUnselected = delegate { };
-    public Action onUnitPastPlanning = delegate { };
+    public static Action<Unit> onUnitSelected = delegate { };
+    public static Action<Unit> onUnitUnselected = delegate { };
+    public static Action<Unit> onUnitPastPlanning = delegate { };
     public Action onUnitMoving = delegate { };
     public Action onMovementFinished = delegate { };
     public Action<Unit> onUnitPlanningMovement = delegate { };
@@ -30,7 +30,7 @@ public class UnitStateHandler : MonoBehaviour
         worldManager = WorldManager.instance;
         Debug.Assert(unit = GetComponent<Unit>());
         timer = GetComponent<UnitTimer>();
-        timer.onTimerRemoved += SetUnselected;
+        timer.onTimerRemoved += SetState;
     }
 
     public void SetState(Unit.UnitState state)
@@ -38,7 +38,7 @@ public class UnitStateHandler : MonoBehaviour
         unit.currentUnitState = state;
 
         if (!InPrepState(state)) {
-            onUnitPastPlanning();
+            onUnitPastPlanning(unit);
         }
 
         if (state == Unit.UnitState.selected)
@@ -110,7 +110,7 @@ public class UnitStateHandler : MonoBehaviour
         {
             ResetCosts(node);
         }
-        onUnitUnselected();
+        onUnitUnselected(unit);
     }
 
     private void SetMoving(bool isMoving)

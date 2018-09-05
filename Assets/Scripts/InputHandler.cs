@@ -35,8 +35,12 @@ public class InputHandler : MonoBehaviour
 
     void Update()
     {
-        SelectionLogic();
-        SelectedLogic();
+                    SelectionLogic();
+
+        if (ValidSelectedState())
+        {
+            SelectedLogic();
+        }
         MovementLogic();
         AttackLogic();
     }
@@ -51,19 +55,18 @@ public class InputHandler : MonoBehaviour
 
     private void SelectedLogic()
     {
-        if (ValidSelectedState())
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                unitStateHandler.SetState(Unit.UnitState.planningMovement);
-                return;
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                unitStateHandler.SetState(Unit.UnitState.planningAttack);
-                return;
-            }
+            unitStateHandler.SetState(Unit.UnitState.planningMovement);
+            return;
         }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            unitStateHandler.SetState(Unit.UnitState.planningAttack);
+            return;
+        }
+
     }
 
     private bool ValidSelectedState()
@@ -83,7 +86,12 @@ public class InputHandler : MonoBehaviour
 
     private void SelectionLogic()
     {
-        if (WorldManager.instance.NoUnitsSelected())
+        if (WorldManager.instance.ReturnUnitSelected() ||
+        unit.currentUnitState != Unit.UnitState.unselected)
+        {
+            return;
+        }
+        else
         {
             if (Input.GetMouseButtonDown(0))
             {
@@ -95,8 +103,6 @@ public class InputHandler : MonoBehaviour
                     return;
                 }
             }
-        } else {
-            return;
         }
     }
 
