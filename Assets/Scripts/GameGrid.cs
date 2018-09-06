@@ -14,10 +14,17 @@ public class GameGrid : MonoBehaviour
     public LayerMask enemyMask;
     public LayerMask allyMask;
     public List<Node> nodesContainingUnits;
+    [SerializeField]
     public Node[,] grid;
     [SerializeField]
 
     int gridSizeX, gridSizeY;
+    [SerializeField]
+    private Sprite[] possibleNodeImages;
+    [SerializeField]
+    private Transform[] tileSprites;
+    [SerializeField]
+    private int pixelsPerUnit = 100;
 
     void Awake()
     {
@@ -29,8 +36,8 @@ public class GameGrid : MonoBehaviour
         {
             Destroy(this);
         }
-        // Set our info for generating the grid
-        nodeDiameter = nodeRadius * 2;
+        nodeDiameter = possibleNodeImages[0].bounds.size.x;
+        print(nodeDiameter);
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
         nodesContainingUnits = new List<Node>();
@@ -39,34 +46,42 @@ public class GameGrid : MonoBehaviour
 
     void CreateGrid()
     {
-        // Create an x by y grid
         grid = new Node[gridSizeX, gridSizeY];
-        // Store our values in a consistent manner so we can access them later for path requests
         Vector3 worldBottomLeft = transform.position - Vector3.right * gridWorldSize.x / 2 - Vector3.up * gridWorldSize.y / 2;
 
         for (int x = 0; x < gridSizeX; x++)
         {
             for (int y = 0; y < gridSizeY; y++)
             {
-                // Store our world point so we can access nodes later, and set the value of walkable or not walkable, also create the node
                 Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.up * (y * nodeDiameter + nodeRadius);
                 bool walkable = !(Physics.CheckSphere(worldPoint, nodeRadius, obstacleMask));
+
+                int tileImageIndex = UnityEngine.Random.Range(0, tileSprites.Length);
+                Transform currentTile = Instantiate(tileSprites[tileImageIndex], worldPoint, Quaternion.identity);
+                currentTile.transform.SetParent(transform);                
+                Node currentNode = currentTile.gameObject.AddComponent<Node>();
 
                 if ((Physics.CheckSphere(worldPoint, nodeRadius, allyMask)))
                 {
                     Node.OccupiedByUnit occupiedByUnit = Node.OccupiedByUnit.ally;
-                    grid[x, y] = new Node(walkable, worldPoint, x, y, Node.NodeType.plains, occupiedByUnit);
+                    grid[x, y] = currentNode.SetReferences(
+                        walkable, worldPoint, x, y, Node.NodeType.plains, occupiedByUnit,
+                        possibleNodeImages[tileImageIndex]);
                     nodesContainingUnits.Add(grid[x, y]);
                 }
                 else if ((Physics.CheckSphere(worldPoint, nodeRadius, enemyMask)))
                 {
                     Node.OccupiedByUnit occupiedByUnit = Node.OccupiedByUnit.enemy;
-                    grid[x, y] = new Node(walkable, worldPoint, x, y, Node.NodeType.plains, occupiedByUnit);
+                    grid[x, y] = currentNode.SetReferences(
+                        walkable, worldPoint, x, y, Node.NodeType.plains, occupiedByUnit,
+                        possibleNodeImages[tileImageIndex]);
                     nodesContainingUnits.Add(grid[x, y]);
                 }
                 else
                 {
-                    grid[x, y] = new Node(walkable, worldPoint, x, y, Node.NodeType.plains, Node.OccupiedByUnit.noUnit);
+                    grid[x, y] = currentNode.SetReferences(
+                        walkable, worldPoint, x, y, Node.NodeType.plains, Node.OccupiedByUnit.noUnit,
+                        possibleNodeImages[tileImageIndex]);
                 }
             }
         }
