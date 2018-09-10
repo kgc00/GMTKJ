@@ -57,7 +57,7 @@ public class GameGrid : MonoBehaviour
 
                 int tileImageIndex = UnityEngine.Random.Range(0, tileSprites.Length);
                 Transform currentTile = Instantiate(tileSprites[tileImageIndex], worldPoint, Quaternion.identity);
-                currentTile.transform.SetParent(transform);                
+                currentTile.transform.SetParent(transform);
                 Node currentNode = currentTile.gameObject.AddComponent<Node>();
                 currentNode.gameObject.layer = 12;
 
@@ -166,7 +166,14 @@ public class GameGrid : MonoBehaviour
                 int checkY = node.gridY + y;
                 if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
                 {
-                    nodesWithinAttackRange.Add(grid[checkX, checkY]);
+                    if (x == 0 && y == 0)
+                    {
+
+                    }
+                    else
+                    {
+                        nodesWithinAttackRange.Add(grid[checkX, checkY]);
+                    }
                 }
             }
         }

@@ -10,7 +10,6 @@ public class AttackTargeting : MonoBehaviour
     List<Node> nodeAttackTargeting = new List<Node>();
     GameGrid grid;
     Unit unit;
-    DebugGizmo gizmothing;
     AStar aStar;
     UnitStateHandler unitStateHandler;
     public static event Action<List<Node>> onGenerateAttackRange = delegate { };
@@ -19,14 +18,12 @@ public class AttackTargeting : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        gizmothing = DebugGizmo.instance;
         grid = GameGrid.instance;
         unit = GetComponent<Unit>();
         aStar = GetComponent<AStar>();
         unitStateHandler = GetComponent<UnitStateHandler>();
         GetComponent<InputHandler>().onRequestingAttackLogic += RequestingAttackLogic;
         unitStateHandler.onPlanningAttack += InitiateAttackTargetting;
-        unitStateHandler.onAttackFinished += ResetTargetting;
     }
 
     private void CommitAttack(Unit targetUnit, int incomingDamage)
@@ -38,7 +35,6 @@ public class AttackTargeting : MonoBehaviour
     private void InitiateAttackTargetting()
     {
         GeneratePossibleMoves(unit.transform.position, unit.attackRange);
-        gizmothing.playerRequestingPath = true;
     }
 
     void RequestingAttackLogic(Vector3 startPos, Vector3 targetPos)
@@ -93,13 +89,5 @@ public class AttackTargeting : MonoBehaviour
     {
         nodeAttackTargeting = new List<Node>();
         nodeAttackTargeting.Add(grid.NodeFromWorldPosition(targetPos));
-        gizmothing.attackTarget = nodeAttackTargeting;
-        gizmothing.playerRequestingTargetting = true;
-    }
-
-    private void ResetTargetting()
-    {
-        gizmothing.attackTarget = null;
-        gizmothing.playerRequestingTargetting = false;
     }
 }
