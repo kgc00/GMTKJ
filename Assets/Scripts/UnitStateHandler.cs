@@ -9,7 +9,6 @@ public class UnitStateHandler : MonoBehaviour
     Unit unit;
     SceneManager sceneManager;
     GameGrid grid;
-    DebugGizmo gizmothing;
     UnitTimer timer;
     WorldManager worldManager;
     public static Action<Unit> onUnitSelected = delegate { };
@@ -26,7 +25,6 @@ public class UnitStateHandler : MonoBehaviour
     {
         sceneManager = FindObjectOfType<SceneManager>().GetComponent<SceneManager>();
         grid = GameGrid.instance;
-        gizmothing = DebugGizmo.instance;
         worldManager = WorldManager.instance;
         Debug.Assert(unit = GetComponent<Unit>());
         timer = GetComponent<UnitTimer>();
@@ -80,13 +78,11 @@ public class UnitStateHandler : MonoBehaviour
 
     private void SetPlanningAttack()
     {
-        ResetLists();
         onPlanningAttack();
     }
 
     private void SetPlanningMovement()
     {
-        ResetLists();
         onUnitPlanningMovement(unit);
     }
 
@@ -115,15 +111,12 @@ public class UnitStateHandler : MonoBehaviour
 
     private void SetMoving(bool isMoving)
     {
-        gizmothing.playerRequestingPath = false;
         onUnitMoving();
-        ResetLists();
     }
 
     public void AttackFinished()
     {
         onAttackFinished();
-        ResetLists();
         SetState(Unit.UnitState.cooldown);
     }
 
@@ -136,7 +129,6 @@ public class UnitStateHandler : MonoBehaviour
             ResetCosts(node);
         }
         onMovementFinished();
-        ResetLists();
     }
     public void ConfirmMovement(int movementPointsUsed)
     {
@@ -153,12 +145,5 @@ public class UnitStateHandler : MonoBehaviour
     {
         node.gCost = 0;
         node.hCost = 0;
-    }
-
-    public void ResetLists()
-    {
-        gizmothing._nodesWithinRange = new List<Node>();
-        gizmothing.path = new List<Node>();
-        gizmothing.attackTarget = new List<Node>();
     }
 }

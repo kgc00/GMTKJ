@@ -77,7 +77,6 @@ public class MovementHandler : MonoBehaviour
         }
         Vector3[] waypoints = ConvertPath(path);
         Array.Reverse(waypoints);
-        gizmothing.path = path;
         return waypoints;
     }
 

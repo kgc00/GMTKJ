@@ -1,29 +1,30 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class UnitMovement : MonoBehaviour
 {
     UnitStateHandler unitStateHandler;
-    DebugGizmo gizmothing;
     List<Node> nodesInRange;
     GameGrid grid;
     AStar aStar;
     Unit unit;
     InputHandler inputHandler;
-	TargetingInformation targetInformation;
+    TargetingInformation targetInformation;
+    public static event Action<List<Node>> onGenerateMovementRange = delegate { };
+    public static event Action<List<Node>> onGeneratePath = delegate { };
 
     private void Start()
     {
         unitStateHandler = GetComponent<UnitStateHandler>();
         inputHandler = GetComponent<InputHandler>();
         aStar = GetComponent<AStar>();
-        gizmothing = DebugGizmo.instance;
         grid = GameGrid.instance;
         inputHandler.onRequestingMovementLogic += MovementLogic;
         unitStateHandler.onUnitPlanningMovement += DisplayMoves;
-		unitStateHandler.onMovementFinished += ResetNodesInRange;
-		unitStateHandler.onUnitMoving += ResetNodesInRange;
+        unitStateHandler.onMovementFinished += ResetNodesInRange;
+        unitStateHandler.onUnitMoving += ResetNodesInRange;
         unit = GetComponent<Unit>();
     }
     public void DisplayMoves(Unit _unit)
@@ -31,7 +32,6 @@ public class UnitMovement : MonoBehaviour
         if (_unit.currentMovementPoints > 0)
         {
             GeneratePossibleMoves(_unit.transform.position, _unit.currentMovementPoints);
-            gizmothing.playerRequestingPath = true;
         }
     }
 
@@ -71,7 +71,7 @@ public class UnitMovement : MonoBehaviour
                 nodesInRange.Add(node);
             }
         }
-        gizmothing._nodesWithinRange = nodesInRange;
+        onGenerateMovementRange(nodesInRange);
         return nodesInRange;
     }
 
@@ -101,8 +101,8 @@ public class UnitMovement : MonoBehaviour
             path.Add(currentNode);
             currentNode = currentNode.parent;
         }
+        onGeneratePath(path);
         path.Reverse();
-        gizmothing.path = path;
     }
     private void StoreTargetInfo(Vector3 startingPos, Vector3 targetPos)
     {

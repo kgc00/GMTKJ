@@ -193,7 +193,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &177466853
 Transform:
   m_ObjectHideFlags: 0
@@ -288,7 +288,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &248850471
 Transform:
   m_ObjectHideFlags: 0
@@ -660,10 +660,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 1183413669182236, guid: b3f0e7a9cf1b1304fa97324a85e97858, type: 2}
-      propertyPath: m_Name
-      value: Manager Holder
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b3f0e7a9cf1b1304fa97324a85e97858, type: 2}
   m_IsPrefabAsset: 0
@@ -1020,3 +1016,21 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1966966546}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1969033612 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1183413669182236, guid: b3f0e7a9cf1b1304fa97324a85e97858,
+    type: 2}
+  m_PrefabInternal: {fileID: 1387459394}
+--- !u!114 &1969033613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1969033612}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa4dd6f817e6722439ecfd1dd5e50524, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allUnits: []
+  allUnitsAsGameObjects: []

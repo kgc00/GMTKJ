@@ -37,7 +37,6 @@ public class GameGrid : MonoBehaviour
             Destroy(this);
         }
         nodeDiameter = possibleNodeImages[0].bounds.size.x;
-        print(nodeDiameter);
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
         nodesContainingUnits = new List<Node>();
@@ -60,6 +59,7 @@ public class GameGrid : MonoBehaviour
                 Transform currentTile = Instantiate(tileSprites[tileImageIndex], worldPoint, Quaternion.identity);
                 currentTile.transform.SetParent(transform);                
                 Node currentNode = currentTile.gameObject.AddComponent<Node>();
+                currentNode.gameObject.layer = 12;
 
                 if ((Physics.CheckSphere(worldPoint, nodeRadius, allyMask)))
                 {

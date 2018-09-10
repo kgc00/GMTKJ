@@ -35,7 +35,7 @@ public class InputHandler : MonoBehaviour
 
     void Update()
     {
-                    SelectionLogic();
+        SelectionLogic();
 
         if (ValidSelectedState())
         {
@@ -95,12 +95,17 @@ public class InputHandler : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
-                selectedNode = grid.NodeFromWorldPosition(target.position);
-                if (selectedNode.occupiedByUnit == Node.OccupiedByUnit.ally &&
-                UnitFromNode(selectedNode) == unit)
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                
+                if (Physics.Raycast(ray, 50, 1 << 11))
                 {
-                    unitStateHandler.SetState(Unit.UnitState.selected);
-                    return;
+                    selectedNode = grid.NodeFromWorldPosition(target.position);
+                    if (selectedNode.occupiedByUnit == Node.OccupiedByUnit.ally &&
+                    UnitFromNode(selectedNode) == unit)
+                    {
+                        unitStateHandler.SetState(Unit.UnitState.selected);
+                        return;
+                    }
                 }
             }
         }

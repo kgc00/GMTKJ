@@ -13,6 +13,8 @@ public class AttackTargeting : MonoBehaviour
     DebugGizmo gizmothing;
     AStar aStar;
     UnitStateHandler unitStateHandler;
+    public static event Action<List<Node>> onGenerateAttackRange = delegate { };
+
 
     // Use this for initialization
     void Start()
@@ -83,7 +85,7 @@ public class AttackTargeting : MonoBehaviour
                 nodesWithinAttackRange.Add(node);
             }
         }
-        gizmothing._nodesWithinRange = nodesWithinAttackRange;
+        onGenerateAttackRange(nodesWithinAttackRange);
         return nodesWithinAttackRange;
     }
 

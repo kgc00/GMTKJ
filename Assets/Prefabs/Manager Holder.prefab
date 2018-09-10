@@ -19,11 +19,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4169040881589528}
-  - component: {fileID: 114652464596598700}
   - component: {fileID: 114251445448249914}
   - component: {fileID: 114352093274002184}
   - component: {fileID: 114314058700553454}
   - component: {fileID: 114564240876149726}
+  - component: {fileID: 114711471641692496}
   m_Layer: 9
   m_Name: Manager Holder
   m_TagString: Untagged
@@ -120,7 +120,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   anyUnitSelected: 0
---- !u!114 &114652464596598700
+--- !u!114 &114711471641692496
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -128,11 +128,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1183413669182236}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 820c8f169abeee3409f54bb93b7d2b74, type: 3}
+  m_Script: {fileID: 11500000, guid: d7d57542913b8e844b42a64d9b9d87cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  path: []
-  attackTarget: []
-  _nodesWithinRange: []
-  playerRequestingPath: 0
-  playerRequestingTargetting: 0
+  selectionHighlight: {fileID: 1694537367954258, guid: 4ca0948d0ebbc09468da1ed4f4baed32,
+    type: 2}
+  selectionArray: []
+  attackHighlight: {fileID: 21300000, guid: 3a26ee45a1d349b47becd7b50463b25d, type: 3}
+  movementHighlight: {fileID: 21300000, guid: 54765d216af806147867e33d66729df2, type: 3}
+  pathHighlight: {fileID: 21300000, guid: 7f8766525258dda4baa24bbfc40ec500, type: 3}
