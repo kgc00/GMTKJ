@@ -41,14 +41,12 @@ public class GridEffects : MonoBehaviour
         movementSpriteRenderer.sprite = movementHighlight;
         movementSpriteRenderer.sortingOrder = 1;
         movementHighlightGO.name = movementName;
-        movementHighlightGO.GetComponent<Animation>().playAutomatically = false;
         GameObject attackHighlightGO = Instantiate(selectionHighlight, _node.gameObject.transform);
         attackHighlightGO.transform.localPosition = new Vector3(0, 0, 0);
         SpriteRenderer attackSpriteRenderer = attackHighlightGO.GetComponent<SpriteRenderer>();
         attackSpriteRenderer.sprite = attackHighlight;
         attackSpriteRenderer.sortingOrder = 1;
         attackHighlightGO.name = attackName;
-        attackHighlightGO.GetComponent<Animation>().playAutomatically = false;
         GameObject pathHighlightGO = Instantiate(selectionHighlight, _node.gameObject.transform);
         pathHighlightGO.transform.localPosition = new Vector3(0, 0, 0);
         SpriteRenderer pathSpriteRenderer = pathHighlightGO.GetComponent<SpriteRenderer>();
@@ -80,7 +78,7 @@ public class GridEffects : MonoBehaviour
         foreach (Node node in _nodesToHighlight)
         {
             selectionArray[arrayCount] = node.gameObject;
-            // selectionArray[arrayCount].transform.Find(_name).gameObject.SetActive(true);
+            selectionArray[arrayCount].transform.Find(_name).gameObject.SetActive(true);
             arrayCount++;
         }
     }
@@ -100,10 +98,10 @@ public class GridEffects : MonoBehaviour
             // foreach node see if we've already generated a  highlight
             if (_nodeGameObject.transform.Find(pathName))
             {
-                // _nodeGameObject.transform.Find(pathName).gameObject.SetActive(true);
+                _nodeGameObject.transform.Find(pathName).gameObject.SetActive(true);
                 if (!pathList.Contains(_nodeGameObject.transform.Find(pathName).gameObject))
                 {
-                    // pathList.Add(_nodeGameObject.transform.Find(pathName).gameObject);
+                    pathList.Add(_nodeGameObject.transform.Find(pathName).gameObject);
                 }
                 else
                 {

@@ -16,7 +16,7 @@ public class AStar : MonoBehaviour
     }
 
     private void InitialAssignment()
-    {        
+    {
         requestManager = FindObjectOfType<PathRequestManager>();
         grid = GameGrid.instance;
     }
@@ -26,7 +26,7 @@ public class AStar : MonoBehaviour
     public bool PathFindingLogic(bool pathSuccess, Node startNode, Node targetNode, int currentMovementPoints)
     {
         List<Node> openSet = new List<Node>();
-        HashSet<Node> closedSet = new HashSet<Node>();  
+        HashSet<Node> closedSet = new HashSet<Node>();
         openSet.Add(startNode);
 
         // Basically we iterate through all nearby nodes in a line to the target. We calculate distance to target and 
@@ -45,33 +45,34 @@ public class AStar : MonoBehaviour
 
             openSet.Remove(currentNode);
             closedSet.Add(currentNode);
-
-            if (currentNode == targetNode)
+            if (currentNode.fCost <= currentMovementPoints)
             {
-                if (currentNode.fCost <= currentMovementPoints)
+                if (currentNode == targetNode)
                 {
+
                     // If we were able to reach the target node, we've found a path.
                     pathSuccess = true;
                     break;
                 }
-            }
 
-            foreach (Node neighbour in grid.GetNeighbors(currentNode))
-            {
-                if (!neighbour.walkable || closedSet.Contains(neighbour))
+
+                foreach (Node neighbor in grid.GetNeighbors(currentNode))
                 {
-                    continue;
-                }
+                    if (!neighbor.walkable || closedSet.Contains(neighbor))
+                    {
+                        continue;
+                    }
 
-                int newCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
-                if (newCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
-                {
-                    neighbour.gCost = newCostToNeighbour;
-                    neighbour.hCost = GetDistance(neighbour, targetNode);
-                    neighbour.parent = currentNode;
+                    int newCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor);
+                    if (newCostToNeighbor < neighbor.gCost || !openSet.Contains(neighbor))
+                    {
+                        neighbor.gCost = newCostToNeighbor;
+                        neighbor.hCost = GetDistance(neighbor, targetNode);
+                        neighbor.parent = currentNode;
 
-                    if (!openSet.Contains(neighbour))
-                        openSet.Add(neighbour);
+                        if (!openSet.Contains(neighbor))
+                            openSet.Add(neighbor);
+                    }
                 }
             }
         }
