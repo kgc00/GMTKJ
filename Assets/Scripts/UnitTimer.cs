@@ -13,7 +13,6 @@ public class UnitTimer : MonoBehaviour
     public event Action onTimerStarted = delegate { };
     public event Action<float> onTimeChanged = delegate { };
     public event Action<Unit.UnitState> onTimerRemoved = delegate { };
-    public Action UnitReady = delegate { };
 
     // Use this for initialization
     void Start()
@@ -51,7 +50,6 @@ public class UnitTimer : MonoBehaviour
     private void ReadyUnit()
     {
         EndTimer();
-        UnitReady();
     }
 
     private void AddTimeToTimerMovement()

@@ -73,7 +73,8 @@ public class InputHandler : MonoBehaviour
     {
         return unit.currentUnitState == Unit.UnitState.selected ||
                 unit.currentUnitState == Unit.UnitState.planningAttack ||
-                unit.currentUnitState == Unit.UnitState.planningMovement;
+                unit.currentUnitState == Unit.UnitState.planningMovement ||
+                unit.currentUnitState == Unit.UnitState.ready;
     }
 
     private void MovementLogic()
@@ -96,7 +97,7 @@ public class InputHandler : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                
+
                 if (Physics.Raycast(ray, 50, 1 << 11))
                 {
                     selectedNode = grid.NodeFromWorldPosition(target.position);

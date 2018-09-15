@@ -12,6 +12,7 @@ public class UnitMovement : MonoBehaviour
     Unit unit;
     InputHandler inputHandler;
     TargetingInformation targetInformation;
+    bool gridShoulDisplay = false;
     public static event Action<List<Node>> onGenerateMovementRange = delegate { };
     public static event Action<List<Node>> onGeneratePath = delegate { };
 
@@ -25,6 +26,7 @@ public class UnitMovement : MonoBehaviour
         unitStateHandler.onUnitPlanningMovement += DisplayMoves;
         unitStateHandler.onMovementFinished += ResetNodesInRange;
         unitStateHandler.onUnitMoving += ResetNodesInRange;
+        WorldManager.onRequestGridState += ReturnDisplayGrid;
         unit = GetComponent<Unit>();
     }
     public void DisplayMoves(Unit _unit)
@@ -32,6 +34,7 @@ public class UnitMovement : MonoBehaviour
         if (_unit.currentMovementPoints > 0)
         {
             GeneratePossibleMoves(_unit.transform.position, _unit.currentMovementPoints);
+            gridShoulDisplay = true;
         }
     }
 
@@ -45,6 +48,7 @@ public class UnitMovement : MonoBehaviour
         {
             StoreTargetInfo(startPos, targetPos);
             unitStateHandler.SetState(Unit.UnitState.moving);
+            gridShoulDisplay = false;
         }
     }
 
@@ -117,5 +121,9 @@ public class UnitMovement : MonoBehaviour
     public void ResetNodesInRange()
     {
         nodesInRange = new List<Node>();
+    }
+
+    private bool ReturnDisplayGrid(){
+        return gridShoulDisplay;
     }
 }

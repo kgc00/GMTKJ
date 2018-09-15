@@ -25,6 +25,7 @@ public class GameGrid : MonoBehaviour
     private Transform[] tileSprites;
     [SerializeField]
     private int pixelsPerUnit = 100;
+    public static event Action<Node> requestingHighlights;
 
     void Awake()
     {
@@ -40,7 +41,14 @@ public class GameGrid : MonoBehaviour
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
         nodesContainingUnits = new List<Node>();
-        CreateGrid();
+        CreateGrid();        
+    }
+
+    void Start(){
+        foreach (Node node in grid)
+        {
+            requestingHighlights(node);
+        }
     }
 
     void CreateGrid()
@@ -82,6 +90,7 @@ public class GameGrid : MonoBehaviour
                     grid[x, y] = currentNode.SetReferences(
                         walkable, worldPoint, x, y, Node.NodeType.plains, Node.OccupiedByUnit.noUnit,
                         possibleNodeImages[tileImageIndex]);
+
                 }
             }
         }

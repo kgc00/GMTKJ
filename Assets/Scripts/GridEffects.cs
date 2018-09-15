@@ -18,6 +18,7 @@ public class GridEffects : MonoBehaviour
     private Sprite movementHighlight;
     [SerializeField]
     private Sprite pathHighlight;
+    [SerializeField]
     private List<GameObject> pathList;
     private List<GameObject> nodesToRemovedFromPath;
 
@@ -27,8 +28,39 @@ public class GridEffects : MonoBehaviour
         UnitMovement.onGeneratePath += GeneratePath;
         AttackTargeting.onGenerateAttackRange += InitiateAttackHighlights;
         UnitStateHandler.onUnitPastPlanning += ClearHighlights;
+        GameGrid.requestingHighlights += SpawnHighlightsForNode;
         pathList = new List<GameObject>();
         nodesToRemovedFromPath = new List<GameObject>();
+    }
+
+    private void SpawnHighlightsForNode(Node _node)
+    {
+        GameObject movementHighlightGO = Instantiate(selectionHighlight, _node.gameObject.transform);
+        movementHighlightGO.transform.localPosition = new Vector3(0, 0, 0);
+        SpriteRenderer movementSpriteRenderer = movementHighlightGO.GetComponent<SpriteRenderer>();
+        movementSpriteRenderer.sprite = movementHighlight;
+        movementSpriteRenderer.sortingOrder = 1;
+        movementHighlightGO.name = movementName;
+        movementHighlightGO.GetComponent<Animation>().playAutomatically = false;
+        GameObject attackHighlightGO = Instantiate(selectionHighlight, _node.gameObject.transform);
+        attackHighlightGO.transform.localPosition = new Vector3(0, 0, 0);
+        SpriteRenderer attackSpriteRenderer = attackHighlightGO.GetComponent<SpriteRenderer>();
+        attackSpriteRenderer.sprite = attackHighlight;
+        attackSpriteRenderer.sortingOrder = 1;
+        attackHighlightGO.name = attackName;
+        attackHighlightGO.GetComponent<Animation>().playAutomatically = false;
+        GameObject pathHighlightGO = Instantiate(selectionHighlight, _node.gameObject.transform);
+        pathHighlightGO.transform.localPosition = new Vector3(0, 0, 0);
+        SpriteRenderer pathSpriteRenderer = pathHighlightGO.GetComponent<SpriteRenderer>();
+        pathSpriteRenderer.sprite = this.pathHighlight;
+        pathSpriteRenderer.sortingOrder = 2;
+        pathHighlightGO.name = pathName;
+        // come back here and polish
+        pathHighlightGO.GetComponent<Animation>().enabled = false;
+
+        movementHighlightGO.SetActive(false);
+        attackHighlightGO.SetActive(false);
+        pathHighlightGO.SetActive(false);
     }
 
     private void InitiateMovementHighlights(List<Node> _nodesToHighlight)
@@ -47,59 +79,50 @@ public class GridEffects : MonoBehaviour
         int arrayCount = 0;
         foreach (Node node in _nodesToHighlight)
         {
-            selectionArray[arrayCount] = Instantiate(selectionHighlight, node.gameObject.transform);
-            // for some reason setting the transform gets use a local position of 1 on the x
-            // so we fix that here.  better solution needed.
-            selectionArray[arrayCount].transform.localPosition = new Vector3(0, 0, 0);
-            selectionArray[arrayCount].GetComponent<SpriteRenderer>().sprite = _highlightToUse;
-            selectionArray[arrayCount].GetComponent<SpriteRenderer>().sortingOrder = 1;
-            selectionArray[arrayCount].name = _name;
+            selectionArray[arrayCount] = node.gameObject;
+            // selectionArray[arrayCount].transform.Find(_name).gameObject.SetActive(true);
             arrayCount++;
         }
     }
 
     private void GeneratePath(List<Node> _nodesToHighlight)
     {
-        List<GameObject> incomingPathList = CreateNewPath(_nodesToHighlight);
-        RemoveOldPath(incomingPathList);
+        List<GameObject> _incomingPathList = CreateNewPath(_nodesToHighlight);
+        RemoveOldPath(_incomingPathList);
     }
 
     private List<GameObject> CreateNewPath(List<Node> _nodesToHighlight)
     {
-        List<GameObject> incomingPathList = _nodesToHighlight.ConvertAll(node => node.gameObject);
+        List<GameObject> _incomingPathList = _nodesToHighlight.ConvertAll(node => node.gameObject);
 
-        foreach (GameObject highlight in incomingPathList)
+        foreach (GameObject _nodeGameObject in _incomingPathList)
         {
             // foreach node see if we've already generated a  highlight
-            if (highlight.transform.Find(pathName))
+            if (_nodeGameObject.transform.Find(pathName))
             {
-            }
-            else
-            {
-                // otherwise, create a highlight, add it to the list.
-                GameObject temp = Instantiate(selectionHighlight, highlight.transform);
-                temp.transform.localPosition = new Vector3(0, 0, 0);
-                temp.GetComponent<SpriteRenderer>().sprite = pathHighlight;
-                temp.GetComponent<SpriteRenderer>().sortingOrder = 2;
-                temp.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.6f);
-                temp.GetComponent<Animation>().enabled = false;
-                temp.name = pathName;
-                pathList.Add(temp);
+                // _nodeGameObject.transform.Find(pathName).gameObject.SetActive(true);
+                if (!pathList.Contains(_nodeGameObject.transform.Find(pathName).gameObject))
+                {
+                    // pathList.Add(_nodeGameObject.transform.Find(pathName).gameObject);
+                }
+                else
+                {
+                }
             }
         }
-        return incomingPathList;
+        return _incomingPathList;
     }
 
-    private void RemoveOldPath(List<GameObject> incomingPathList)
+    private void RemoveOldPath(List<GameObject> _incomingPathList)
     {
-        foreach (GameObject highlight in pathList)
+        foreach (GameObject _childHighlight in pathList)
         {
-            if (!incomingPathList.Contains(highlight.transform.parent.gameObject))
+            if (!_incomingPathList.Contains(_childHighlight.transform.parent.gameObject))
             {
-                Destroy(highlight);
+                _childHighlight.SetActive(false);
             }
         }
-        pathList.RemoveAll(highlight => !incomingPathList.Contains(highlight.transform.parent.gameObject));
+        pathList.RemoveAll(_nodeGameObjects => !_incomingPathList.Contains(_nodeGameObjects.transform.parent.gameObject));
     }
 
     private void ClearHighlights(Unit _unit)
@@ -108,14 +131,17 @@ public class GridEffects : MonoBehaviour
         {
             foreach (GameObject highlight in selectionArray)
             {
-                Destroy(highlight);
+                highlight.transform.Find(pathName).gameObject.SetActive(false);
+                highlight.transform.Find(attackName).gameObject.SetActive(false);
+                highlight.transform.Find(movementName).gameObject.SetActive(false);
             }
             Array.Clear(selectionArray, 0, selectionArray.Length);
         }
-        if (pathList != null){
+        if (pathList != null)
+        {
             foreach (GameObject highlight in pathList)
             {
-                Destroy(highlight);
+                highlight.SetActive(false);
             }
             pathList.Clear();
         }

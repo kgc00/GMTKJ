@@ -35,7 +35,8 @@ public class UnitStateHandler : MonoBehaviour
     {
         unit.currentUnitState = state;
 
-        if (!InPrepState(state)) {
+        if (!InPrepState(state))
+        {
             onUnitPastPlanning(unit);
         }
 
@@ -102,11 +103,14 @@ public class UnitStateHandler : MonoBehaviour
 
     private void SetUnselected()
     {
-        foreach (Node node in grid.grid)
-        {
-            ResetCosts(node);
-        }
-        onUnitUnselected(unit);
+        // if (!worldManager.ReturnShouldDisplayGrid())
+        // {
+            foreach (Node node in grid.grid)
+            {
+                ResetCosts(node);
+            }
+            onUnitUnselected(unit);
+        // }
     }
 
     private void SetMoving(bool isMoving)

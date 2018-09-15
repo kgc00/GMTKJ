@@ -8,7 +8,7 @@ public class Unit : MonoBehaviour
     public enum UnitState
     {
         planningMovement, moving, unselected,
-        selected, cooldown, attacking, planningAttack
+        selected, cooldown, attacking, planningAttack, ready
     };
     [SerializeField]
     public UnitState currentUnitState;

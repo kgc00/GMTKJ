@@ -10,6 +10,8 @@ public class WorldManager : MonoBehaviour
     public static WorldManager instance;
     [SerializeField]
     private bool anyUnitSelected = false;
+    private bool test = false;
+    public static event Func<bool> onRequestGridState;
     
     void Start()
     {
@@ -47,5 +49,9 @@ public class WorldManager : MonoBehaviour
 
     public bool ReturnUnitSelected(){
         return anyUnitSelected;
+    }
+
+    public bool ReturnShouldDisplayGrid(){
+        return onRequestGridState();
     }
 }
