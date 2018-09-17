@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-[RequireComponent(typeof(Unit))]
 public class MovementHandler : MonoBehaviour
 {
     public Unit unit;
@@ -11,7 +10,6 @@ public class MovementHandler : MonoBehaviour
     GameGrid grid;
     PathRequestManager requestManager;
     AStar aStar;
-    DebugGizmo gizmothing;
     InputHandler inputHandler;
     TargetingInformation targetInfo;
     private Vector3[] path;
@@ -24,30 +22,30 @@ public class MovementHandler : MonoBehaviour
     {
         grid = GameGrid.instance;
         requestManager = PathRequestManager.instance;
-        gizmothing = DebugGizmo.instance;
         unit = GetComponent<Unit>();
         target = FindObjectOfType<TargetPosition>().transform;
         Debug.Assert(aStar = GetComponent<AStar>());
         unitMovement = GetComponent<UnitMovement>();
         inputHandler = GetComponent<InputHandler>();
         unitStateHandler = GetComponent<UnitStateHandler>();
-        unitStateHandler.onUnitMoving += StartMovementPathLogic;
+        // unitStateHandler.onUnitMoving += StartMovementPathLogic;
     }
 
     private void StartMovementPathLogic()
     {
         targetInfo = unitMovement.PassTargetInfo();
-        StartCoroutine(GenerateMovementPath(targetInfo.startingPoint, targetInfo.targetPoint));
-        MoveUnit();
+        Unit _unit = grid.UnitFromNode(grid.NodeFromWorldPosition(targetInfo.startingPoint));
+        StartCoroutine(GenerateMovementPath(targetInfo.startingPoint, targetInfo.targetPoint, _unit));
+        MoveUnit(_unit);
     }
 
-    public IEnumerator GenerateMovementPath(Vector3 startPos, Vector3 targetPos)
+    public IEnumerator GenerateMovementPath(Vector3 _startPos, Vector3 _targetPos, Unit _unit)
     {
         Vector3[] waypoints = new Vector3[0];
         bool pathSuccess = false;
 
-        Node startNode = grid.NodeFromWorldPosition(startPos);
-        Node targetNode = grid.NodeFromWorldPosition(targetPos);
+        Node startNode = grid.NodeFromWorldPosition(_startPos);
+        Node targetNode = grid.NodeFromWorldPosition(_targetPos);
 
         if (startNode.walkable && targetNode.walkable && startNode != targetNode)
         {
@@ -62,7 +60,7 @@ public class MovementHandler : MonoBehaviour
         {
             Debug.LogError("Path requested was not valid.");
         }
-        requestManager.FinishedProcessingPath(waypoints, pathSuccess, this);
+        requestManager.FinishedProcessingPath(waypoints, pathSuccess, _unit, this);
     }
 
     Vector3[] RetracePath(Node startNode, Node endNode)
@@ -90,23 +88,23 @@ public class MovementHandler : MonoBehaviour
         return waypoints;
     }
 
-    public void MoveUnit()
+    public void MoveUnit(Unit _unit)
     {
-        PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, this);
+        PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, this, _unit);
     }
 
-    public void OnPathFound(Vector3[] newPath, bool pathSuccessful)
+    public void OnPathFound(Vector3[] newPath, bool pathSuccessful, Unit _unit)
     {
         if (pathSuccessful)
         {
             path = newPath;
             targetIndex = 0;
             StopCoroutine("FollowPath");
-            StartCoroutine("FollowPath");
+            StartCoroutine("FollowPath", _unit);
         }
     }
 
-    IEnumerator FollowPath()
+    IEnumerator FollowPath(Unit _unit)
     {
         Vector3 currentWaypoint = path[0];
         while (true)
@@ -116,7 +114,7 @@ public class MovementHandler : MonoBehaviour
                 targetIndex++;
                 if (targetIndex >= path.Length)
                 {
-                    unitStateHandler.ConfirmMovement(path.Length);
+                    unitStateHandler.ConfirmMovement(_unit);
                     yield break;
                 }
                 currentWaypoint = path[targetIndex];

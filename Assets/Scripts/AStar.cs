@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-[RequireComponent(typeof(Unit))]
 public class AStar : MonoBehaviour
 {
     GameGrid grid;

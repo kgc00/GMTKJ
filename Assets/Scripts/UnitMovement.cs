@@ -18,16 +18,15 @@ public class UnitMovement : MonoBehaviour
 
     private void Start()
     {
-        unitStateHandler = GetComponent<UnitStateHandler>();
-        inputHandler = GetComponent<InputHandler>();
-        aStar = GetComponent<AStar>();
+        unitStateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
+        inputHandler = FindObjectOfType<InputHandler>().GetComponent<InputHandler>();
+        aStar = FindObjectOfType<AStar>().GetComponent<AStar>();
         grid = GameGrid.instance;
         inputHandler.onRequestingMovementLogic += MovementLogic;
-        unitStateHandler.onUnitPlanningMovement += DisplayMoves;
-        unitStateHandler.onMovementFinished += ResetNodesInRange;
-        unitStateHandler.onUnitMoving += ResetNodesInRange;
+        // unitStateHandler.onUnitPlanningMovement += DisplayMoves;
+        // unitStateHandler.onMovementFinished += ResetNodesInRange;
+        // unitStateHandler.onUnitMoving += ResetNodesInRange;
         WorldManager.onRequestGridState += ReturnDisplayGrid;
-        unit = GetComponent<Unit>();
     }
     public void DisplayMoves(Unit _unit)
     {
@@ -47,7 +46,8 @@ public class UnitMovement : MonoBehaviour
         if (IsLegalMove(targetPos) && Input.GetMouseButtonDown(0) && unit.currentMovementPoints > 0)
         {
             StoreTargetInfo(startPos, targetPos);
-            unitStateHandler.SetState(Unit.UnitState.moving);
+            Unit _unit = grid.UnitFromNode(grid.NodeFromWorldPosition(startPos));
+            unitStateHandler.SetState(_unit, Unit.UnitState.moving);
             gridShoulDisplay = false;
         }
     }

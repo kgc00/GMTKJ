@@ -7,15 +7,12 @@ public class SelectionUnitUI : MonoBehaviour
 {
 
     public Image selectionImage;
-    UnitStateHandler unitStateHandler;
 
     void Awake()
     {
         selectionImage = transform.Find("Selected Image").GetComponent<Image>();
-        unitStateHandler = GetComponentInParent<UnitStateHandler>();
-        UnitStateHandler.onUnitSelected += ShowSelection;
+        UnitSelectionHandler.onUnitSelected += ShowSelection;
         UnitStateHandler.onUnitPastPlanning += HideSelection;
-        // HideSelection();
         this.transform.Find("Selected Image").GetComponent<Image>().enabled = false;
     }
     

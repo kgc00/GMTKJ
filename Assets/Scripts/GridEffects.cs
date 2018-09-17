@@ -35,30 +35,30 @@ public class GridEffects : MonoBehaviour
 
     private void SpawnHighlightsForNode(Node _node)
     {
-        GameObject movementHighlightGO = Instantiate(selectionHighlight, _node.gameObject.transform);
-        movementHighlightGO.transform.localPosition = new Vector3(0, 0, 0);
-        SpriteRenderer movementSpriteRenderer = movementHighlightGO.GetComponent<SpriteRenderer>();
-        movementSpriteRenderer.sprite = movementHighlight;
-        movementSpriteRenderer.sortingOrder = 1;
-        movementHighlightGO.name = movementName;
-        GameObject attackHighlightGO = Instantiate(selectionHighlight, _node.gameObject.transform);
-        attackHighlightGO.transform.localPosition = new Vector3(0, 0, 0);
-        SpriteRenderer attackSpriteRenderer = attackHighlightGO.GetComponent<SpriteRenderer>();
-        attackSpriteRenderer.sprite = attackHighlight;
-        attackSpriteRenderer.sortingOrder = 1;
-        attackHighlightGO.name = attackName;
-        GameObject pathHighlightGO = Instantiate(selectionHighlight, _node.gameObject.transform);
-        pathHighlightGO.transform.localPosition = new Vector3(0, 0, 0);
-        SpriteRenderer pathSpriteRenderer = pathHighlightGO.GetComponent<SpriteRenderer>();
-        pathSpriteRenderer.sprite = this.pathHighlight;
-        pathSpriteRenderer.sortingOrder = 2;
-        pathHighlightGO.name = pathName;
+        GameObject _movementHighlightGO = Instantiate(selectionHighlight, _node.gameObject.transform);
+        _movementHighlightGO.transform.localPosition = new Vector3(0, 0, 0);
+        SpriteRenderer _movementSpriteRenderer = _movementHighlightGO.GetComponent<SpriteRenderer>();
+        _movementSpriteRenderer.sprite = movementHighlight;
+        _movementSpriteRenderer.sortingOrder = 1;
+        _movementHighlightGO.name = movementName;
+        GameObject _attackHighlightGO = Instantiate(selectionHighlight, _node.gameObject.transform);
+        _attackHighlightGO.transform.localPosition = new Vector3(0, 0, 0);
+        SpriteRenderer _attackSpriteRenderer = _attackHighlightGO.GetComponent<SpriteRenderer>();
+        _attackSpriteRenderer.sprite = attackHighlight;
+        _attackSpriteRenderer.sortingOrder = 1;
+        _attackHighlightGO.name = attackName;
+        GameObject _pathHighlightGO = Instantiate(selectionHighlight, _node.gameObject.transform);
+        _pathHighlightGO.transform.localPosition = new Vector3(0, 0, 0);
+        SpriteRenderer _pathSpriteRenderer = _pathHighlightGO.GetComponent<SpriteRenderer>();
+        _pathSpriteRenderer.sprite = this.pathHighlight;
+        _pathSpriteRenderer.sortingOrder = 2;
+        _pathHighlightGO.name = pathName;
         // come back here and polish
-        pathHighlightGO.GetComponent<Animation>().enabled = false;
+        _pathHighlightGO.GetComponent<Animation>().enabled = false;
 
-        movementHighlightGO.SetActive(false);
-        attackHighlightGO.SetActive(false);
-        pathHighlightGO.SetActive(false);
+        _movementHighlightGO.SetActive(false);
+        _attackHighlightGO.SetActive(false);
+        _pathHighlightGO.SetActive(false);
     }
 
     private void InitiateMovementHighlights(List<Node> _nodesToHighlight)
@@ -74,12 +74,12 @@ public class GridEffects : MonoBehaviour
     private void CreateHighlightForNodes(List<Node> _nodesToHighlight, Sprite _highlightToUse, string _name)
     {
         selectionArray = new GameObject[_nodesToHighlight.Count];
-        int arrayCount = 0;
+        int _arrayCount = 0;
         foreach (Node node in _nodesToHighlight)
         {
-            selectionArray[arrayCount] = node.gameObject;
-            selectionArray[arrayCount].transform.Find(_name).gameObject.SetActive(true);
-            arrayCount++;
+            selectionArray[_arrayCount] = node.gameObject;
+            selectionArray[_arrayCount].transform.Find(_name).gameObject.SetActive(true);
+            _arrayCount++;
         }
     }
 
@@ -125,23 +125,33 @@ public class GridEffects : MonoBehaviour
 
     private void ClearHighlights(Unit _unit)
     {
-        if (selectionArray != null)
+        if (_unit.currentUnitState == Unit.UnitState.moving ||
+        _unit.currentUnitState == Unit.UnitState.attacking)
         {
-            foreach (GameObject highlight in selectionArray)
+            if (selectionArray != null)
             {
-                highlight.transform.Find(pathName).gameObject.SetActive(false);
-                highlight.transform.Find(attackName).gameObject.SetActive(false);
-                highlight.transform.Find(movementName).gameObject.SetActive(false);
+                foreach (GameObject _tileGameObject in selectionArray)
+                {
+                    if (_tileGameObject.transform.Find(movementName).gameObject.activeInHierarchy)
+                    {
+                        print("thing");
+                        _tileGameObject.transform.Find(movementName).gameObject.SetActive(false);
+                    }
+                    else if (_tileGameObject.transform.Find(attackName).gameObject.activeInHierarchy)
+                    {
+                        _tileGameObject.transform.Find(attackName).gameObject.SetActive(false);
+                    }
+                }
+                Array.Clear(selectionArray, 0, selectionArray.Length);
             }
-            Array.Clear(selectionArray, 0, selectionArray.Length);
-        }
-        if (pathList != null)
-        {
-            foreach (GameObject highlight in pathList)
+            if (pathList != null)
             {
-                highlight.SetActive(false);
+                foreach (GameObject _pathHighlight in pathList)
+                {
+                    _pathHighlight.SetActive(false);
+                }
+                pathList.Clear();
             }
-            pathList.Clear();
         }
     }
 }

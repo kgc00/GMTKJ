@@ -3,146 +3,133 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-[RequireComponent(typeof(Unit))]
 public class UnitStateHandler : MonoBehaviour
 {
     Unit unit;
     SceneManager sceneManager;
     GameGrid grid;
-    UnitTimer timer;
     WorldManager worldManager;
-    public static Action<Unit> onUnitSelected = delegate { };
+    public Dictionary<Unit.UnitState, Action<Unit>> unitStateDictionary;
     public static Action<Unit> onUnitUnselected = delegate { };
     public static Action<Unit> onUnitPastPlanning = delegate { };
-    public Action onUnitMoving = delegate { };
-    public Action onMovementFinished = delegate { };
-    public Action<Unit> onUnitPlanningMovement = delegate { };
-    public Action onPlanningAttack = delegate { };
-    public Action onAttacking = delegate { };
-    public Action onAttackFinished = delegate { };
+    public static Action<Unit> onUnitMoving = delegate { };
+    public static Action<Unit> onMovementFinished = delegate { };
+    public static Action<Unit> onUnitPlanningMovement = delegate { };
+    public static Action<Unit> onUnitPlanningAttack = delegate { };
+    public static Action<Unit> onUnitAttacking = delegate { };
+    public static Action<Unit> onAttackFinished = delegate { };
+    public static Action<Unit> onUnitCoolingDown = delegate { };
+    public static Action<Unit> onUnitIdle = delegate { };
 
     void Start()
     {
+        unitStateDictionary = new Dictionary<Unit.UnitState, Action<Unit>>(){
+            {Unit.UnitState.planningMovement, onUnitPlanningMovement},
+            {Unit.UnitState.planningAttack, onUnitPlanningAttack},
+            {Unit.UnitState.moving, onUnitMoving},
+            {Unit.UnitState.attacking, onUnitAttacking},
+            {Unit.UnitState.cooldown, onUnitCoolingDown},
+            {Unit.UnitState.idle, onUnitIdle},
+        };
+
         sceneManager = FindObjectOfType<SceneManager>().GetComponent<SceneManager>();
         grid = GameGrid.instance;
         worldManager = WorldManager.instance;
-        Debug.Assert(unit = GetComponent<Unit>());
-        timer = GetComponent<UnitTimer>();
-        timer.onTimerRemoved += SetState;
+        unit = GetComponent<Unit>();
     }
 
-    public void SetState(Unit.UnitState state)
+    public void SetState(Unit _unit, Unit.UnitState _state)
     {
-        unit.currentUnitState = state;
-
-        if (!InPrepState(state))
+        _unit.currentUnitState = _state;
+        if (_state == Unit.UnitState.idle)
         {
-            onUnitPastPlanning(unit);
+            SetIdle(_unit, _state);
         }
-
-        if (state == Unit.UnitState.selected)
+        else if (_state == Unit.UnitState.planningMovement)
         {
-            SetSelected();
+            SetPlanningMovement(_unit, _state);
         }
-        else if (state == Unit.UnitState.moving)
+        else if (_state == Unit.UnitState.planningAttack)
         {
-            SetMoving(true);
+            SetPlanningAttack(_unit, _state);
         }
-        else if (state == Unit.UnitState.cooldown)
+        else if (_state == Unit.UnitState.moving)
         {
-            SetOnCooldown();
+            SetMoving(_unit);
         }
-        else if (state == Unit.UnitState.attacking)
+        else if (_state == Unit.UnitState.attacking)
         {
-            SetAttacking();
+            SetAttacking(_unit, _state);
         }
-        else if (state == Unit.UnitState.unselected)
+        else if (_state == Unit.UnitState.cooldown)
         {
-            SetUnselected();
-        }
-        else if (state == Unit.UnitState.planningMovement)
-        {
-            SetPlanningMovement();
-        }
-        else if (state == Unit.UnitState.planningAttack)
-        {
-            SetPlanningAttack();
+            SetOnCooldown(_unit, _state);
         }
     }
 
+    private void SetIdle(Unit _unit, Unit.UnitState _state)
+    {
+        onUnitIdle(_unit);
+    }
+
+    private void SetPlanningMovement(Unit _unit, Unit.UnitState _state)
+    {
+        onUnitPlanningMovement(_unit);
+    }
+
+    private void SetPlanningAttack(Unit _unit, Unit.UnitState _state)
+    {
+        onUnitPlanningAttack(_unit);
+    }
+    
     private static bool InPrepState(Unit.UnitState state)
     {
-        return state == Unit.UnitState.selected ||
-                state == Unit.UnitState.planningAttack ||
+        return state == Unit.UnitState.planningAttack ||
                 state == Unit.UnitState.planningMovement;
     }
 
-    private void SetPlanningAttack()
+    private void SetAttacking(Unit _unit, Unit.UnitState _state)
     {
-        onPlanningAttack();
+        onUnitAttacking(_unit);
     }
 
-    private void SetPlanningMovement()
+    private void SetOnCooldown(Unit _unit, Unit.UnitState _state)
     {
-        onUnitPlanningMovement(unit);
+        onUnitCoolingDown(_unit);
     }
 
-    private void SetSelected()
+    private void SetMoving(Unit _unit)
     {
-        onUnitSelected(unit);
+        onUnitMoving(_unit);
     }
 
-    private void SetAttacking()
+    public void AttackFinished(Unit _attackingUnit)
     {
-        onAttacking();
+        onAttackFinished(_attackingUnit);
+        SetState(_attackingUnit, Unit.UnitState.cooldown);
     }
 
-    private void SetOnCooldown()
+    public void DestinationReached(Unit _unit)
     {
-    }
-
-    private void SetUnselected()
-    {
-        // if (!worldManager.ReturnShouldDisplayGrid())
-        // {
-            foreach (Node node in grid.grid)
-            {
-                ResetCosts(node);
-            }
-            onUnitUnselected(unit);
-        // }
-    }
-
-    private void SetMoving(bool isMoving)
-    {
-        onUnitMoving();
-    }
-
-    public void AttackFinished()
-    {
-        onAttackFinished();
-        SetState(Unit.UnitState.cooldown);
-    }
-
-    public void DestinationReached()
-    {
-        SetOnCooldown();
+        SetOnCooldown(_unit, Unit.UnitState.cooldown);
         grid.UpdateNodeStatuses();
+        // why every node in grid?  Should be only nodes in range
         foreach (Node node in grid.grid)
         {
             ResetCosts(node);
         }
-        onMovementFinished();
+        // 0 subscribers
+        // onMovementFinished(_unit);
     }
-    public void ConfirmMovement(int movementPointsUsed)
+    public void ConfirmMovement(Unit _unit)
     {
-        DestinationReached();
+        DestinationReached(_unit);
     }
 
-    public void NextTurn()
+    public void NextTurn(Unit _unit)
     {
         unit.currentMovementPoints = unit.maxMovementPointsPerTurn;
-        ConfirmMovement(0);
+        ConfirmMovement(_unit);
     }
 
     private static void ResetCosts(Node node)

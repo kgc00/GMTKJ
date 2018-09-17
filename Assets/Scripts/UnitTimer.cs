@@ -3,29 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-[RequireComponent(typeof(Unit))]
 public class UnitTimer : MonoBehaviour
 {
 
-    UnitStateHandler unitStateHandler;
-    float cooldownTimeRemaining;
-    bool coolingDown = false;
-    public event Action onTimerStarted = delegate { };
-    public event Action<float> onTimeChanged = delegate { };
-    public event Action<Unit.UnitState> onTimerRemoved = delegate { };
+    private float cooldownTimeRemaining;
+    private bool coolingDown = false;
+    public static event Action<Unit> onTimerStarted = delegate { };
+    public static event Action<Unit, Unit.UnitState> onTimerRemoved = delegate { };
 
     // Use this for initialization
     void Start()
     {
-        unitStateHandler = GetComponent<UnitStateHandler>();
-        unitStateHandler.onMovementFinished += AddTimeToTimerMovement;
-        unitStateHandler.onAttackFinished += AddTimeToTimerAttack;
+        // unitStateHandler.onMovementFinished += AddTimeToTimerMovement;
+        // unitStateHandler.onAttackFinished += AddTimeToTimerAttack;
     }
 
     private void EndTimer()
     {
         coolingDown = false;
-        onTimerRemoved(Unit.UnitState.unselected);
+        // unitStateHandler.SetState(Unit.UnitState.unselected);
     }
 
     // Update is called once per frame
@@ -75,6 +71,6 @@ public class UnitTimer : MonoBehaviour
     private void StartTimer()
     {
         coolingDown = true;
-        onTimerStarted();
+        // onTimerStarted();
     }
 }

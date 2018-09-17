@@ -41,10 +41,11 @@ public class GameGrid : MonoBehaviour
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
         nodesContainingUnits = new List<Node>();
-        CreateGrid();        
+        CreateGrid();
     }
 
-    void Start(){
+    void Start()
+    {
         foreach (Node node in grid)
         {
             requestingHighlights(node);
@@ -221,5 +222,20 @@ public class GameGrid : MonoBehaviour
         int y = Mathf.RoundToInt((gridSizeY - 1) * percentY);
 
         return grid[x, y];
+    }
+
+    public Unit UnitFromNode(Node _selectedNode)
+    {
+        Unit affectedUnit = null;
+        Collider[] hitColliders = Physics.OverlapSphere(_selectedNode.worldPosition, nodeRadius, allyMask);
+        foreach (Collider collider in hitColliders)
+        {
+            affectedUnit = collider.gameObject.GetComponentInParent<Unit>();
+            if (affectedUnit != null)
+            {
+                return affectedUnit;
+            }
+        }
+        return affectedUnit;
     }
 }

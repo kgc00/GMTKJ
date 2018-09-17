@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AbilityManager))]
 public class ChargeAbility : MonoBehaviour {
 
 	InputHandler inputHandler;

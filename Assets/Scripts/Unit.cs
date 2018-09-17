@@ -3,15 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Unit : MonoBehaviour
+public class Unit : MonoBehaviour, IDamageable
 {
     public enum UnitState
     {
-        planningMovement, moving, unselected,
-        selected, cooldown, attacking, planningAttack, ready
+        planningMovement, planningAttack,
+        moving, attacking,
+        cooldown, idle
+    };
+    public enum SelectionState
+    {
+        selected, notSelected
     };
     [SerializeField]
     public UnitState currentUnitState;
+    public SelectionState currentSelectionState;
     public int maxMovementPointsPerTurn, currentMovementPoints, movementCost, attackRange, maxHealth, currentHealth, attackPower;
     public static event Action<Unit> OnUnitDeath = delegate { };
 
@@ -19,7 +25,8 @@ public class Unit : MonoBehaviour
 
     void Start()
     {
-        currentUnitState = UnitState.unselected;
+        currentUnitState = UnitState.idle;
+        currentSelectionState = SelectionState.notSelected;
         movementCost = 0;
         maxMovementPointsPerTurn = 6;
         maxHealth = 3;
@@ -35,7 +42,7 @@ public class Unit : MonoBehaviour
         Destroy(gameObject, 2.0f);
     }
 
-    public void DamageTaken(int incomingDamage)
+    public void TakeDamage(int incomingDamage)
     {
         OnDamageTaken(currentHealth, maxHealth, incomingDamage);
         currentHealth -= incomingDamage;

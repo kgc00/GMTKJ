@@ -162,17 +162,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4102389374139440}
-  - component: {fileID: 114810799356653898}
   - component: {fileID: 114692805415049520}
-  - component: {fileID: 114942970492716386}
-  - component: {fileID: 114824265821083668}
-  - component: {fileID: 114258475034842604}
-  - component: {fileID: 114977871675391278}
   - component: {fileID: 114563648612169586}
-  - component: {fileID: 114403537002735880}
-  - component: {fileID: 114415096239324102}
+  - component: {fileID: 114538392464439080}
   m_Layer: 11
-  m_Name: Actor
+  m_Name: Unit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -185,7 +179,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1860653317249716}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.5, y: 1.5, z: -0.5}
+  m_LocalPosition: {x: -4.38, y: 0.74, z: -0.5}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children:
   - {fileID: 224737117338619746}
@@ -301,17 +295,6 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114258475034842604
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1860653317249716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e543b49c17c99d45826948f3ab6bc8a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114259098798915624
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -429,7 +412,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
---- !u!114 &114403537002735880
+--- !u!114 &114538392464439080
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -437,18 +420,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1860653317249716}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 934627dd5bd6bb04a9775c6e9c13f180, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114415096239324102
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1860653317249716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76b9df6906a15a74ab7678cf9d5a2745, type: 3}
+  m_Script: {fileID: 11500000, guid: b767a175b95528f43a2bbfcb57f3ad9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114563648612169586
@@ -534,6 +506,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentUnitState: 0
+  currentSelectionState: 0
   maxMovementPointsPerTurn: 6
   currentMovementPoints: 0
   movementCost: 0
@@ -541,43 +514,6 @@ MonoBehaviour:
   maxHealth: 0
   currentHealth: 0
   attackPower: 0
---- !u!114 &114810799356653898
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1860653317249716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d45897d565322f84d974e8f7cf3ec4de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114824265821083668
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1860653317249716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80caba09e8c7d9c4ab1b5f856e6189de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  unit: {fileID: 0}
-  target: {fileID: 0}
---- !u!114 &114942970492716386
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1860653317249716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0139ff21754de814caf7eb6769ff1399, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  nodesInRange: []
 --- !u!114 &114954763319763116
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -591,17 +527,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   foregroundImage: {fileID: 0}
   updateSpeed: 0.25
---- !u!114 &114977871675391278
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1860653317249716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 297a8a2da55841e4ab164c01726b010e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114980278327194834
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -3,19 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Unit))]
 public class InputHandler : MonoBehaviour
 {
-
-    InputHandler inputHandler;
-    Unit unit;
+    Camera cam;
     public Transform target;
     public List<Node> nodesInRange;
     SceneManager sceneManager;
     GameGrid grid;
-    DebugGizmo gizmothing;
-    AStar aStar;
-    Node selectedNode;
+    Unit selectedUnit;
     UnitStateHandler unitStateHandler;
     private TargetingInformation targetInformation;
     public event Action<TargetingInformation> onAbilityCalled = delegate { };
@@ -25,45 +20,50 @@ public class InputHandler : MonoBehaviour
     {
         sceneManager = SceneManager.instance;
         grid = GameGrid.instance;
-        gizmothing = DebugGizmo.instance;
-        unitStateHandler = GetComponent<UnitStateHandler>();
-        Debug.Assert(aStar = GetComponent<AStar>());
-        Debug.Assert(unit = GetComponent<Unit>());
-        Debug.Assert(inputHandler = GetComponent<InputHandler>());
-        target = FindObjectOfType<TargetPosition>().transform;
+        cam = Camera.main;
+        if (target == null)
+        {
+            target = FindObjectOfType<TargetPosition>().transform;
+        }
     }
 
     void Update()
     {
-        SelectionLogic();
-
-        if (ValidSelectedState())
+        if (WorldManager.instance.ReturnUnitSelected())
         {
-            SelectedLogic();
+            selectedUnit = WorldManager.ReturnSelectedUnit();
+            if (ValidSelectedState())
+            {
+                SelectedLogic(selectedUnit);
+            }
+            MovementLogic(selectedUnit);
+            AttackLogic(selectedUnit);
         }
-        MovementLogic();
-        AttackLogic();
+        else
+        {
+            SelectionLogic();
+        }
     }
 
-    private void AttackLogic()
+    private void AttackLogic(Unit _unit)
     {
-        if (unit.currentUnitState == Unit.UnitState.planningAttack)
-        {
-            onRequestingAttackLogic(unit.transform.position, target.position);
-        }
+        // if (unit.currentUnitState == Unit.UnitState.planningAttack)
+        // {
+        //     onRequestingAttackLogic(unit.transform.position, target.position);
+        // }
     }
 
-    private void SelectedLogic()
+    private void SelectedLogic(Unit _unit)
     {
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            unitStateHandler.SetState(Unit.UnitState.planningMovement);
+            unitStateHandler.SetState(_unit, Unit.UnitState.planningMovement);
             return;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            unitStateHandler.SetState(Unit.UnitState.planningAttack);
+            unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
             return;
         }
 
@@ -71,59 +71,42 @@ public class InputHandler : MonoBehaviour
 
     private bool ValidSelectedState()
     {
-        return unit.currentUnitState == Unit.UnitState.selected ||
-                unit.currentUnitState == Unit.UnitState.planningAttack ||
-                unit.currentUnitState == Unit.UnitState.planningMovement ||
-                unit.currentUnitState == Unit.UnitState.ready;
+        return false;
+        // unit.currentSelectionState == Unit.SelectionState.selected ||
+        //         unit.currentUnitState == Unit.UnitState.planningAttack ||
+        //         unit.currentUnitState == Unit.UnitState.planningMovement ||
+        //         unit.currentUnitState == Unit.UnitState.idle;
     }
 
-    private void MovementLogic()
+    private void MovementLogic(Unit _unit)
     {
-        if (unit.currentUnitState == Unit.UnitState.planningMovement)
-        {
-            onRequestingMovementLogic(unit.transform.position, target.position);
-        }
+        // if (unit.currentUnitState == Unit.UnitState.planningMovement)
+        // {
+        //     onRequestingMovementLogic(unit.transform.position, target.position);
+        // }
     }
 
     private void SelectionLogic()
     {
-        if (WorldManager.instance.ReturnUnitSelected() ||
-        unit.currentUnitState != Unit.UnitState.unselected)
+        if (Input.GetMouseButtonDown(0))
         {
-            return;
-        }
-        else
-        {
-            if (Input.GetMouseButtonDown(0))
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, 50, 1 << 11))
             {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-                if (Physics.Raycast(ray, 50, 1 << 11))
+                Node _selectedNode = grid.NodeFromWorldPosition(hit.transform.position);
+                if (_selectedNode.occupiedByUnit == Node.OccupiedByUnit.ally)
                 {
-                    selectedNode = grid.NodeFromWorldPosition(target.position);
-                    if (selectedNode.occupiedByUnit == Node.OccupiedByUnit.ally &&
-                    UnitFromNode(selectedNode) == unit)
-                    {
-                        unitStateHandler.SetState(Unit.UnitState.selected);
-                        return;
-                    }
+                    SelectUnit(hit);
                 }
             }
         }
     }
 
-    private Unit UnitFromNode(Node _selectedNode)
+    private static void SelectUnit(RaycastHit hit)
     {
-        Unit affectedUnit = null;
-        Collider[] hitColliders = Physics.OverlapSphere(_selectedNode.worldPosition, grid.nodeRadius, grid.allyMask);
-        foreach (Collider collider in hitColliders)
-        {
-            affectedUnit = collider.gameObject.GetComponentInParent<Unit>();
-            if (affectedUnit != null)
-            {
-                return affectedUnit;
-            }
-        }
-        return affectedUnit;
+        Unit _unitToSelect = hit.transform.parent.gameObject.GetComponent<Unit>();
+        UnitSelectionHandler.SetSelection(_unitToSelect, Unit.SelectionState.selected);
+        return;
     }
 }

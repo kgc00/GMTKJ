@@ -6,13 +6,14 @@ using UnityEngine;
 public class WorldManager : MonoBehaviour
 {
 
-    Unit[] allUnits;
+    List<Unit> allUnits;
+    private Unit selectedUnit;
     public static WorldManager instance;
     [SerializeField]
     private bool anyUnitSelected = false;
     private bool test = false;
     public static event Func<bool> onRequestGridState;
-    
+
     void Start()
     {
         if (instance == null)
@@ -23,35 +24,47 @@ public class WorldManager : MonoBehaviour
         {
             Destroy(this);
         }
-        UnitStateHandler.onUnitSelected += UnitSelected;
+        UnitSelectionHandler.onUnitSelected += UnitSelected;
+        UnitSelectionHandler.onUnitSelected += DeselectOtherUnits;
         UnitStateHandler.onUnitPastPlanning += SetNoUnitsSelected;
+        allUnits = new List<Unit>(FindObjectsOfType<Unit>());
     }
 
-    public void UnitSelected(Unit selectedUnit)
+    private void UnitSelected(Unit _selectedUnit)
     {
+        _selectedUnit.currentSelectionState = Unit.SelectionState.selected;
         anyUnitSelected = true;
+        selectedUnit = _selectedUnit;
     }
 
-    public void DeselectOtherUnits(Unit selectedUnit)
+    private void SetNoUnitsSelected(Unit unit)
     {
-        foreach (Unit unit in allUnits)
-        {
-            if (unit != selectedUnit && unit.currentUnitState == Unit.UnitState.selected)
-            {
-                unit.GetComponent<UnitStateHandler>().SetState(Unit.UnitState.unselected);
-            }
-        }
-    }
-
-    private void SetNoUnitsSelected(Unit unit){
         anyUnitSelected = false;
     }
 
-    public bool ReturnUnitSelected(){
+    public static Unit ReturnSelectedUnit()
+    {
+        return WorldManager.instance.selectedUnit;
+    }
+
+    public bool ReturnUnitSelected()
+    {
         return anyUnitSelected;
     }
 
-    public bool ReturnShouldDisplayGrid(){
+    public bool ReturnShouldDisplayGrid()
+    {
         return onRequestGridState();
+    }
+
+    public void DeselectOtherUnits(Unit _selectedUnit)
+    {
+        foreach (Unit unit in allUnits)
+        {
+            if (unit != _selectedUnit && unit.currentSelectionState == Unit.SelectionState.selected)
+            {
+                unit.currentSelectionState = Unit.SelectionState.notSelected;
+            }
+        }
     }
 }
