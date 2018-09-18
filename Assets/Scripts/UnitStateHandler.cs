@@ -7,6 +7,7 @@ public class UnitStateHandler : MonoBehaviour
 {
     Unit unit;
     SceneManager sceneManager;
+    UnitSelectionHandler unitSelectionHandler;
     GameGrid grid;
     WorldManager worldManager;
     public Dictionary<Unit.UnitState, Action<Unit>> unitStateDictionary;
@@ -33,6 +34,7 @@ public class UnitStateHandler : MonoBehaviour
         };
 
         sceneManager = FindObjectOfType<SceneManager>().GetComponent<SceneManager>();
+        unitSelectionHandler = FindObjectOfType<UnitSelectionHandler>().GetComponent<UnitSelectionHandler>();
         grid = GameGrid.instance;
         worldManager = WorldManager.instance;
         unit = GetComponent<Unit>();
@@ -56,10 +58,12 @@ public class UnitStateHandler : MonoBehaviour
         else if (_state == Unit.UnitState.moving)
         {
             SetMoving(_unit);
+            UnitSelectionHandler.SetSelection(_unit, Unit.SelectionState.notSelected);
         }
         else if (_state == Unit.UnitState.attacking)
         {
             SetAttacking(_unit, _state);
+            UnitSelectionHandler.SetSelection(_unit, Unit.SelectionState.notSelected);
         }
         else if (_state == Unit.UnitState.cooldown)
         {
@@ -81,7 +85,7 @@ public class UnitStateHandler : MonoBehaviour
     {
         onUnitPlanningAttack(_unit);
     }
-    
+
     private static bool InPrepState(Unit.UnitState state)
     {
         return state == Unit.UnitState.planningAttack ||
@@ -111,25 +115,13 @@ public class UnitStateHandler : MonoBehaviour
 
     public void DestinationReached(Unit _unit)
     {
-        SetOnCooldown(_unit, Unit.UnitState.cooldown);
         grid.UpdateNodeStatuses();
         // why every node in grid?  Should be only nodes in range
         foreach (Node node in grid.grid)
         {
             ResetCosts(node);
         }
-        // 0 subscribers
-        // onMovementFinished(_unit);
-    }
-    public void ConfirmMovement(Unit _unit)
-    {
-        DestinationReached(_unit);
-    }
-
-    public void NextTurn(Unit _unit)
-    {
-        unit.currentMovementPoints = unit.maxMovementPointsPerTurn;
-        ConfirmMovement(_unit);
+        onMovementFinished(_unit);
     }
 
     private static void ResetCosts(Node node)

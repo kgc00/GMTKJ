@@ -5,22 +5,19 @@ using UnityEngine.UI;
 
 public class TimerUI : MonoBehaviour
 {
-    public Image hourGlass;
-
     void Awake()
     {
-		hourGlass = transform.Find("Cooldown Image").GetComponent<Image>();
+        transform.Find("Cooldown Image").GetComponent<Image>().enabled = false;
         UnitTimer.onTimerStarted += StartTimer;
-        UnitTimer.onTimerRemoved += StopTimer;
-        // StopTimer(Unit.UnitState.unselected);
+        UnitTimer.onTimerStopped += StopTimer;
     }
     void StartTimer(Unit _unit)
     {
-        hourGlass.enabled = true;
+        _unit.transform.Find("Cooldown Canvas/Cooldown Image").GetComponent<Image>().enabled = true;
     }
 
     void StopTimer(Unit _unit, Unit.UnitState state)
     {
-        hourGlass.enabled = false;
+        _unit.transform.Find("Cooldown Canvas/Cooldown Image").GetComponent<Image>().enabled = false;
     }
 }

@@ -9,7 +9,6 @@ public class AttackTargeting : MonoBehaviour
     List<Node> nodesWithinAttackRange = new List<Node>();
     List<Node> nodeAttackTargeting = new List<Node>();
     GameGrid grid;
-    Unit unit;
     AStar aStar;
     UnitStateHandler unitStateHandler;
     public static event Action<List<Node>> onGenerateAttackRange = delegate { };
@@ -19,10 +18,9 @@ public class AttackTargeting : MonoBehaviour
     void Start()
     {
         grid = GameGrid.instance;
-        unit = GetComponent<Unit>();
-        aStar = GetComponent<AStar>();
-        unitStateHandler = GetComponent<UnitStateHandler>();
-        GetComponent<InputHandler>().onRequestingAttackLogic += RequestingAttackLogic;
+        aStar = FindObjectOfType<AStar>().GetComponent<AStar>();
+        unitStateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
+        FindObjectOfType<InputHandler>().GetComponent<InputHandler>().onRequestingAttackLogic += RequestingAttackLogic;
         UnitStateHandler.onUnitPlanningAttack += InitiateAttackTargetting;
     }
 
@@ -38,9 +36,9 @@ public class AttackTargeting : MonoBehaviour
         GeneratePossibleMoves(unit.transform.position, unit.attackRange);
     }
 
-    void RequestingAttackLogic(Vector3 startPos, Vector3 targetPos)
+    void RequestingAttackLogic(Vector3 startPos, Vector3 targetPos, Unit unit)
     {
-        if (IsLegalMove(targetPos))
+        if (IsLegalMove(startPos, targetPos, unit))
         {
             DisplayTargetting(targetPos);
             if (Input.GetMouseButtonDown(0))
@@ -62,11 +60,12 @@ public class AttackTargeting : MonoBehaviour
         }
         else
         {
+            unitStateHandler.SetState(_attackingUnit, Unit.UnitState.attacking);
             unitStateHandler.AttackFinished(_attackingUnit);
         }
     }
 
-    private bool IsLegalMove(Vector3 targetPos)
+    private bool IsLegalMove(Vector3 startPos, Vector3 targetPos, Unit unit)
     {
         return nodesWithinAttackRange.Contains(grid.NodeFromWorldPosition(targetPos)) &&
                 grid.NodeFromWorldPosition(targetPos) != grid.NodeFromWorldPosition(unit.transform.position);

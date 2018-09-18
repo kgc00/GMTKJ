@@ -48,7 +48,6 @@ public class AStar : MonoBehaviour
             {
                 if (currentNode == targetNode)
                 {
-
                     // If we were able to reach the target node, we've found a path.
                     pathSuccess = true;
                     break;

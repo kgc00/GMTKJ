@@ -5,7 +5,6 @@ using System;
 
 public class MovementHandler : MonoBehaviour
 {
-    public Unit unit;
     public Transform target;
     GameGrid grid;
     PathRequestManager requestManager;
@@ -22,19 +21,18 @@ public class MovementHandler : MonoBehaviour
     {
         grid = GameGrid.instance;
         requestManager = PathRequestManager.instance;
-        unit = GetComponent<Unit>();
         target = FindObjectOfType<TargetPosition>().transform;
-        Debug.Assert(aStar = GetComponent<AStar>());
-        unitMovement = GetComponent<UnitMovement>();
-        inputHandler = GetComponent<InputHandler>();
-        unitStateHandler = GetComponent<UnitStateHandler>();
-        // unitStateHandler.onUnitMoving += StartMovementPathLogic;
+        aStar = FindObjectOfType<AStar>().GetComponent<AStar>();
+        unitMovement = FindObjectOfType<UnitMovement>().GetComponent<UnitMovement>();
+        inputHandler = FindObjectOfType<InputHandler>().GetComponent<InputHandler>();
+        unitStateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
+        UnitStateHandler.onUnitMoving += StartMovementPathLogic;
     }
 
-    private void StartMovementPathLogic()
+    private void StartMovementPathLogic(Unit _unit)
     {
         targetInfo = unitMovement.PassTargetInfo();
-        Unit _unit = grid.UnitFromNode(grid.NodeFromWorldPosition(targetInfo.startingPoint));
+        // Unit _unit = grid.UnitFromNode(grid.NodeFromWorldPosition(targetInfo.startingPoint));
         StartCoroutine(GenerateMovementPath(targetInfo.startingPoint, targetInfo.targetPoint, _unit));
         MoveUnit(_unit);
     }
@@ -49,12 +47,12 @@ public class MovementHandler : MonoBehaviour
 
         if (startNode.walkable && targetNode.walkable && startNode != targetNode)
         {
-            pathSuccess = aStar.PathFindingLogic(pathSuccess, startNode, targetNode, unit.currentMovementPoints);
+            pathSuccess = aStar.PathFindingLogic(pathSuccess, startNode, targetNode, _unit.currentMovementPoints);
         }
         yield return null;
         if (pathSuccess)
         {
-            waypoints = RetracePath(startNode, targetNode);
+            waypoints = RetracePath(startNode, targetNode, _unit);
         }
         else
         {
@@ -63,7 +61,7 @@ public class MovementHandler : MonoBehaviour
         requestManager.FinishedProcessingPath(waypoints, pathSuccess, _unit, this);
     }
 
-    Vector3[] RetracePath(Node startNode, Node endNode)
+    Vector3[] RetracePath(Node startNode, Node endNode, Unit _unit)
     {
         List<Node> path = new List<Node>();
         Node currentNode = endNode;
@@ -73,17 +71,17 @@ public class MovementHandler : MonoBehaviour
             path.Add(currentNode);
             currentNode = currentNode.parent;
         }
-        Vector3[] waypoints = ConvertPath(path);
+        Vector3[] waypoints = ConvertPath(path, _unit);
         Array.Reverse(waypoints);
         return waypoints;
     }
 
-    Vector3[] ConvertPath(List<Node> path)
+    Vector3[] ConvertPath(List<Node> path, Unit _unit)
     {
         Vector3[] waypoints = new Vector3[path.Count];
         for (int i = 0; i < path.Count; i++)
         {
-            waypoints[i] = new Vector3(path[i].worldPosition.x, path[i].worldPosition.y, unit.transform.position.z);
+            waypoints[i] = new Vector3(path[i].worldPosition.x, path[i].worldPosition.y, _unit.transform.position.z);
         }
         return waypoints;
     }
@@ -109,17 +107,17 @@ public class MovementHandler : MonoBehaviour
         Vector3 currentWaypoint = path[0];
         while (true)
         {
-            if (transform.position == currentWaypoint)
+            if (_unit.transform.position == currentWaypoint)
             {
                 targetIndex++;
                 if (targetIndex >= path.Length)
                 {
-                    unitStateHandler.ConfirmMovement(_unit);
+                    unitStateHandler.DestinationReached(_unit);
                     yield break;
                 }
                 currentWaypoint = path[targetIndex];
             }
-            transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, speed * Time.deltaTime);
+            _unit.transform.position = Vector3.MoveTowards(_unit.transform.position, currentWaypoint, speed * Time.deltaTime);
             yield return null;
         }
     }

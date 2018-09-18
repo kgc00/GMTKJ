@@ -5,15 +5,15 @@ using System;
 
 public class Unit : MonoBehaviour, IDamageable
 {
+    public enum SelectionState
+    {
+        selected, notSelected
+    };
     public enum UnitState
     {
         planningMovement, planningAttack,
         moving, attacking,
         cooldown, idle
-    };
-    public enum SelectionState
-    {
-        selected, notSelected
     };
     [SerializeField]
     public UnitState currentUnitState;

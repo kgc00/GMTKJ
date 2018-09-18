@@ -8,7 +8,7 @@ public class ChargeAbility : MonoBehaviour {
 	InputHandler inputHandler;
 
 	void Awake(){
-		inputHandler = GetComponent<InputHandler>();
+		inputHandler = FindObjectOfType<InputHandler>();
 		inputHandler.onAbilityCalled += CheckAbility;
 	}
 

@@ -27,7 +27,8 @@ public class GridEffects : MonoBehaviour
         UnitMovement.onGenerateMovementRange += InitiateMovementHighlights;
         UnitMovement.onGeneratePath += GeneratePath;
         AttackTargeting.onGenerateAttackRange += InitiateAttackHighlights;
-        UnitStateHandler.onUnitPastPlanning += ClearHighlights;
+        UnitStateHandler.onUnitMoving += ClearHighlights;
+        UnitStateHandler.onUnitAttacking += ClearHighlights;
         GameGrid.requestingHighlights += SpawnHighlightsForNode;
         pathList = new List<GameObject>();
         nodesToRemovedFromPath = new List<GameObject>();
@@ -134,7 +135,6 @@ public class GridEffects : MonoBehaviour
                 {
                     if (_tileGameObject.transform.Find(movementName).gameObject.activeInHierarchy)
                     {
-                        print("thing");
                         _tileGameObject.transform.Find(movementName).gameObject.SetActive(false);
                     }
                     else if (_tileGameObject.transform.Find(attackName).gameObject.activeInHierarchy)

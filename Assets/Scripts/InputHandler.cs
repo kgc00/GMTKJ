@@ -14,13 +14,14 @@ public class InputHandler : MonoBehaviour
     UnitStateHandler unitStateHandler;
     private TargetingInformation targetInformation;
     public event Action<TargetingInformation> onAbilityCalled = delegate { };
-    public event Action<Vector3, Vector3> onRequestingMovementLogic = delegate { };
-    public event Action<Vector3, Vector3> onRequestingAttackLogic = delegate { };
+    public event Action<Vector3, Vector3, Unit> onRequestingMovementLogic = delegate { };
+    public event Action<Vector3, Vector3, Unit> onRequestingAttackLogic = delegate { };
     void Start()
     {
         sceneManager = SceneManager.instance;
         grid = GameGrid.instance;
         cam = Camera.main;
+        unitStateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
         if (target == null)
         {
             target = FindObjectOfType<TargetPosition>().transform;
@@ -32,7 +33,7 @@ public class InputHandler : MonoBehaviour
         if (WorldManager.instance.ReturnUnitSelected())
         {
             selectedUnit = WorldManager.ReturnSelectedUnit();
-            if (ValidSelectedState())
+            if (ValidSelectedState(selectedUnit))
             {
                 SelectedLogic(selectedUnit);
             }
@@ -47,10 +48,10 @@ public class InputHandler : MonoBehaviour
 
     private void AttackLogic(Unit _unit)
     {
-        // if (unit.currentUnitState == Unit.UnitState.planningAttack)
-        // {
-        //     onRequestingAttackLogic(unit.transform.position, target.position);
-        // }
+        if (_unit.currentUnitState == Unit.UnitState.planningAttack)
+        {
+            onRequestingAttackLogic(_unit.transform.position, target.position, _unit);
+        }
     }
 
     private void SelectedLogic(Unit _unit)
@@ -69,21 +70,29 @@ public class InputHandler : MonoBehaviour
 
     }
 
-    private bool ValidSelectedState()
+    private bool ValidSelectedState(Unit _unit)
     {
-        return false;
-        // unit.currentSelectionState == Unit.SelectionState.selected ||
-        //         unit.currentUnitState == Unit.UnitState.planningAttack ||
-        //         unit.currentUnitState == Unit.UnitState.planningMovement ||
-        //         unit.currentUnitState == Unit.UnitState.idle;
+        if (_unit.currentSelectionState == Unit.SelectionState.selected)
+        {
+            if (_unit.currentUnitState == Unit.UnitState.planningMovement ||
+            _unit.currentUnitState == Unit.UnitState.planningAttack ||
+            _unit.currentUnitState == Unit.UnitState.idle){
+                return true;
+            }
+            return false;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private void MovementLogic(Unit _unit)
     {
-        // if (unit.currentUnitState == Unit.UnitState.planningMovement)
-        // {
-        //     onRequestingMovementLogic(unit.transform.position, target.position);
-        // }
+        if (_unit.currentUnitState == Unit.UnitState.planningMovement)
+        {
+            onRequestingMovementLogic(_unit.transform.position, target.position, _unit);
+        }
     }
 
     private void SelectionLogic()

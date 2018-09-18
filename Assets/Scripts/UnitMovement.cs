@@ -23,11 +23,12 @@ public class UnitMovement : MonoBehaviour
         aStar = FindObjectOfType<AStar>().GetComponent<AStar>();
         grid = GameGrid.instance;
         inputHandler.onRequestingMovementLogic += MovementLogic;
-        // unitStateHandler.onUnitPlanningMovement += DisplayMoves;
-        // unitStateHandler.onMovementFinished += ResetNodesInRange;
-        // unitStateHandler.onUnitMoving += ResetNodesInRange;
+        UnitStateHandler.onUnitPlanningMovement += DisplayMoves;
+        UnitStateHandler.onMovementFinished += ResetNodesInRange;
+        UnitStateHandler.onUnitMoving += ResetNodesInRange;
         WorldManager.onRequestGridState += ReturnDisplayGrid;
     }
+
     public void DisplayMoves(Unit _unit)
     {
         if (_unit.currentMovementPoints > 0)
@@ -37,27 +38,26 @@ public class UnitMovement : MonoBehaviour
         }
     }
 
-    public void MovementLogic(Vector3 startPos, Vector3 targetPos)
+    public void MovementLogic(Vector3 startPos, Vector3 targetPos, Unit _unit)
     {
-        if (IsLegalMove(targetPos))
+        if (IsLegalMove(startPos, targetPos))
         {
-            DisplayPath(startPos, targetPos);
+            DisplayPath(startPos, targetPos, _unit);
         }
-        if (IsLegalMove(targetPos) && Input.GetMouseButtonDown(0) && unit.currentMovementPoints > 0)
+        if (IsLegalMove(startPos, targetPos) && Input.GetMouseButtonDown(0) && _unit.currentMovementPoints > 0)
         {
             StoreTargetInfo(startPos, targetPos);
-            Unit _unit = grid.UnitFromNode(grid.NodeFromWorldPosition(startPos));
             unitStateHandler.SetState(_unit, Unit.UnitState.moving);
             gridShoulDisplay = false;
         }
     }
 
 
-    private bool IsLegalMove(Vector3 targetPos)
+    private bool IsLegalMove(Vector3 _startPos, Vector3 _targetPos)
     {
-        return nodesInRange.Contains(grid.NodeFromWorldPosition(targetPos)) &&
-                grid.NodeFromWorldPosition(targetPos) != grid.NodeFromWorldPosition(unit.transform.position) &&
-                !grid.nodesContainingUnits.Contains(grid.NodeFromWorldPosition(targetPos));
+        return nodesInRange.Contains(grid.NodeFromWorldPosition(_targetPos)) &&
+                grid.NodeFromWorldPosition(_targetPos) != grid.NodeFromWorldPosition(_startPos) &&
+                !grid.nodesContainingUnits.Contains(grid.NodeFromWorldPosition(_targetPos));
     }
 
     private List<Node> GeneratePossibleMoves(Vector3 startPos, int range)
@@ -79,16 +79,16 @@ public class UnitMovement : MonoBehaviour
         return nodesInRange;
     }
 
-    void DisplayPath(Vector3 startPos, Vector3 targetPos)
+    void DisplayPath(Vector3 startPos, Vector3 targetPos, Unit _unit)
     {
         Node startNode = grid.NodeFromWorldPosition(startPos);
         Node targetNode = grid.NodeFromWorldPosition(targetPos);
         bool pathSuccess = false;
-
         if (startNode.walkable && targetNode.walkable && startNode != targetNode)
         {
-            pathSuccess = aStar.PathFindingLogic(pathSuccess, startNode, targetNode, unit.currentMovementPoints);
+            pathSuccess = aStar.PathFindingLogic(pathSuccess, startNode, targetNode, _unit.currentMovementPoints);
         }
+
         if (pathSuccess)
         {
             GetPathToDisplay(startNode, targetNode);
@@ -108,6 +108,7 @@ public class UnitMovement : MonoBehaviour
         onGeneratePath(path);
         path.Reverse();
     }
+
     private void StoreTargetInfo(Vector3 startingPos, Vector3 targetPos)
     {
         targetInformation = new TargetingInformation(startingPos, targetPos);
@@ -118,12 +119,13 @@ public class UnitMovement : MonoBehaviour
         return targetInformation;
     }
 
-    public void ResetNodesInRange()
+    public void ResetNodesInRange(Unit _unit)
     {
         nodesInRange = new List<Node>();
     }
 
-    private bool ReturnDisplayGrid(){
+    private bool ReturnDisplayGrid()
+    {
         return gridShoulDisplay;
     }
 }

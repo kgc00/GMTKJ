@@ -5,24 +5,21 @@ using UnityEngine.UI;
 
 public class SelectionUnitUI : MonoBehaviour
 {
-
-    public Image selectionImage;
-
     void Awake()
     {
-        selectionImage = transform.Find("Selected Image").GetComponent<Image>();
         UnitSelectionHandler.onUnitSelected += ShowSelection;
-        UnitStateHandler.onUnitPastPlanning += HideSelection;
+        UnitStateHandler.onUnitMoving += HideSelection;
+        UnitStateHandler.onUnitAttacking += HideSelection;
         this.transform.Find("Selected Image").GetComponent<Image>().enabled = false;
     }
     
-    void ShowSelection(Unit unit)
+    void ShowSelection(Unit _unit)
     {
-        unit.transform.Find("Selected Canvas/Selected Image").GetComponent<Image>().enabled = true;
+        _unit.transform.Find("Selected Canvas/Selected Image").GetComponent<Image>().enabled = true;
     }
 
-    void HideSelection(Unit unit)
+    void HideSelection(Unit _unit)
     {
-        unit.transform.Find("Selected Canvas/Selected Image").GetComponent<Image>().enabled = false;
+        _unit.transform.Find("Selected Canvas/Selected Image").GetComponent<Image>().enabled = false;
     }
 }

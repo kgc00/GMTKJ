@@ -5,72 +5,67 @@ using System;
 
 public class UnitTimer : MonoBehaviour
 {
-
-    private float cooldownTimeRemaining;
-    private bool coolingDown = false;
+    private UnitStateHandler unitStateHandler;
+    private UnitSelectionHandler unitSelectionHandler;
     public static event Action<Unit> onTimerStarted = delegate { };
-    public static event Action<Unit, Unit.UnitState> onTimerRemoved = delegate { };
+    public static event Action<Unit, Unit.UnitState> onTimerStopped = delegate { };
+    public struct TimerInfo
+    {
+        public float timeToAddToTimer;
+        public Unit unit;
+        public TimerInfo(float _timeToAddToTimer, Unit _unit)
+        {
+            timeToAddToTimer = _timeToAddToTimer;
+            unit = _unit;
+        }
+    }
 
     // Use this for initialization
     void Start()
     {
-        // unitStateHandler.onMovementFinished += AddTimeToTimerMovement;
-        // unitStateHandler.onAttackFinished += AddTimeToTimerAttack;
+        unitStateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
+        unitSelectionHandler = FindObjectOfType<UnitSelectionHandler>().GetComponent<UnitSelectionHandler>();
+        UnitStateHandler.onMovementFinished += AddTimeToTimerMovement;
+        UnitStateHandler.onAttackFinished += AddTimeToTimerAttack;
     }
 
-    private void EndTimer()
+    private void EndTimer(Unit _unit)
     {
-        coolingDown = false;
-        // unitStateHandler.SetState(Unit.UnitState.unselected);
+        unitStateHandler.SetState(_unit, Unit.UnitState.idle);
+        onTimerStopped(_unit, Unit.UnitState.idle);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void ReadyUnit(Unit _unit)
     {
-        if (coolingDown)
+        EndTimer(_unit);
+    }
+
+    private void AddTimeToTimerMovement(Unit _unit)
+    {
+        float _timeToAddToTimer = 2.5f;
+        StartTimer(_unit, _timeToAddToTimer);
+    }
+
+    private void AddTimeToTimerAttack(Unit _unit)
+    {
+        float _timeToAddToTimer = 3.5f;
+        StartTimer(_unit, _timeToAddToTimer);
+    }
+
+    private void StartTimer(Unit _unit, float _timeToAddToTimer)
+    {
+        TimerInfo info = new TimerInfo(_timeToAddToTimer, _unit);
+        onTimerStarted(_unit);
+        StartCoroutine("InitiateCooldown", info);
+    }
+
+    private IEnumerator InitiateCooldown(TimerInfo info)
+    {
+        float timeToWait = info.timeToAddToTimer + Time.time;
+        while (Time.time < timeToWait)
         {
-            ModifyTime();
-            if (cooldownTimeRemaining <= 0)
-            {
-                ReadyUnit();
-            }
+            yield return new WaitForSeconds(.1f);
         }
-    }
-
-    private void ModifyTime()
-    {
-        cooldownTimeRemaining -= Time.deltaTime;
-        // onTimeChanged(cooldownTimeRemaining);
-    }
-
-    private void ReadyUnit()
-    {
-        EndTimer();
-    }
-
-    private void AddTimeToTimerMovement()
-    {
-        cooldownTimeRemaining += 2.5f;
-        CheckStartTimer();
-    }
-
-    private void AddTimeToTimerAttack()
-    {
-        cooldownTimeRemaining += 3.5f;
-        CheckStartTimer();
-    }
-
-    private void CheckStartTimer()
-    {
-        if (cooldownTimeRemaining > 0)
-        {
-            StartTimer();
-        }
-    }
-
-    private void StartTimer()
-    {
-        coolingDown = true;
-        // onTimerStarted();
+        ReadyUnit(info.unit);
     }
 }
