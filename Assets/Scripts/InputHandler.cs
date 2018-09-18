@@ -76,7 +76,8 @@ public class InputHandler : MonoBehaviour
         {
             if (_unit.currentUnitState == Unit.UnitState.planningMovement ||
             _unit.currentUnitState == Unit.UnitState.planningAttack ||
-            _unit.currentUnitState == Unit.UnitState.idle){
+            _unit.currentUnitState == Unit.UnitState.idle)
+            {
                 return true;
             }
             return false;
@@ -104,18 +105,19 @@ public class InputHandler : MonoBehaviour
             if (Physics.Raycast(ray, out hit, 50, 1 << 11))
             {
                 Node _selectedNode = grid.NodeFromWorldPosition(hit.transform.position);
-                if (_selectedNode.occupiedByUnit == Node.OccupiedByUnit.ally)
+                Unit _selectedUnit = hit.transform.parent.gameObject.GetComponent<Unit>();
+                if (_selectedNode.occupiedByUnit == Node.OccupiedByUnit.ally &&
+                _selectedUnit.currentUnitState == Unit.UnitState.idle)
                 {
-                    SelectUnit(hit);
+                    SelectUnit(_selectedUnit);
                 }
             }
         }
     }
 
-    private static void SelectUnit(RaycastHit hit)
+    private static void SelectUnit(Unit _selectedUnit)
     {
-        Unit _unitToSelect = hit.transform.parent.gameObject.GetComponent<Unit>();
-        UnitSelectionHandler.SetSelection(_unitToSelect, Unit.SelectionState.selected);
+        UnitSelectionHandler.SetSelection(_selectedUnit, Unit.SelectionState.selected);
         return;
     }
 }
