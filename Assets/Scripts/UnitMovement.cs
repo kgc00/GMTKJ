@@ -13,7 +13,7 @@ public class UnitMovement : MonoBehaviour
     InputHandler inputHandler;
     TargetingInformation targetInformation;
     bool gridShoulDisplay = false;
-    public static event Action<List<Node>> onGenerateMovementRange = delegate { };
+    public static event Action<Unit, List<Node>> onGenerateMovementRange = delegate { };
     public static event Action<List<Node>> onGeneratePath = delegate { };
 
     private void Start()
@@ -23,17 +23,26 @@ public class UnitMovement : MonoBehaviour
         aStar = FindObjectOfType<AStar>().GetComponent<AStar>();
         grid = GameGrid.instance;
         inputHandler.onRequestingMovementLogic += MovementLogic;
-        UnitStateHandler.onUnitPlanningMovement += DisplayMoves;
-        UnitStateHandler.onMovementFinished += ResetNodesInRange;
-        UnitStateHandler.onUnitMoving += ResetNodesInRange;
+        UnitStateHandler.onUnitPlanningMovement += PrepForMovement;
         WorldManager.onRequestGridState += ReturnDisplayGrid;
+    }
+
+    private void PrepForMovement(Unit _unit)
+    {
+        ResetNodesInRange(_unit);
+        DisplayMoves(_unit);
+    }
+
+    public void ResetNodesInRange(Unit _unit)
+    {
+        nodesInRange = new List<Node>();
     }
 
     public void DisplayMoves(Unit _unit)
     {
         if (_unit.currentMovementPoints > 0)
         {
-            GeneratePossibleMoves(_unit.transform.position, _unit.currentMovementPoints);
+            GeneratePossibleMoves(_unit, _unit.transform.position, _unit.currentMovementPoints);
             gridShoulDisplay = true;
         }
     }
@@ -60,7 +69,7 @@ public class UnitMovement : MonoBehaviour
                 !grid.nodesContainingUnits.Contains(grid.NodeFromWorldPosition(_targetPos));
     }
 
-    private List<Node> GeneratePossibleMoves(Vector3 startPos, int range)
+    private List<Node> GeneratePossibleMoves(Unit _unit, Vector3 startPos, int range)
     {
         if (nodesInRange == null)
         {
@@ -75,7 +84,7 @@ public class UnitMovement : MonoBehaviour
                 nodesInRange.Add(node);
             }
         }
-        onGenerateMovementRange(nodesInRange);
+        onGenerateMovementRange(_unit, nodesInRange);
         return nodesInRange;
     }
 
@@ -117,11 +126,6 @@ public class UnitMovement : MonoBehaviour
     public TargetingInformation PassTargetInfo()
     {
         return targetInformation;
-    }
-
-    public void ResetNodesInRange(Unit _unit)
-    {
-        nodesInRange = new List<Node>();
     }
 
     private bool ReturnDisplayGrid()

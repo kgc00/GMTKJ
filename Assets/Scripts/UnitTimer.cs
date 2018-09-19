@@ -9,7 +9,7 @@ public class UnitTimer : MonoBehaviour
     private UnitSelectionHandler unitSelectionHandler;
     public static event Action<Unit> onTimerStarted = delegate { };
     public static event Action<Unit, Unit.UnitState> onTimerStopped = delegate { };
-    public struct TimerInfo
+    private struct TimerInfo
     {
         public float timeToAddToTimer;
         public Unit unit;

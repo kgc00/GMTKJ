@@ -20,7 +20,6 @@ public class GridEffects : MonoBehaviour
     private Sprite pathHighlight;
     [SerializeField]
     private List<GameObject> pathList;
-    private List<GameObject> nodesToRemovedFromPath;
 
     void Start()
     {
@@ -31,7 +30,6 @@ public class GridEffects : MonoBehaviour
         UnitStateHandler.onUnitAttacking += ClearHighlights;
         GameGrid.requestingHighlights += SpawnHighlightsForNode;
         pathList = new List<GameObject>();
-        nodesToRemovedFromPath = new List<GameObject>();
     }
 
     private void SpawnHighlightsForNode(Node _node)
@@ -62,13 +60,21 @@ public class GridEffects : MonoBehaviour
         _pathHighlightGO.SetActive(false);
     }
 
-    private void InitiateMovementHighlights(List<Node> _nodesToHighlight)
+    private void InitiateMovementHighlights(Unit _unit, List<Node> _nodesToHighlight)
     {
+        if (selectionArray.Length > 0)
+        {
+            ClearHighlights(_unit);
+        }
         CreateHighlightForNodes(_nodesToHighlight, movementHighlight, movementName);
     }
 
-    private void InitiateAttackHighlights(List<Node> _nodesToHighlight)
+    private void InitiateAttackHighlights(Unit _unit, List<Node> _nodesToHighlight)
     {
+        if (selectionArray.Length > 0)
+        {
+            ClearHighlights(_unit);
+        }
         CreateHighlightForNodes(_nodesToHighlight, attackHighlight, attackName);
     }
 
@@ -126,10 +132,10 @@ public class GridEffects : MonoBehaviour
 
     private void ClearHighlights(Unit _unit)
     {
-        if (_unit.currentUnitState == Unit.UnitState.moving ||
-        _unit.currentUnitState == Unit.UnitState.attacking)
+        if (selectionArray != null)
         {
-            if (selectionArray != null)
+            // better way to check?
+            if (selectionArray[0] != null)
             {
                 foreach (GameObject _tileGameObject in selectionArray)
                 {
@@ -142,16 +148,19 @@ public class GridEffects : MonoBehaviour
                         _tileGameObject.transform.Find(attackName).gameObject.SetActive(false);
                     }
                 }
-                Array.Clear(selectionArray, 0, selectionArray.Length);
             }
-            if (pathList != null)
+            Array.Clear(selectionArray, 0, selectionArray.Length);
+        }
+        if (pathList != null)
+        {
+            if (pathList.Count > 0)
             {
                 foreach (GameObject _pathHighlight in pathList)
                 {
                     _pathHighlight.SetActive(false);
                 }
-                pathList.Clear();
             }
+            pathList.Clear();
         }
     }
 }

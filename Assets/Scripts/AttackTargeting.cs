@@ -11,7 +11,7 @@ public class AttackTargeting : MonoBehaviour
     GameGrid grid;
     AStar aStar;
     UnitStateHandler unitStateHandler;
-    public static event Action<List<Node>> onGenerateAttackRange = delegate { };
+    public static event Action<Unit, List<Node>> onGenerateAttackRange = delegate { };
 
 
     // Use this for initialization
@@ -31,9 +31,9 @@ public class AttackTargeting : MonoBehaviour
         unitStateHandler.AttackFinished(_attackingUnit);
     }
 
-    private void InitiateAttackTargetting(Unit unit)
+    private void InitiateAttackTargetting(Unit _unit)
     {
-        GeneratePossibleMoves(unit.transform.position, unit.attackRange);
+        GeneratePossibleMoves(_unit, _unit.transform.position, _unit.attackRange);
     }
 
     void RequestingAttackLogic(Vector3 startPos, Vector3 targetPos, Unit unit)
@@ -71,7 +71,7 @@ public class AttackTargeting : MonoBehaviour
                 grid.NodeFromWorldPosition(targetPos) != grid.NodeFromWorldPosition(unit.transform.position);
     }
 
-    private List<Node> GeneratePossibleMoves(Vector3 startPos, int range)
+    private List<Node> GeneratePossibleMoves(Unit _unit, Vector3 startPos, int range)
     {
         nodesWithinAttackRange = new List<Node>();
         Node targetNode = grid.NodeFromWorldPosition(startPos);
@@ -82,7 +82,7 @@ public class AttackTargeting : MonoBehaviour
                 nodesWithinAttackRange.Add(node);
             }
         }
-        onGenerateAttackRange(nodesWithinAttackRange);
+        onGenerateAttackRange(_unit, nodesWithinAttackRange);
         return nodesWithinAttackRange;
     }
 

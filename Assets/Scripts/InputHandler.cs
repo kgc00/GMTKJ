@@ -56,7 +56,6 @@ public class InputHandler : MonoBehaviour
 
     private void SelectedLogic(Unit _unit)
     {
-
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             unitStateHandler.SetState(_unit, Unit.UnitState.planningMovement);
@@ -67,7 +66,6 @@ public class InputHandler : MonoBehaviour
             unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
             return;
         }
-
     }
 
     private bool ValidSelectedState(Unit _unit)
@@ -104,11 +102,13 @@ public class InputHandler : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, 50, 1 << 11))
             {
+                print(hit.collider.gameObject);
                 Node _selectedNode = grid.NodeFromWorldPosition(hit.transform.position);
                 Unit _selectedUnit = hit.transform.parent.gameObject.GetComponent<Unit>();
                 if (_selectedNode.occupiedByUnit == Node.OccupiedByUnit.ally &&
                 _selectedUnit.currentUnitState == Unit.UnitState.idle)
                 {
+                    print("next gate");
                     SelectUnit(_selectedUnit);
                 }
             }

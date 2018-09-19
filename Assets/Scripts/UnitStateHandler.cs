@@ -78,18 +78,24 @@ public class UnitStateHandler : MonoBehaviour
 
     private void SetPlanningMovement(Unit _unit, Unit.UnitState _state)
     {
+        grid.UpdateNodeStatuses(_unit);
+        // why every node in grid?  Should be only nodes in range
+        foreach (Node node in grid.grid)
+        {
+            ResetCosts(node);
+        } 
         onUnitPlanningMovement(_unit);
     }
 
     private void SetPlanningAttack(Unit _unit, Unit.UnitState _state)
     {
+        grid.UpdateNodeStatuses(_unit);
+        // why every node in grid?  Should be only nodes in range
+        foreach (Node node in grid.grid)
+        {
+            ResetCosts(node);
+        }
         onUnitPlanningAttack(_unit);
-    }
-
-    private static bool InPrepState(Unit.UnitState state)
-    {
-        return state == Unit.UnitState.planningAttack ||
-                state == Unit.UnitState.planningMovement;
     }
 
     private void SetAttacking(Unit _unit, Unit.UnitState _state)
@@ -115,12 +121,6 @@ public class UnitStateHandler : MonoBehaviour
 
     public void DestinationReached(Unit _unit)
     {
-        grid.UpdateNodeStatuses();
-        // why every node in grid?  Should be only nodes in range
-        foreach (Node node in grid.grid)
-        {
-            ResetCosts(node);
-        }
         onMovementFinished(_unit);
     }
 

@@ -41,6 +41,7 @@ public class GameGrid : MonoBehaviour
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
         nodesContainingUnits = new List<Node>();
+        UnitStateHandler.onMovementFinished += UpdateNodeStatuses;
         CreateGrid();
     }
 
@@ -190,14 +191,18 @@ public class GameGrid : MonoBehaviour
         return nodesWithinAttackRange;
     }
 
-    public void UpdateNodeStatuses()
+    public void UpdateNodeStatuses(Unit _unit)
     {
         foreach (Node node in grid)
         {
-            if ((Physics.CheckSphere(node.worldPosition, nodeRadius, allyMask)) ||
-            (Physics.CheckSphere(node.worldPosition, nodeRadius, enemyMask)))
+            if ((Physics.CheckSphere(node.worldPosition, nodeRadius, allyMask)))
             {
                 node.occupiedByUnit = Node.OccupiedByUnit.ally;
+                nodesContainingUnits.Add(node);
+            }
+            else if ((Physics.CheckSphere(node.worldPosition, nodeRadius, enemyMask)))
+            {
+                node.occupiedByUnit = Node.OccupiedByUnit.enemy;
                 nodesContainingUnits.Add(node);
             }
             else
