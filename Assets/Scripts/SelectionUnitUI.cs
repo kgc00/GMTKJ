@@ -10,7 +10,10 @@ public class SelectionUnitUI : MonoBehaviour
         UnitSelectionHandler.onUnitSelected += ShowSelection;
         UnitStateHandler.onUnitMoving += HideSelection;
         UnitStateHandler.onUnitAttacking += HideSelection;
-        this.transform.Find("Selected Image").GetComponent<Image>().enabled = false;
+    }
+
+    void Start(){
+
     }
     
     void ShowSelection(Unit _unit)

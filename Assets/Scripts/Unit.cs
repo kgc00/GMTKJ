@@ -21,7 +21,7 @@ public class Unit : MonoBehaviour, IDamageable
     public int maxMovementPointsPerTurn, currentMovementPoints, movementCost, attackRange, maxHealth, currentHealth, attackPower;
     public static event Action<Unit> OnUnitDeath = delegate { };
 
-    public event Action<int, int, int> OnDamageTaken = delegate { };
+    public static event Action<Unit, int, int, int> OnDamageTaken = delegate { };
 
     void Start()
     {
@@ -36,7 +36,7 @@ public class Unit : MonoBehaviour, IDamageable
         currentMovementPoints = maxMovementPointsPerTurn;
     }
 
-    void UnitDeath()
+    protected void UnitDeath()
     {
         OnUnitDeath(this);
         Destroy(gameObject, 2.0f);
@@ -44,12 +44,12 @@ public class Unit : MonoBehaviour, IDamageable
 
     public void TakeDamage(int incomingDamage)
     {
-        OnDamageTaken(currentHealth, maxHealth, incomingDamage);
+        OnDamageTaken(this, currentHealth, maxHealth, incomingDamage);
         currentHealth -= incomingDamage;
         CheckForUnitDeath();
     }
 
-    private void CheckForUnitDeath()
+    protected void CheckForUnitDeath()
     {
         if (currentHealth <= 0)
         {

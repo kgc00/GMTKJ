@@ -7,7 +7,7 @@ public class TimerUI : MonoBehaviour
 {
     void Awake()
     {
-        transform.Find("Cooldown Image").GetComponent<Image>().enabled = false;
+        // pass in an array of all units.... or call a function on unit component enabled
         UnitTimer.onTimerStarted += StartTimer;
         UnitTimer.onTimerStopped += StopTimer;
     }

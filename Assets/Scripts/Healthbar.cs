@@ -9,19 +9,26 @@ public class Healthbar : MonoBehaviour
 
     public Image foregroundImage;
     Unit unit;
-	public float updateSpeed = .5f;
+    public float updateSpeed = .5f;
     private Coroutine CoroutineHandler;
+    private struct HealthFillInfo
+    {
+        public float newTotal;
+        public Unit unit;
+        public HealthFillInfo(float _newTotal, Unit _unit)
+        {
+            newTotal = _newTotal;
+            unit = _unit;
+        }
+    }
 
     // Use this for initialization
     void Start()
     {
-        foregroundImage = transform.Find("Health Foreground").GetComponent<Image>();
-        unit = GetComponentInParent<Unit>();
-        unit.OnDamageTaken += OnDamageTaken;
-        foregroundImage.fillAmount = 1;
+        Unit.OnDamageTaken += OnDamageTaken;
     }
 
-    private void OnDamageTaken(int currentHealth, int maxHealth, int damageTaken)
+    private void OnDamageTaken(Unit unit, int currentHealth, int maxHealth, int damageTaken)
     {
         float newTotal = (float)(currentHealth - damageTaken) / (float)maxHealth;
         if (newTotal < 0)
@@ -32,19 +39,28 @@ public class Healthbar : MonoBehaviour
         {
             StopCoroutine(CoroutineHandler);
         }
-        CoroutineHandler = StartCoroutine(AnimateHealthBar(newTotal));
+        HealthFillInfo info = new HealthFillInfo(newTotal, unit);
+        CoroutineHandler = StartCoroutine(AnimateHealthBar(info));
     }
 
-    private IEnumerator AnimateHealthBar(float newTotal)
+    private IEnumerator AnimateHealthBar(HealthFillInfo info)
     {
-		float preChangePct = foregroundImage.fillAmount;
-		float elapsed = 0f;
+        float newTotal = info.newTotal;
+        if (info.unit.transform.Find("Health Canvas/Health Foreground").GetComponent<Image>())
+        {
+            foregroundImage = info.unit.transform.Find("Health Canvas/Health Foreground").GetComponent<Image>();
+        } else {
+            Debug.LogError("Could not find healthbar image");
+        }
+        float preChangePct = foregroundImage.fillAmount;
+        float elapsed = 0f;
 
-		while (elapsed < updateSpeed){
-			elapsed += Time.deltaTime;
-			foregroundImage.fillAmount = Mathf.Lerp(preChangePct, newTotal, elapsed / updateSpeed);
-			yield return null;
-		}
-		foregroundImage.fillAmount = newTotal;
+        while (elapsed < updateSpeed)
+        {
+            elapsed += Time.deltaTime;
+            foregroundImage.fillAmount = Mathf.Lerp(preChangePct, newTotal, elapsed / updateSpeed);
+            yield return null;
+        }
+        foregroundImage.fillAmount = newTotal;
     }
 }

@@ -102,13 +102,11 @@ public class InputHandler : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, 50, 1 << 11))
             {
-                print(hit.collider.gameObject);
                 Node _selectedNode = grid.NodeFromWorldPosition(hit.transform.position);
                 Unit _selectedUnit = hit.transform.parent.gameObject.GetComponent<Unit>();
                 if (_selectedNode.occupiedByUnit == Node.OccupiedByUnit.ally &&
                 _selectedUnit.currentUnitState == Unit.UnitState.idle)
                 {
-                    print("next gate");
                     SelectUnit(_selectedUnit);
                 }
             }
