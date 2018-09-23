@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 125f08e7cd060ae4d8f7572e19d9306d, type: 3}
+  m_Name: Knight_Bash
+  m_EditorClassIdentifier: 
+  targettingBehavior: 0
+  abilityInfo:
+    attackPower: 0
+    cooldownTime: 1
+    abilityIcon: {fileID: 21300000, guid: ea182fcd42b8a9a4e855f8478fa39983, type: 3}

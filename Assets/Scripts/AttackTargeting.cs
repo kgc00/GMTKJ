@@ -13,13 +13,10 @@ public class AttackTargeting : MonoBehaviour
     UnitStateHandler unitStateHandler;
     public static event Action<Unit, List<Node>> onGenerateAttackRange = delegate { };
 
-
-    // Use this for initialization
     void Start()
     {
-        grid = GameGrid.instance;
         aStar = FindObjectOfType<AStar>().GetComponent<AStar>();
-        unitStateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
+        grid = GameGrid.instance;
         FindObjectOfType<InputHandler>().GetComponent<InputHandler>().onRequestingAttackLogic += RequestingAttackLogic;
         UnitStateHandler.onUnitPlanningAttack += InitiateAttackTargetting;
     }

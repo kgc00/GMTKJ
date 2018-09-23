@@ -43,31 +43,31 @@ public class UnitStateHandler : MonoBehaviour
     public void SetState(Unit _unit, Unit.UnitState _state)
     {
         _unit.currentUnitState = _state;
-        if (_state == Unit.UnitState.idle)
+        switch (_unit.currentUnitState)
         {
-            SetIdle(_unit, _state);
-        }
-        else if (_state == Unit.UnitState.planningMovement)
-        {
-            SetPlanningMovement(_unit, _state);
-        }
-        else if (_state == Unit.UnitState.planningAttack)
-        {
-            SetPlanningAttack(_unit, _state);
-        }
-        else if (_state == Unit.UnitState.moving)
-        {
-            SetMoving(_unit);
-            UnitSelectionHandler.SetSelection(_unit, Unit.SelectionState.notSelected);
-        }
-        else if (_state == Unit.UnitState.attacking)
-        {
-            SetAttacking(_unit, _state);
-            UnitSelectionHandler.SetSelection(_unit, Unit.SelectionState.notSelected);
-        }
-        else if (_state == Unit.UnitState.cooldown)
-        {
-            SetOnCooldown(_unit, _state);
+            case Unit.UnitState.idle:
+                SetIdle(_unit, _state);
+                break;
+            case Unit.UnitState.planningMovement:
+                SetPlanningMovement(_unit, _state);
+                break;
+            case Unit.UnitState.planningAttack:
+                SetPlanningAttack(_unit, _state);
+                break;
+            case Unit.UnitState.moving:
+                SetMoving(_unit);
+                UnitSelectionHandler.SetSelection(_unit, Unit.SelectionState.notSelected);
+                break;
+            case Unit.UnitState.attacking:
+                SetAttacking(_unit, _state);
+                UnitSelectionHandler.SetSelection(_unit, Unit.SelectionState.notSelected);
+                break;
+            case Unit.UnitState.cooldown:
+                SetOnCooldown(_unit, _state);
+                break;
+            default:
+                Debug.LogError("Unrecognized unit state");
+                break;
         }
     }
 
@@ -83,7 +83,7 @@ public class UnitStateHandler : MonoBehaviour
         foreach (Node node in grid.grid)
         {
             ResetCosts(node);
-        } 
+        }
         onUnitPlanningMovement(_unit);
     }
 

@@ -7,12 +7,10 @@ public class InputHandler : MonoBehaviour
 {
     Camera cam;
     public Transform target;
-    public List<Node> nodesInRange;
     SceneManager sceneManager;
     GameGrid grid;
     Unit selectedUnit;
     UnitStateHandler unitStateHandler;
-    private TargetingInformation targetInformation;
     public event Action<TargetingInformation> onAbilityCalled = delegate { };
     public event Action<Vector3, Vector3, Unit> onRequestingMovementLogic = delegate { };
     public event Action<Vector3, Vector3, Unit> onRequestingAttackLogic = delegate { };
@@ -32,7 +30,11 @@ public class InputHandler : MonoBehaviour
     {
         if (WorldManager.instance.ReturnUnitSelected())
         {
-            selectedUnit = WorldManager.ReturnSelectedUnit();
+            if (WorldManager.ReturnSelectedUnit() != selectedUnit)
+            {
+                selectedUnit = WorldManager.ReturnSelectedUnit();
+            }
+
             if (ValidSelectedState(selectedUnit))
             {
                 SelectedLogic(selectedUnit);
@@ -62,6 +64,19 @@ public class InputHandler : MonoBehaviour
             return;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            if (_unit.GetComponent<AbilityManager>().GetAttack(0))
+            {
+                unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
+            }
+            return;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
+            return;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
             return;
