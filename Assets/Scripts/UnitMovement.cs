@@ -58,6 +58,7 @@ public class UnitMovement : MonoBehaviour
             StoreTargetInfo(startPos, targetPos);
             unitStateHandler.SetState(_unit, Unit.UnitState.moving);
             gridShoulDisplay = false;
+            _unit.GetComponent<AbilityManager>().AnimateAbilityUse(0);
         }
     }
 

@@ -13,7 +13,7 @@ public class InputHandler : MonoBehaviour
     UnitStateHandler unitStateHandler;
     public event Action<TargetingInformation> onAbilityCalled = delegate { };
     public event Action<Vector3, Vector3, Unit> onRequestingMovementLogic = delegate { };
-    public event Action<Vector3, Vector3, Unit> onRequestingAttackLogic = delegate { };
+    public event Action<Vector3, Vector3, Unit, int> onRequestingAttackLogic = delegate { };
     void Start()
     {
         sceneManager = SceneManager.instance;
@@ -52,7 +52,8 @@ public class InputHandler : MonoBehaviour
     {
         if (_unit.currentUnitState == Unit.UnitState.planningAttack)
         {
-            onRequestingAttackLogic(_unit.transform.position, target.position, _unit);
+            onRequestingAttackLogic(_unit.transform.position, target.position,
+            _unit, _unit.GetComponent<AbilityManager>().ReturnCurrentAttack());
         }
     }
 
@@ -60,12 +61,15 @@ public class InputHandler : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            unitStateHandler.SetState(_unit, Unit.UnitState.planningMovement);
+            if (_unit.GetComponent<AbilityManager>().AnimateAbilitySelection(0))
+            {
+                unitStateHandler.SetState(_unit, Unit.UnitState.planningMovement);
+            }
             return;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            if (_unit.GetComponent<AbilityManager>().GetAttack(0))
+            if (_unit.GetComponent<AbilityManager>().AnimateAbilitySelection(1))
             {
                 unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
             }
@@ -73,12 +77,18 @@ public class InputHandler : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
+            if (_unit.GetComponent<AbilityManager>().AnimateAbilitySelection(2))
+            {
+                unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
+            }
             return;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
+            if (_unit.GetComponent<AbilityManager>().AnimateAbilitySelection(3))
+            {
+                unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
+            }
             return;
         }
     }

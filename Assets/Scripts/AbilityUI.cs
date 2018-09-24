@@ -11,6 +11,7 @@ public class AbilityUI : MonoBehaviour
     private List<Image> abilityImages;
     [SerializeField]
     private AnimationClip[] clips;
+
     void Start()
     {
         UnitSelectionHandler.onUnitSelected += PopulateAbilityPanel;
@@ -25,7 +26,7 @@ public class AbilityUI : MonoBehaviour
         }
     }
 
-    private void PopulateAbilityPanel(Unit _unit)
+    public void PopulateAbilityPanel(Unit _unit)
     {
         List<Ability> abilities = _unit.GetComponent<AbilityManager>().ReturnEquippedAbilities();
         for (int i = 0; i < abilities.Count; i++)
@@ -33,6 +34,7 @@ public class AbilityUI : MonoBehaviour
             if (i <= abilityImages.Count)
             {
                 abilityImages[i].sprite = abilities[i].abilityInfo.abilityIcon;
+                abilityImages[i].color = Color.white;
                 abilityImages[i].enabled = true;
             }
         }

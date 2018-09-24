@@ -33,6 +33,10 @@ public class UnitTimer : MonoBehaviour
     {
         unitStateHandler.SetState(_unit, Unit.UnitState.idle);
         onTimerStopped(_unit, Unit.UnitState.idle);
+        if (_unit == WorldManager.ReturnSelectedUnit())
+        {
+            FindObjectOfType<AbilityUI>().GetComponent<AbilityUI>().PopulateAbilityPanel(_unit);
+        }
     }
 
     private void ReadyUnit(Unit _unit)

@@ -20,6 +20,7 @@ public class AbilityManager : MonoBehaviour
     private bool equipAbilitiesInEditor;
     private AbilityUI abilityUI;
     Unit unit;
+    private int currentAttackSlot;
     void Awake()
     {
         if (!equipAbilitiesInEditor)
@@ -49,13 +50,34 @@ public class AbilityManager : MonoBehaviour
         return equippedAbilities;
     }
 
-    public bool GetAttack(int v)
+    public bool AnimateAbilitySelection(int v)
     {
         if (equippedAbilities[v] != null)
         {
+            currentAttackSlot = v;
             abilityUI.RequestAnimation(unit, v, true);
             return true;
         }
         return false;
+    }
+
+    public bool AnimateAbilityUse(int v)
+    {
+        if (equippedAbilities[v] != null)
+        {
+            abilityUI.RequestAnimation(unit, v, false);
+            return true;
+        }
+        return false;
+    }
+
+    public int ReturnCurrentAttack()
+    {
+        return currentAttackSlot;
+    }
+
+    public Ability.AbilityInfo ReturnAbilityInfo()
+    {
+        return equippedAbilities[currentAttackSlot].abilityInfo;
     }
 }
