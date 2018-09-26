@@ -11,23 +11,25 @@ public class AttackTargeting : MonoBehaviour
     GameGrid grid;
     AStar aStar;
     UnitStateHandler unitStateHandler;
+    InputHandler inputHandler;
     public static event Action<Unit, List<Node>> onGenerateAttackRange = delegate { };
 
     void Start()
     {
         aStar = FindObjectOfType<AStar>().GetComponent<AStar>();
         grid = GameGrid.instance;
+        inputHandler = FindObjectOfType<InputHandler>().GetComponent<InputHandler>();
         unitStateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
-        FindObjectOfType<InputHandler>().GetComponent<InputHandler>().onRequestingAttackLogic += RequestingAttackLogic;
+        inputHandler.onRequestingAttackLogic += RequestingAttackLogic;
         UnitStateHandler.onUnitPlanningAttack += InitiateAttackTargeting;
     }
 
     // Need individual move logic here
-    private void InitiateAttackTargeting(Unit _unit)
+    private void InitiateAttackTargeting(Unit _unit, Ability.AbilityInfo _abilityInfo)
     {
         DetermineAttackType(_unit);
         // pass output to generate possible moves
-        GeneratePossibleMovesSquare(_unit, _unit.transform.position, _unit.attackRange);
+        GeneratePossibleMoves(_unit, _unit.transform.position, _abilityInfo);
     }
 
     private void DetermineAttackType(Unit _unit)
@@ -40,10 +42,7 @@ public class AttackTargeting : MonoBehaviour
         if (IsLegalMove(startPos, targetPos, unit))
         {
             DisplayTargeting(targetPos);
-            if (Input.GetMouseButtonDown(0))
-            {
-                InitiateAttack(startPos, targetPos, slot);
-            }
+            inputHandler.AttackInput(startPos, targetPos, slot);
         }
     }
 
@@ -54,7 +53,7 @@ public class AttackTargeting : MonoBehaviour
         unitStateHandler.AttackFinished(_attackingUnit);
     }
 
-    private void InitiateAttack(Vector3 _startPos, Vector3 _targetPos, int slot)
+    public void InitiateAttack(Vector3 _startPos, Vector3 _targetPos, int slot)
     {
         Node _selectedNode = grid.NodeFromWorldPosition(_targetPos);
         Unit _target = UnitFromNode.SingleUnitFromNode(_selectedNode);
@@ -78,13 +77,13 @@ public class AttackTargeting : MonoBehaviour
                 grid.NodeFromWorldPosition(targetPos) != grid.NodeFromWorldPosition(unit.transform.position);
     }
 
-    private List<Node> GeneratePossibleMovesSquare(Unit _unit, Vector3 startPos, int range)
+    private List<Node> GeneratePossibleMoves(Unit _unit, Vector3 startPos, Ability.AbilityInfo info)
     {
         nodesWithinAttackRange = new List<Node>();
         Node targetNode = grid.NodeFromWorldPosition(startPos);
-        foreach (Node node in grid.GetAttackRange(targetNode, range))
+        foreach (Node node in grid.GetAttackRange(targetNode, info))
         {
-            if (aStar.PathFindingLogic(false, targetNode, node, range))
+            if (aStar.PathFindingLogic(false, targetNode, node, info.attackRange))
             {
                 nodesWithinAttackRange.Add(node);
             }

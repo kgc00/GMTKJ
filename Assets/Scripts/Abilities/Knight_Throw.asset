@@ -11,8 +11,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c06b84b6d0408444a2ecb17d6c3bf6a, type: 3}
   m_Name: Knight_Throw
   m_EditorClassIdentifier: 
-  targettingBehavior: 0
   abilityInfo:
     attackPower: 1
+    attackRange: 4
     cooldownTime: 2
     abilityIcon: {fileID: 21300000, guid: 9ccb655bf5035f7459a8e9d139f46a6f, type: 3}
+    targetingBehavior: 1

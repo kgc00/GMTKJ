@@ -11,6 +11,7 @@ public class InputHandler : MonoBehaviour
     GameGrid grid;
     Unit selectedUnit;
     UnitStateHandler unitStateHandler;
+    AttackTargeting attackTargeting;
     public event Action<TargetingInformation> onAbilityCalled = delegate { };
     public event Action<Vector3, Vector3, Unit> onRequestingMovementLogic = delegate { };
     public event Action<Vector3, Vector3, Unit, int> onRequestingAttackLogic = delegate { };
@@ -19,6 +20,7 @@ public class InputHandler : MonoBehaviour
         sceneManager = SceneManager.instance;
         grid = GameGrid.instance;
         cam = Camera.main;
+        attackTargeting = FindObjectOfType<AttackTargeting>().GetComponentInChildren<AttackTargeting>();
         unitStateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
         if (target == null)
         {
@@ -54,6 +56,7 @@ public class InputHandler : MonoBehaviour
         {
             onRequestingAttackLogic(_unit.transform.position, target.position,
             _unit, _unit.GetComponent<AbilityManager>().ReturnCurrentAttack());
+
         }
     }
 
@@ -71,6 +74,7 @@ public class InputHandler : MonoBehaviour
         {
             if (_unit.GetComponent<AbilityManager>().AnimateAbilitySelection(1))
             {
+                unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
                 unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
             }
             return;
@@ -79,6 +83,7 @@ public class InputHandler : MonoBehaviour
         {
             if (_unit.GetComponent<AbilityManager>().AnimateAbilitySelection(2))
             {
+                unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
                 unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
             }
             return;
@@ -87,6 +92,7 @@ public class InputHandler : MonoBehaviour
         {
             if (_unit.GetComponent<AbilityManager>().AnimateAbilitySelection(3))
             {
+                unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
                 unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
             }
             return;
@@ -135,6 +141,14 @@ public class InputHandler : MonoBehaviour
                     SelectUnit(_selectedUnit);
                 }
             }
+        }
+    }
+
+    public void AttackInput(Vector3 startPos, Vector3 targetPos, int slot)
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            attackTargeting.InitiateAttack(startPos, targetPos, slot);
         }
     }
 

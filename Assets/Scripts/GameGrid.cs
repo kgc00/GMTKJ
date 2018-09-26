@@ -166,8 +166,9 @@ public class GameGrid : MonoBehaviour
         return nodesWithinRange;
     }
 
-    public List<Node> GetAttackRange(Node node, int range)
+    public List<Node> GetAttackRange(Node node, Ability.AbilityInfo abilityInfo)
     {
+        int range = abilityInfo.attackRange;
         List<Node> nodesWithinAttackRange = new List<Node>();
         for (int x = -range; x <= range; x++)
         {
@@ -175,20 +176,55 @@ public class GameGrid : MonoBehaviour
             {
                 int checkX = node.gridX + x;
                 int checkY = node.gridY + y;
-                if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
+                switch (abilityInfo.targetingBehavior)
                 {
-                    if (x == 0 && y == 0)
-                    {
-
-                    }
-                    else
-                    {
-                        nodesWithinAttackRange.Add(grid[checkX, checkY]);
-                    }
+                    case Ability.TargetingBehavior.line:
+                        CheckRangeResultsLine(nodesWithinAttackRange, x, y, checkX, checkY, abilityInfo);
+                        break;
+                    case Ability.TargetingBehavior.square:
+                        CheckRangeResultsSquare(nodesWithinAttackRange, x, y, checkX, checkY, abilityInfo);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
         return nodesWithinAttackRange;
+    }
+
+    private void CheckRangeResultsSquare(List<Node> nodesWithinAttackRange, int x, int y,
+    int checkX, int checkY, Ability.AbilityInfo attackType)
+    {
+        if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
+        {
+            if (x == 0 && y == 0)
+            {
+
+            }
+            else
+            {
+                nodesWithinAttackRange.Add(grid[checkX, checkY]);
+            }
+        }
+    }
+
+    private void CheckRangeResultsLine(List<Node> nodesWithinAttackRange, int x, int y,
+   int checkX, int checkY, Ability.AbilityInfo attackType)
+    {
+        if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
+        {
+            if (x == 0 || y == 0)
+            {
+                if (x == 0 && y == 0)
+                {
+
+                }
+                else
+                {
+                    nodesWithinAttackRange.Add(grid[checkX, checkY]);
+                }
+            }
+        }
     }
 
     public void UpdateNodeStatuses(Unit _unit)

@@ -16,22 +16,23 @@ public class UnitStateHandler : MonoBehaviour
     public static Action<Unit> onUnitMoving = delegate { };
     public static Action<Unit> onMovementFinished = delegate { };
     public static Action<Unit> onUnitPlanningMovement = delegate { };
-    public static Action<Unit> onUnitPlanningAttack = delegate { };
+    public static Action<Unit, Ability.AbilityInfo> onUnitPlanningAttack = delegate { };
     public static Action<Unit> onUnitAttacking = delegate { };
     public static Action<Unit> onAttackFinished = delegate { };
     public static Action<Unit> onUnitCoolingDown = delegate { };
     public static Action<Unit> onUnitIdle = delegate { };
+    private Ability.AbilityInfo currentAbilityInfo = new Ability.AbilityInfo();
 
     void Start()
     {
-        unitStateDictionary = new Dictionary<Unit.UnitState, Action<Unit>>(){
-            {Unit.UnitState.planningMovement, onUnitPlanningMovement},
-            {Unit.UnitState.planningAttack, onUnitPlanningAttack},
-            {Unit.UnitState.moving, onUnitMoving},
-            {Unit.UnitState.attacking, onUnitAttacking},
-            {Unit.UnitState.cooldown, onUnitCoolingDown},
-            {Unit.UnitState.idle, onUnitIdle},
-        };
+        // unitStateDictionary = new Dictionary<Unit.UnitState, Action<Unit>>(){
+        //     {Unit.UnitState.planningMovement, onUnitPlanningMovement},
+        //     {Unit.UnitState.planningAttack, onUnitPlanningAttack},
+        //     {Unit.UnitState.moving, onUnitMoving},
+        //     {Unit.UnitState.attacking, onUnitAttacking},
+        //     {Unit.UnitState.cooldown, onUnitCoolingDown},
+        //     {Unit.UnitState.idle, onUnitIdle},
+        // };
 
         sceneManager = FindObjectOfType<SceneManager>().GetComponent<SceneManager>();
         unitSelectionHandler = FindObjectOfType<UnitSelectionHandler>().GetComponent<UnitSelectionHandler>();
@@ -71,6 +72,11 @@ public class UnitStateHandler : MonoBehaviour
         }
     }
 
+    internal void GetAttackData(Ability.AbilityInfo _abilityInfo)
+    {
+        currentAbilityInfo = _abilityInfo;
+    }
+
     private void SetIdle(Unit _unit, Unit.UnitState _state)
     {
         onUnitIdle(_unit);
@@ -95,7 +101,7 @@ public class UnitStateHandler : MonoBehaviour
         {
             ResetCosts(node);
         }
-        onUnitPlanningAttack(_unit);
+        onUnitPlanningAttack(_unit, currentAbilityInfo);
     }
 
     private void SetAttacking(Unit _unit, Unit.UnitState _state)

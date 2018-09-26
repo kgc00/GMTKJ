@@ -11,8 +11,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 125f08e7cd060ae4d8f7572e19d9306d, type: 3}
   m_Name: Knight_Bash
   m_EditorClassIdentifier: 
-  targettingBehavior: 0
   abilityInfo:
     attackPower: 0
+    attackRange: 1
     cooldownTime: 1
     abilityIcon: {fileID: 21300000, guid: ea182fcd42b8a9a4e855f8478fa39983, type: 3}
+    targetingBehavior: 1

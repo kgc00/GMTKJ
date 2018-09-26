@@ -485,8 +485,8 @@ MonoBehaviour:
   equippedAbilities:
   - {fileID: 11400000, guid: 5ff7536a21b4513409d50599ef289128, type: 2}
   - {fileID: 11400000, guid: d2409301c4ea2464890ffb40f7121deb, type: 2}
-  - {fileID: 11400000, guid: 1539d3a8f30491f47a8e7d80bad7c110, type: 2}
   - {fileID: 11400000, guid: e0a17303729d6f34f87b0a5e969f37ef, type: 2}
+  - {fileID: 11400000, guid: 1539d3a8f30491f47a8e7d80bad7c110, type: 2}
   equipAbilitiesInEditor: 1
 --- !u!114 &114986204852996212
 MonoBehaviour:
