@@ -11,8 +11,8 @@ public class Unit : MonoBehaviour, IDamageable
     };
     public enum UnitState
     {
-        planningMovement, planningAttack,
-        moving, attacking,
+        planningMovement, planningAttack, planningAction,
+        moving, attacking, acting,
         cooldown, idle
     };
     [SerializeField]

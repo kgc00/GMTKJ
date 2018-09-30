@@ -64,39 +64,48 @@ public class InputHandler : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            if (_unit.GetComponent<AbilityManager>().AnimateAbilitySelection(0))
-            {
-                unitStateHandler.SetState(_unit, Unit.UnitState.planningMovement);
-            }
+            unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
+            unitStateHandler.GetAbil(_unit.GetComponent<AbilityManager>().ReturnAbility());
+            unitStateHandler.SetState(_unit, Unit.UnitState.planningAction);
+            CallForAnimation(_unit, 0);
             return;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            if (_unit.GetComponent<AbilityManager>().AnimateAbilitySelection(1))
-            {
-                unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
-                unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
-            }
+            unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
+            unitStateHandler.GetAbil(_unit.GetComponent<AbilityManager>().ReturnAbility());
+            unitStateHandler.SetState(_unit, Unit.UnitState.planningAction);
+            CallForAnimation(_unit, 1);
             return;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            if (_unit.GetComponent<AbilityManager>().AnimateAbilitySelection(2))
-            {
-                unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
-                unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
-            }
+            unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
+            unitStateHandler.GetAbil(_unit.GetComponent<AbilityManager>().ReturnAbility());
+            unitStateHandler.SetState(_unit, Unit.UnitState.planningAction);
+            CallForAnimation(_unit, 2);
             return;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            if (_unit.GetComponent<AbilityManager>().AnimateAbilitySelection(3))
-            {
-                unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
-                unitStateHandler.SetState(_unit, Unit.UnitState.planningAttack);
-            }
+            unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
+            unitStateHandler.GetAbil(_unit.GetComponent<AbilityManager>().ReturnAbility());
+            unitStateHandler.SetState(_unit, Unit.UnitState.planningAction);
+            CallForAnimation(_unit, 3);
             return;
         }
+        else if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // unitStateHandler.SetState(_unit, Unit.UnitState.idle);
+            // UnitSelectionHandler.SetSelection(_unit, Unit.SelectionState.notSelected);
+            Debug.LogError("scripts are not set up to handle this request");
+            return;
+        }
+    }
+
+    private bool CallForAnimation(Unit _unit, int v)
+    {
+        return _unit.GetComponent<AbilityManager>().AnimateAbilitySelection(v);
     }
 
     private bool ValidSelectedState(Unit _unit)

@@ -1,12 +1,19 @@
 using UnityEngine;
 
-[CreateAssetMenu]
-public class Ability : ScriptableObject
+[CreateAssetMenu(menuName = "Ability/Ability")]
+public abstract class Ability : ScriptableObject
 {
+    public AbilityInfo abilityInfo;
     public enum TargetingBehavior
     {
         line, square
     }
+
+    public enum AbilityType
+    {
+        attack, movement, buff
+    }
+
 
     [System.Serializable]
     public struct AbilityInfo
@@ -16,17 +23,22 @@ public class Ability : ScriptableObject
         public float cooldownTime;
         public Sprite abilityIcon;
         public TargetingBehavior targetingBehavior;
+        public AbilityType abilityType;
 
         [SerializeField]
-        public AbilityInfo(int _attackpower, float _cooldownTime, int _attackRange,
-        Sprite _abilityIcon, TargetingBehavior _targetingBehavior)
+        public AbilityInfo(int _attackpower, float _cooldownTime, int _attackRange, AbilityType _abilityType,
+        Sprite _abilityIcon, TargetingBehavior _targetingBehavior, System.Action _onCalled)
         {
             attackPower = _attackpower;
             cooldownTime = _cooldownTime;
             attackRange = _attackRange;
+            abilityType = _abilityType;
             abilityIcon = _abilityIcon;
             targetingBehavior = _targetingBehavior;
         }
     }
-    public AbilityInfo abilityInfo;
+
+    public abstract void OnCalled();
+    public abstract void OnCommited();
+    public abstract void OnFinished();
 }

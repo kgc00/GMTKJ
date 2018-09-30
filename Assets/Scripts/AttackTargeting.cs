@@ -13,6 +13,7 @@ public class AttackTargeting : MonoBehaviour
     UnitStateHandler unitStateHandler;
     InputHandler inputHandler;
     public static event Action<Unit, List<Node>> onGenerateAttackRange = delegate { };
+    public static event Action<Node, Unit, Ability> onCommitToAttack = delegate { };
 
     void Start()
     {
@@ -25,11 +26,12 @@ public class AttackTargeting : MonoBehaviour
     }
 
     // Need individual move logic here
-    private void InitiateAttackTargeting(Unit _unit, Ability.AbilityInfo _abilityInfo)
+    private void InitiateAttackTargeting(Unit _unit, Ability.AbilityInfo _abilityInfo, Ability abil)
     {
         DetermineAttackType(_unit);
         // pass output to generate possible moves
         GeneratePossibleMoves(_unit, _unit.transform.position, _abilityInfo);
+        abil.OnCalled();
     }
 
     private void DetermineAttackType(Unit _unit)
@@ -46,11 +48,9 @@ public class AttackTargeting : MonoBehaviour
         }
     }
 
-    private void CommitAttack(Unit _targetUnit, Unit _attackingUnit)
+    private void CommitToAttack(Node _targetNode, Unit _attackingUnit, Ability _ability)
     {
-        int _incomingDamage = _attackingUnit.attackPower;
-        _targetUnit.TakeDamage(_incomingDamage);
-        unitStateHandler.AttackFinished(_attackingUnit);
+        onCommitToAttack(_targetNode, _attackingUnit, _ability);
     }
 
     public void InitiateAttack(Vector3 _startPos, Vector3 _targetPos, int slot)
@@ -59,14 +59,14 @@ public class AttackTargeting : MonoBehaviour
         Unit _target = UnitFromNode.SingleUnitFromNode(_selectedNode);
         Unit _attackingUnit = UnitFromNode.SingleUnitFromNode(grid.NodeFromWorldPosition(_startPos));
         _attackingUnit.GetComponent<AbilityManager>().AnimateAbilityUse(slot);
+        Ability ability = _attackingUnit.GetComponent<AbilityManager>().ReturnAbility();
+        unitStateHandler.SetState(_attackingUnit, Unit.UnitState.attacking);
         if (_target != null)
         {
-            unitStateHandler.SetState(_attackingUnit, Unit.UnitState.attacking);
-            CommitAttack(_target, _attackingUnit);
+            CommitToAttack(_selectedNode, _attackingUnit, ability);
         }
         else
         {
-            unitStateHandler.SetState(_attackingUnit, Unit.UnitState.attacking);
             unitStateHandler.AttackFinished(_attackingUnit);
         }
     }

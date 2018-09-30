@@ -80,4 +80,14 @@ public class AbilityManager : MonoBehaviour
     {
         return equippedAbilities[currentAttackSlot].abilityInfo;
     }
+
+    public Ability ReturnAbility()
+    {
+        return equippedAbilities[currentAttackSlot];
+    }
+
+    public Ability GetCurrentAbility(int v)
+    {
+        return equippedAbilities[v];
+    }
 }

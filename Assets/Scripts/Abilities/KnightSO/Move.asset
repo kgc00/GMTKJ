@@ -8,12 +8,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 125f08e7cd060ae4d8f7572e19d9306d, type: 3}
-  m_Name: Knight_Bash
+  m_Script: {fileID: 11500000, guid: 890dde11cf2bf164f9cdc268d9691b0b, type: 3}
+  m_Name: Move
   m_EditorClassIdentifier: 
   abilityInfo:
     attackPower: 0
-    attackRange: 1
-    cooldownTime: 1
-    abilityIcon: {fileID: 21300000, guid: ea182fcd42b8a9a4e855f8478fa39983, type: 3}
+    attackRange: 5
+    cooldownTime: 2
+    abilityIcon: {fileID: 21300000, guid: 0b703b998fd3e5a4bb05e52977a25e67, type: 3}
     targetingBehavior: 1

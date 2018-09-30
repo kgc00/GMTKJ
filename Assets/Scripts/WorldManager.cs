@@ -26,6 +26,7 @@ public class WorldManager : MonoBehaviour
         }
         UnitSelectionHandler.onUnitSelected += UnitSelected;
         UnitSelectionHandler.onUnitSelected += DeselectOtherUnits;
+        UnitSelectionHandler.onUnitUnselected += SetNoUnitsSelected;
         UnitStateHandler.onUnitMoving += SetNoUnitsSelected;
         UnitStateHandler.onUnitAttacking += SetNoUnitsSelected;
         allUnits = new List<Unit>(FindObjectsOfType<Unit>());

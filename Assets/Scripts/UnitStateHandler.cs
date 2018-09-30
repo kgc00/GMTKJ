@@ -16,15 +16,19 @@ public class UnitStateHandler : MonoBehaviour
     public static Action<Unit> onUnitMoving = delegate { };
     public static Action<Unit> onMovementFinished = delegate { };
     public static Action<Unit> onUnitPlanningMovement = delegate { };
-    public static Action<Unit, Ability.AbilityInfo> onUnitPlanningAttack = delegate { };
+    public static Action<Unit, Ability.AbilityInfo, Ability> onUnitPlanningAttack = delegate { };
+    public static Action<Unit, Ability> onUnitPlanningAction = delegate { };
+    public static Action<Unit, Ability> onUnitActing = delegate { };
     public static Action<Unit> onUnitAttacking = delegate { };
     public static Action<Unit> onAttackFinished = delegate { };
     public static Action<Unit> onUnitCoolingDown = delegate { };
     public static Action<Unit> onUnitIdle = delegate { };
     private Ability.AbilityInfo currentAbilityInfo = new Ability.AbilityInfo();
+    Ability curAbil;
 
     void Start()
     {
+        #region dictionary
         // unitStateDictionary = new Dictionary<Unit.UnitState, Action<Unit>>(){
         //     {Unit.UnitState.planningMovement, onUnitPlanningMovement},
         //     {Unit.UnitState.planningAttack, onUnitPlanningAttack},
@@ -33,11 +37,12 @@ public class UnitStateHandler : MonoBehaviour
         //     {Unit.UnitState.cooldown, onUnitCoolingDown},
         //     {Unit.UnitState.idle, onUnitIdle},
         // };
-
+        #endregion
         sceneManager = FindObjectOfType<SceneManager>().GetComponent<SceneManager>();
         unitSelectionHandler = FindObjectOfType<UnitSelectionHandler>().GetComponent<UnitSelectionHandler>();
         grid = GameGrid.instance;
         worldManager = WorldManager.instance;
+        curAbil = new BashKnight();
         unit = GetComponent<Unit>();
     }
 
@@ -66,15 +71,36 @@ public class UnitStateHandler : MonoBehaviour
             case Unit.UnitState.cooldown:
                 SetOnCooldown(_unit, _state);
                 break;
+            case Unit.UnitState.planningAction:
+                SetPlanningAction(_unit, _state);
+                break;
+            case Unit.UnitState.acting:
+                SetActing(_unit, _state);
+                break;
             default:
                 Debug.LogError("Unrecognized unit state");
                 break;
         }
     }
 
+    private void SetActing(Unit unit, Unit.UnitState state)
+    {
+        onUnitActing(unit, curAbil);
+    }
+
+    private void SetPlanningAction(Unit unit, Unit.UnitState state)
+    {
+        onUnitPlanningAction(unit, curAbil);
+    }
+
     internal void GetAttackData(Ability.AbilityInfo _abilityInfo)
     {
         currentAbilityInfo = _abilityInfo;
+    }
+
+    internal void GetAbil(Ability _abil)
+    {
+        curAbil = _abil;
     }
 
     private void SetIdle(Unit _unit, Unit.UnitState _state)
@@ -101,7 +127,7 @@ public class UnitStateHandler : MonoBehaviour
         {
             ResetCosts(node);
         }
-        onUnitPlanningAttack(_unit, currentAbilityInfo);
+        onUnitPlanningAttack(_unit, currentAbilityInfo, curAbil);
     }
 
     private void SetAttacking(Unit _unit, Unit.UnitState _state)
