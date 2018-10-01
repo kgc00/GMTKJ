@@ -9,6 +9,7 @@ public class UnitTimer : MonoBehaviour
     private UnitSelectionHandler unitSelectionHandler;
     public static event Action<Unit> onTimerStarted = delegate { };
     public static event Action<Unit, Unit.UnitState> onTimerStopped = delegate { };
+    private Coroutine currentTimer;
     private struct TimerInfo
     {
         public float timeToAddToTimer;
@@ -27,12 +28,25 @@ public class UnitTimer : MonoBehaviour
         unitSelectionHandler = FindObjectOfType<UnitSelectionHandler>().GetComponent<UnitSelectionHandler>();
         UnitStateHandler.onMovementFinished += AddTimeToTimerMovement;
         UnitStateHandler.onAttackFinished += AddTimeToTimerAttack;
+        UnitStateHandler.onUnitStunned += AddTimeToTimerStunned;
+    }
+
+    private void AddTimeToTimerStunned(Unit unitStunned, float timeStunned)
+    {
+        if (currentTimer == null)
+        {
+            StartTimer(unitStunned, timeStunned);
+        }
+        else
+        {
+        }
     }
 
     private void EndTimer(Unit _unit)
     {
         unitStateHandler.SetState(_unit, Unit.UnitState.idle);
         onTimerStopped(_unit, Unit.UnitState.idle);
+        currentTimer = null;
         if (_unit == WorldManager.ReturnSelectedUnit())
         {
             FindObjectOfType<AbilityUI>().GetComponent<AbilityUI>().PopulateAbilityPanel(_unit);
@@ -60,7 +74,7 @@ public class UnitTimer : MonoBehaviour
     {
         TimerInfo info = new TimerInfo(_timeToAddToTimer, _unit);
         onTimerStarted(_unit);
-        StartCoroutine("InitiateCooldown", info);
+        currentTimer = StartCoroutine("InitiateCooldown", info);
     }
 
     private IEnumerator InitiateCooldown(TimerInfo info)

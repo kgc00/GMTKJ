@@ -64,34 +64,22 @@ public class InputHandler : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
-            unitStateHandler.GetAbil(_unit.GetComponent<AbilityManager>().ReturnAbility());
-            unitStateHandler.SetState(_unit, Unit.UnitState.planningAction);
-            CallForAnimation(_unit, 0);
+            PrepActionData(_unit, 0);
             return;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
-            unitStateHandler.GetAbil(_unit.GetComponent<AbilityManager>().ReturnAbility());
-            unitStateHandler.SetState(_unit, Unit.UnitState.planningAction);
-            CallForAnimation(_unit, 1);
+            PrepActionData(_unit, 1);
             return;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
-            unitStateHandler.GetAbil(_unit.GetComponent<AbilityManager>().ReturnAbility());
-            unitStateHandler.SetState(_unit, Unit.UnitState.planningAction);
-            CallForAnimation(_unit, 2);
+            PrepActionData(_unit, 2);
             return;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
-            unitStateHandler.GetAbil(_unit.GetComponent<AbilityManager>().ReturnAbility());
-            unitStateHandler.SetState(_unit, Unit.UnitState.planningAction);
-            CallForAnimation(_unit, 3);
+            PrepActionData(_unit, 3);
             return;
         }
         else if (Input.GetKeyDown(KeyCode.Escape))
@@ -106,6 +94,14 @@ public class InputHandler : MonoBehaviour
     private bool CallForAnimation(Unit _unit, int v)
     {
         return _unit.GetComponent<AbilityManager>().AnimateAbilitySelection(v);
+    }
+
+    private void PrepActionData(Unit _unit, int _abilitySlot)
+    {
+        CallForAnimation(_unit, _abilitySlot);
+        unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
+        unitStateHandler.GetAbil(_unit.GetComponent<AbilityManager>().ReturnAbility());
+        unitStateHandler.SetState(_unit, Unit.UnitState.planningAction);
     }
 
     private bool ValidSelectedState(Unit _unit)

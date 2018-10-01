@@ -1,17 +1,18 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Ability/MovementAbility")]
-public class MovementAbility : Ability
+[CreateAssetMenu(menuName = "Ability/AttackAbility")]
+public class AttackAbility : Ability
 {
     public override void OnCalled(Unit unit)
     {
-        FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>().SetState(unit, Unit.UnitState.planningMovement);
+        FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>().SetState(unit, Unit.UnitState.planningAttack);
     }
 
-    public override void OnAbilityConnected(Unit unit)
+    public override void OnAbilityConnected(Unit targetedUnit)
     {
 
     }
+
     public override void OnCommited(Unit unit)
     {
         throw new System.NotImplementedException();

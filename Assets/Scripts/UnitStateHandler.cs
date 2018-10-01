@@ -23,6 +23,8 @@ public class UnitStateHandler : MonoBehaviour
     public static Action<Unit> onAttackFinished = delegate { };
     public static Action<Unit> onUnitCoolingDown = delegate { };
     public static Action<Unit> onUnitIdle = delegate { };
+    public static Action<Unit, float> onUnitStunned;
+
     private Ability.AbilityInfo currentAbilityInfo = new Ability.AbilityInfo();
     Ability curAbil;
 

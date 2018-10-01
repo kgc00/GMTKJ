@@ -13,7 +13,7 @@ public class AttackTargeting : MonoBehaviour
     UnitStateHandler unitStateHandler;
     InputHandler inputHandler;
     public static event Action<Unit, List<Node>> onGenerateAttackRange = delegate { };
-    public static event Action<Node, Unit, Ability> onCommitToAttack = delegate { };
+    public static event Action<Node, Unit, Ability, Unit> onCommitToAttack = delegate { };
 
     void Start()
     {
@@ -31,7 +31,6 @@ public class AttackTargeting : MonoBehaviour
         DetermineAttackType(_unit);
         // pass output to generate possible moves
         GeneratePossibleMoves(_unit, _unit.transform.position, _abilityInfo);
-        abil.OnCalled();
     }
 
     private void DetermineAttackType(Unit _unit)
@@ -48,9 +47,9 @@ public class AttackTargeting : MonoBehaviour
         }
     }
 
-    private void CommitToAttack(Node _targetNode, Unit _attackingUnit, Ability _ability)
+    private void CommitToAttack(Node _targetNode, Unit _attackingUnit, Ability _ability, Unit _target)
     {
-        onCommitToAttack(_targetNode, _attackingUnit, _ability);
+        onCommitToAttack(_targetNode, _attackingUnit, _ability, _target);
     }
 
     public void InitiateAttack(Vector3 _startPos, Vector3 _targetPos, int slot)
@@ -61,14 +60,7 @@ public class AttackTargeting : MonoBehaviour
         _attackingUnit.GetComponent<AbilityManager>().AnimateAbilityUse(slot);
         Ability ability = _attackingUnit.GetComponent<AbilityManager>().ReturnAbility();
         unitStateHandler.SetState(_attackingUnit, Unit.UnitState.attacking);
-        if (_target != null)
-        {
-            CommitToAttack(_selectedNode, _attackingUnit, ability);
-        }
-        else
-        {
-            unitStateHandler.AttackFinished(_attackingUnit);
-        }
+        CommitToAttack(_selectedNode, _attackingUnit, ability, _target);
     }
 
     private bool IsLegalMove(Vector3 startPos, Vector3 targetPos, Unit unit)

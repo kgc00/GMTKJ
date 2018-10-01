@@ -38,7 +38,8 @@ public abstract class Ability : ScriptableObject
         }
     }
 
-    public abstract void OnCalled();
-    public abstract void OnCommited();
-    public abstract void OnFinished();
+    public abstract void OnCalled(Unit unit);
+    public abstract void OnAbilityConnected(Unit targetedUnit);
+    public abstract void OnCommited(Unit unit);
+    public abstract void OnFinished(Unit unit);
 }

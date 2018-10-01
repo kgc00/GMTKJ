@@ -2,7 +2,18 @@ using UnityEngine;
 
 public class AbilityHandler : MonoBehaviour
 {
+
+    public void Start()
+    {
+        UnitStateHandler.onUnitPlanningAction += HandleIncomingAbility;
+    }
+
     public static void HandleIncomingAbility(Unit unit, Ability ability)
+    {
+        ability.OnCalled(unit);
+    }
+
+    private static void SwitchThing_Legacy(Ability ability)
     {
         switch (ability.abilityInfo.abilityType)
         {
