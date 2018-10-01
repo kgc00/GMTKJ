@@ -32,6 +32,14 @@ public class WorldManager : MonoBehaviour
         allUnits = new List<Unit>(FindObjectsOfType<Unit>());
     }
 
+    public void AddUnitToList(Unit unit)
+    {
+        if (!allUnits.Contains(unit)) { allUnits.Add(unit); }
+    }
+    public void RemoveUnitFromList(Unit unit)
+    {
+        if (allUnits.Contains(unit)) { allUnits.Remove(unit); }
+    }
     private void UnitSelected(Unit _selectedUnit)
     {
         _selectedUnit.currentSelectionState = Unit.SelectionState.selected;
@@ -42,6 +50,11 @@ public class WorldManager : MonoBehaviour
     private void SetNoUnitsSelected(Unit unit)
     {
         anyUnitSelected = false;
+    }
+
+    public List<Unit> GetAllUnits()
+    {
+        return allUnits;
     }
 
     public static Unit ReturnSelectedUnit()

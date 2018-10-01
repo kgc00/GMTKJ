@@ -29,7 +29,6 @@ public class UnitMovement : MonoBehaviour
 
     private void PrepForMovement(Unit _unit)
     {
-        Debug.Log("generating grid");
         ResetNodesInRange(_unit);
         DisplayMoves(_unit);
     }

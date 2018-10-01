@@ -112,7 +112,6 @@ public class UnitStateHandler : MonoBehaviour
 
     private void SetPlanningMovement(Unit _unit, Unit.UnitState _state)
     {
-        grid.UpdateNodeStatuses(_unit);
         // why every node in grid?  Should be only nodes in range
         foreach (Node node in grid.grid)
         {
@@ -123,7 +122,6 @@ public class UnitStateHandler : MonoBehaviour
 
     private void SetPlanningAttack(Unit _unit, Unit.UnitState _state)
     {
-        grid.UpdateNodeStatuses(_unit);
         // why every node in grid?  Should be only nodes in range
         foreach (Node node in grid.grid)
         {

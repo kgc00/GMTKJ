@@ -28,7 +28,7 @@ public class DebugGizmo : MonoBehaviour
 
                 Gizmos.color = Color.magenta;
 
-                Gizmos.DrawCube(n.worldPosition, Vector3.one * (grid.nodeDiameter - .1f));
+                Gizmos.DrawCube(n.worldPosition, Vector3.one * (grid.nodeSize - .1f));
             }
         }
     }

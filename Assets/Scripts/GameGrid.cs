@@ -9,9 +9,10 @@ public class GameGrid : MonoBehaviour
 
     public static GameGrid instance;
     public Vector2 gridWorldSize;
-    public float nodeRadius, nodeDiameter;
+    public float nodeRadius, nodeSize;
     public LayerMask obstacleMask;
     public LayerMask enemyMask;
+
     public LayerMask allyMask;
     public List<Node> nodesContainingUnits;
     [SerializeField]
@@ -37,11 +38,10 @@ public class GameGrid : MonoBehaviour
         {
             Destroy(this);
         }
-        nodeDiameter = possibleNodeImages[0].bounds.size.x;
-        gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
-        gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
+        nodeSize = possibleNodeImages[0].bounds.size.x;
+        gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeSize);
+        gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeSize);
         nodesContainingUnits = new List<Node>();
-        UnitStateHandler.onMovementFinished += UpdateNodeStatuses;
         CreateGrid();
     }
 
@@ -62,7 +62,7 @@ public class GameGrid : MonoBehaviour
         {
             for (int y = 0; y < gridSizeY; y++)
             {
-                Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.up * (y * nodeDiameter + nodeRadius);
+                Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeSize + nodeRadius) + Vector3.up * (y * nodeSize + nodeRadius);
                 bool walkable = !(Physics.CheckSphere(worldPoint, nodeRadius, obstacleMask));
 
                 int tileImageIndex = UnityEngine.Random.Range(0, tileSprites.Length);
@@ -70,6 +70,8 @@ public class GameGrid : MonoBehaviour
                 currentTile.transform.SetParent(transform);
                 Node currentNode = currentTile.gameObject.AddComponent<Node>();
                 currentNode.gameObject.layer = 12;
+                BoxCollider collider = currentTile.gameObject.AddComponent<BoxCollider>();
+                collider.size = new Vector3(nodeSize, nodeSize, 0);
 
                 if ((Physics.CheckSphere(worldPoint, nodeRadius, allyMask)))
                 {
@@ -77,7 +79,7 @@ public class GameGrid : MonoBehaviour
                     grid[x, y] = currentNode.SetReferences(
                         walkable, worldPoint, x, y, Node.NodeType.plains, occupiedByUnit,
                         possibleNodeImages[tileImageIndex]);
-                    nodesContainingUnits.Add(grid[x, y]);
+                    // nodesContainingUnits.Add(grid[x, y]);
                 }
                 else if ((Physics.CheckSphere(worldPoint, nodeRadius, enemyMask)))
                 {
@@ -85,30 +87,14 @@ public class GameGrid : MonoBehaviour
                     grid[x, y] = currentNode.SetReferences(
                         walkable, worldPoint, x, y, Node.NodeType.plains, occupiedByUnit,
                         possibleNodeImages[tileImageIndex]);
-                    nodesContainingUnits.Add(grid[x, y]);
+                    // nodesContainingUnits.Add(grid[x, y]);
                 }
                 else
                 {
                     grid[x, y] = currentNode.SetReferences(
                         walkable, worldPoint, x, y, Node.NodeType.plains, Node.OccupiedByUnit.noUnit,
                         possibleNodeImages[tileImageIndex]);
-
                 }
-            }
-        }
-    }
-
-    private void CheckForUnits()
-    {
-        foreach (Node node in grid)
-        {
-            if ((Physics.CheckSphere(node.worldPosition, nodeRadius, allyMask)) ||
-            (Physics.CheckSphere(node.worldPosition, nodeRadius, enemyMask)))
-            {
-                nodesContainingUnits.Add(node);
-            }
-            else
-            {
             }
         }
     }
@@ -227,29 +213,21 @@ public class GameGrid : MonoBehaviour
         }
     }
 
-    public void UpdateNodeStatuses(Unit _unit)
+    private void AddUnitToNodeStatus(Node node)
     {
-        foreach (Node node in grid)
+        if ((Physics.CheckSphere(node.worldPosition, nodeRadius, allyMask)))
         {
-            if ((Physics.CheckSphere(node.worldPosition, nodeRadius, allyMask)))
-            {
-                node.occupiedByUnit = Node.OccupiedByUnit.ally;
-                nodesContainingUnits.Add(node);
-            }
-            else if ((Physics.CheckSphere(node.worldPosition, nodeRadius, enemyMask)))
-            {
-                node.occupiedByUnit = Node.OccupiedByUnit.enemy;
-                nodesContainingUnits.Add(node);
-            }
-            else
-            {
-                node.occupiedByUnit = Node.OccupiedByUnit.noUnit;
-                if (nodesContainingUnits.Contains(node))
-                {
-                    nodesContainingUnits.Remove(node);
-                }
-            }
+            node.occupiedByUnit = Node.OccupiedByUnit.ally;
         }
+        else if ((Physics.CheckSphere(node.worldPosition, nodeRadius, enemyMask)))
+        {
+            node.occupiedByUnit = Node.OccupiedByUnit.enemy;
+        }
+    }
+
+    private void RemoveUnitFromNodeStatus(Node node)
+    {
+        node.occupiedByUnit = Node.OccupiedByUnit.noUnit;
     }
 
     public Node NodeFromWorldPosition(Vector3 worldPosition)
@@ -263,6 +241,23 @@ public class GameGrid : MonoBehaviour
         int y = Mathf.RoundToInt((gridSizeY - 1) * percentY);
 
         return grid[x, y];
+    }
+    public void TryAddNodeToUnitList(Node node)
+    {
+        if (!nodesContainingUnits.Contains(node))
+        {
+            nodesContainingUnits.Add(node);
+            AddUnitToNodeStatus(node);
+        }
+    }
+
+    public void TryRemoveNodeToUnitList(Node node)
+    {
+        if (nodesContainingUnits.Contains(node))
+        {
+            RemoveUnitFromNodeStatus(node);
+            nodesContainingUnits.Remove(node);
+        }
     }
 
     public Unit UnitFromNode(Node _selectedNode)
