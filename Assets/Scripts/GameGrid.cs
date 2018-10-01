@@ -72,8 +72,9 @@ public class GameGrid : MonoBehaviour
                 currentNode.gameObject.layer = 12;
                 BoxCollider collider = currentTile.gameObject.AddComponent<BoxCollider>();
                 collider.size = new Vector3(nodeSize, nodeSize, 0);
+                collider.isTrigger = true;
 
-                if ((Physics.CheckSphere(worldPoint, nodeRadius, allyMask)))
+                if ((Physics.CheckSphere(worldPoint, nodeRadius / 2, allyMask)))
                 {
                     Node.OccupiedByUnit occupiedByUnit = Node.OccupiedByUnit.ally;
                     grid[x, y] = currentNode.SetReferences(
@@ -81,7 +82,7 @@ public class GameGrid : MonoBehaviour
                         possibleNodeImages[tileImageIndex]);
                     // nodesContainingUnits.Add(grid[x, y]);
                 }
-                else if ((Physics.CheckSphere(worldPoint, nodeRadius, enemyMask)))
+                else if ((Physics.CheckSphere(worldPoint, nodeRadius / 2, enemyMask)))
                 {
                     Node.OccupiedByUnit occupiedByUnit = Node.OccupiedByUnit.enemy;
                     grid[x, y] = currentNode.SetReferences(
@@ -223,11 +224,21 @@ public class GameGrid : MonoBehaviour
         {
             node.occupiedByUnit = Node.OccupiedByUnit.enemy;
         }
+        // node.walkable = false;
     }
 
     private void RemoveUnitFromNodeStatus(Node node)
     {
         node.occupiedByUnit = Node.OccupiedByUnit.noUnit;
+    }
+
+    private void CheckIfUnitOnNode(Node node)
+    {
+        if (Physics.CheckBox(node.transform.position, new Vector3(nodeSize * 0.9f / 2, nodeSize * 0.9f / 2, 2f),
+                Quaternion.identity, 1 << 11))
+        {
+            TryAddNodeToUnitList(node);
+        }
     }
 
     public Node NodeFromWorldPosition(Vector3 worldPosition)
@@ -257,6 +268,7 @@ public class GameGrid : MonoBehaviour
         {
             RemoveUnitFromNodeStatus(node);
             nodesContainingUnits.Remove(node);
+            CheckIfUnitOnNode(node);
         }
     }
 
