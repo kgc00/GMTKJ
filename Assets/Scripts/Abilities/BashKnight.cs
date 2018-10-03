@@ -5,9 +5,14 @@ public class BashKnight : AttackAbility
 {
     [SerializeField]
     private float lengthOfStun = 2.0f;
+    UnitStateHandler stateHandler;
     public override void OnCalled(Unit unit)
     {
-        FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>().SetState(unit, Unit.UnitState.planningAttack);
+        if (!stateHandler)
+        {
+            stateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
+        }
+        stateHandler.SetState(unit, Unit.UnitState.planningAttack);
     }
 
     public override void OnAbilityConnected(Unit targetedUnit)
@@ -15,6 +20,7 @@ public class BashKnight : AttackAbility
         if (targetedUnit.currentUnitState != Unit.UnitState.cooldown)
         {
             UnitStateHandler.onUnitStunned(targetedUnit, lengthOfStun);
+            stateHandler.SetState(targetedUnit, Unit.UnitState.cooldown);
         }
     }
 

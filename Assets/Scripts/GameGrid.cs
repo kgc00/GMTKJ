@@ -43,6 +43,7 @@ public class GameGrid : MonoBehaviour
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeSize);
         nodesContainingUnits = new List<Node>();
         CreateGrid();
+        Unit.OnUnitDeath += RemoveNodeOnUnitDeath;
     }
 
     void Start()
@@ -234,6 +235,7 @@ public class GameGrid : MonoBehaviour
 
     private void CheckIfUnitOnNode(Node node)
     {
+        // still isn't an accurate check...
         if (Physics.CheckBox(node.transform.position, new Vector3(nodeSize * 0.9f / 2, nodeSize * 0.9f / 2, 2f),
                 Quaternion.identity, 1 << 11))
         {
@@ -272,10 +274,17 @@ public class GameGrid : MonoBehaviour
         }
     }
 
+    private void RemoveNodeOnUnitDeath(Unit _unit)
+    {
+        // need to refactor
+        nodesContainingUnits.Remove(NodeFromWorldPosition(_unit.transform.position));
+        NodeFromWorldPosition(_unit.transform.position).occupiedByUnit = Node.OccupiedByUnit.noUnit;
+    }
+
     public Unit UnitFromNode(Node _selectedNode)
     {
         Unit affectedUnit = null;
-        Collider[] hitColliders = Physics.OverlapSphere(_selectedNode.worldPosition, nodeRadius, allyMask);
+        Collider[] hitColliders = Physics.OverlapSphere(_selectedNode.worldPosition, nodeRadius / 2, allyMask);
         foreach (Collider collider in hitColliders)
         {
             affectedUnit = collider.gameObject.GetComponentInParent<Unit>();

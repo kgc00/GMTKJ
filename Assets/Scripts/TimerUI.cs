@@ -16,8 +16,13 @@ public class TimerUI : MonoBehaviour
         _unit.transform.Find("Cooldown Canvas/Cooldown Image").GetComponent<Image>().enabled = true;
     }
 
-    void StopTimer(Unit _unit, Unit.UnitState state)
+    void StopTimer(Unit _unit, Unit.UnitState _state)
     {
-        _unit.transform.Find("Cooldown Canvas/Cooldown Image").GetComponent<Image>().enabled = false;
+        // if a unit is killed while timer is counting do it will cause an error 
+        // on recieving the action call, hopefully this fixes it
+        if (_unit)
+        {
+            _unit.transform.Find("Cooldown Canvas/Cooldown Image").GetComponent<Image>().enabled = false;
+        }
     }
 }

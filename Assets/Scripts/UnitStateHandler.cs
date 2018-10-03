@@ -78,6 +78,7 @@ public class UnitStateHandler : MonoBehaviour
                 break;
             case Unit.UnitState.acting:
                 SetActing(_unit, _state);
+                UnitSelectionHandler.SetSelection(_unit, Unit.SelectionState.notSelected);
                 break;
             default:
                 Debug.LogError("Unrecognized unit state");
