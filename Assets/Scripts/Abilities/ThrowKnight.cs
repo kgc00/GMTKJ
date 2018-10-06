@@ -8,6 +8,9 @@ public class ThrowKnight : AttackAbility
         throw new System.NotImplementedException();
     }
 
+    public override void OnAbilityConnected(Unit unit) { }
+
+
     public override void OnCommited(Unit unit)
     {
         throw new System.NotImplementedException();

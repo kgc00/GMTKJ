@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Ability/MovementAbility")]
-public abstract class MovementAbility : Ability
+[CreateAssetMenu(menuName = "Ability/Generic/MovementGeneric")]
+public class MovementGeneric : MovementAbility
 {
     public override void OnCalled(Unit unit)
     {
@@ -12,7 +12,7 @@ public abstract class MovementAbility : Ability
     {
     }
 
-    public abstract void OnDestinationReached(Unit unit);
+    public override void OnDestinationReached(Unit unit) { }
 
     public override void OnFinished(Unit unit)
     {

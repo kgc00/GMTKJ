@@ -11,12 +11,17 @@ public class AttackHandler : MonoBehaviour
         AttackTargeting.onCommitToAttack += HandleCommitToAttack;
     }
 
+    // need to figure out how to handle extremely different cases
     private void HandleCommitToAttack(Node _targetNode, Unit _attackingUnit, Ability _abilityUsed, Unit _targetUnit)
     {
         if (_targetUnit)
         {
             DealDamage(_targetUnit, _attackingUnit);
-            _abilityUsed.OnAbilityConnected(_targetUnit);
+            if (_abilityUsed is AttackAbility)
+            {
+                AttackAbility _attackAbility = (AttackAbility)_abilityUsed;
+                _attackAbility.OnAbilityConnected(_targetUnit);
+            }
         }
         FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>().AttackFinished(_attackingUnit);
     }
