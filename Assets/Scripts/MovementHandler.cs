@@ -29,10 +29,9 @@ public class MovementHandler : MonoBehaviour
         UnitStateHandler.onUnitMoving += StartMovementPathLogic;
     }
 
-    private void StartMovementPathLogic(Unit _unit)
+    public void StartMovementPathLogic(Unit _unit)
     {
         targetInfo = unitMovement.PassTargetInfo();
-        // Unit _unit = grid.UnitFromNode(grid.NodeFromWorldPosition(targetInfo.startingPoint));
         StartCoroutine(GenerateMovementPath(targetInfo.startingPoint, targetInfo.targetPoint, _unit));
         MoveUnit(_unit);
     }
@@ -102,6 +101,15 @@ public class MovementHandler : MonoBehaviour
         }
     }
 
+    public void OnStopPath(Vector3 dest, Unit _unit, Action<Unit> destReached)
+    {
+        StopCoroutine("FollowPath");
+        path = new Vector3[] { dest };
+        targetIndex = 0;
+        Debug.Log("unit name: " + _unit);
+        StartCoroutine(FollowPathAbil(_unit, destReached));
+    }
+
     IEnumerator FollowPath(Unit _unit)
     {
         Vector3 currentWaypoint = path[0];
@@ -113,6 +121,26 @@ public class MovementHandler : MonoBehaviour
                 if (targetIndex >= path.Length)
                 {
                     unitStateHandler.DestinationReached(_unit);
+                    yield break;
+                }
+                currentWaypoint = path[targetIndex];
+            }
+            _unit.transform.position = Vector3.MoveTowards(_unit.transform.position, currentWaypoint, speed * Time.deltaTime);
+            yield return null;
+        }
+    }
+    IEnumerator FollowPathAbil(Unit _unit, Action<Unit> destReached)
+    {
+        yield return new WaitForSeconds(.15f);
+        Vector3 currentWaypoint = path[0];
+        while (true)
+        {
+            if (_unit.transform.position == currentWaypoint)
+            {
+                targetIndex++;
+                if (targetIndex >= path.Length)
+                {
+                    destReached(_unit);
                     yield break;
                 }
                 currentWaypoint = path[targetIndex];

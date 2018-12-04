@@ -11,7 +11,7 @@ public class InputHandler : MonoBehaviour
     GameGrid grid;
     Unit selectedUnit;
     UnitStateHandler unitStateHandler;
-    AttackTargeting attackTargeting;
+    AbilityTargeting abilityTargeting;
     public event Action<TargetingInformation> onAbilityCalled = delegate { };
     public event Action<Vector3, Vector3, Unit> onRequestingMovementLogic = delegate { };
     public event Action<Vector3, Vector3, Unit, int> onRequestingAttackLogic = delegate { };
@@ -20,7 +20,7 @@ public class InputHandler : MonoBehaviour
         sceneManager = SceneManager.instance;
         grid = GameGrid.instance;
         cam = Camera.main;
-        attackTargeting = FindObjectOfType<AttackTargeting>().GetComponentInChildren<AttackTargeting>();
+        abilityTargeting = FindObjectOfType<AbilityTargeting>().GetComponentInChildren<AbilityTargeting>();
         unitStateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
         if (target == null)
         {
@@ -36,27 +36,23 @@ public class InputHandler : MonoBehaviour
             {
                 selectedUnit = WorldManager.ReturnSelectedUnit();
             }
+            if (selectedUnit.currentUnitState == Unit.UnitState.planningAction)
+            {
+                abilityTargeting.HandleAbilityInput();
+                AbilityInput(selectedUnit: selectedUnit, startPos: selectedUnit.transform.position,
+                targetPos: target.position, slot: unitStateHandler.curAbilSlot);
+                return;
+            }
 
             if (ValidSelectedState(selectedUnit))
             {
                 SelectedLogic(selectedUnit);
             }
             MovementLogic(selectedUnit);
-            AttackLogic(selectedUnit);
         }
         else
         {
             SelectionLogic();
-        }
-    }
-
-    private void AttackLogic(Unit _unit)
-    {
-        if (_unit.currentUnitState == Unit.UnitState.planningAttack)
-        {
-            onRequestingAttackLogic(_unit.transform.position, target.position,
-            _unit, _unit.GetComponent<AbilityManager>().ReturnCurrentAttack());
-
         }
     }
 
@@ -99,9 +95,10 @@ public class InputHandler : MonoBehaviour
     private void PrepActionData(Unit _unit, int _abilitySlot)
     {
         CallForAnimation(_unit, _abilitySlot);
-        unitStateHandler.GetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
-        unitStateHandler.GetAbil(_unit.GetComponent<AbilityManager>().ReturnAbility());
+        unitStateHandler.SetAttackData(_unit.GetComponent<AbilityManager>().ReturnAbilityInfo());
+        unitStateHandler.SetAbil(_unit.GetComponent<AbilityManager>().ReturnAbility());
         unitStateHandler.SetState(_unit, Unit.UnitState.planningAction);
+        unitStateHandler.SetAbilSlot(_unit, _abilitySlot);
     }
 
     private bool ValidSelectedState(Unit _unit)
@@ -110,6 +107,7 @@ public class InputHandler : MonoBehaviour
         {
             if (_unit.currentUnitState == Unit.UnitState.planningMovement ||
             _unit.currentUnitState == Unit.UnitState.planningAttack ||
+            _unit.currentUnitState == Unit.UnitState.planningAction ||
             _unit.currentUnitState == Unit.UnitState.idle)
             {
                 return true;
@@ -149,11 +147,12 @@ public class InputHandler : MonoBehaviour
         }
     }
 
-    public void AttackInput(Vector3 startPos, Vector3 targetPos, int slot)
+    public void AbilityInput(Unit selectedUnit, Vector3 startPos, Vector3 targetPos, int slot)
     {
         if (Input.GetMouseButtonDown(0))
         {
-            attackTargeting.InitiateAttack(startPos, targetPos, slot);
+            unitStateHandler.curAbil.abilityInfo.infoTheSecond = abilityTargeting.CacheRelevantInfo(startPos, targetPos, slot);
+            unitStateHandler.curAbil.OnCommited(selectedUnit);
         }
     }
 

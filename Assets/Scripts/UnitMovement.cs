@@ -15,12 +15,14 @@ public class UnitMovement : MonoBehaviour
     bool gridShoulDisplay = false;
     public static event Action<Unit, List<Node>> onGenerateMovementRange = delegate { };
     public static event Action<List<Node>> onGeneratePath = delegate { };
+    MovementHandler movementHandler;
 
     private void Start()
     {
         unitStateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
         inputHandler = FindObjectOfType<InputHandler>().GetComponent<InputHandler>();
         aStar = FindObjectOfType<AStar>().GetComponent<AStar>();
+        movementHandler = FindObjectOfType<MovementHandler>().GetComponent<MovementHandler>();
         grid = GameGrid.instance;
         inputHandler.onRequestingMovementLogic += MovementLogic;
         UnitStateHandler.onUnitPlanningMovement += PrepForMovement;
@@ -55,13 +57,19 @@ public class UnitMovement : MonoBehaviour
         }
         if (IsLegalMove(startPos, targetPos) && Input.GetMouseButtonDown(0) && _unit.currentMovementPoints > 0)
         {
-            StoreTargetInfo(startPos, targetPos);
-            unitStateHandler.SetState(_unit, Unit.UnitState.moving);
-            gridShoulDisplay = false;
-            _unit.GetComponent<AbilityManager>().AnimateAbilityUse(0);
+            CommitMovement(startPos, targetPos, _unit);
         }
     }
 
+    public void CommitMovement(Vector3 startPos, Vector3 targetPos, Unit _unit)
+    {
+        StoreTargetInfo(startPos, targetPos);
+        // unitStateHandler.SetState(_unit, Unit.UnitState.moving);
+        gridShoulDisplay = false;
+        movementHandler.StartMovementPathLogic(_unit);
+        // _unit.GetComponent<AbilityManager>().AnimateAbilityUse(0);
+
+    }
 
     private bool IsLegalMove(Vector3 _startPos, Vector3 _targetPos)
     {

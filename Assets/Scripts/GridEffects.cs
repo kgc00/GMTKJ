@@ -25,9 +25,9 @@ public class GridEffects : MonoBehaviour
     {
         UnitMovement.onGenerateMovementRange += InitiateMovementHighlights;
         UnitMovement.onGeneratePath += GeneratePath;
-        AttackTargeting.onGenerateAttackRange += InitiateAttackHighlights;
+        AbilityTargeting.onGenerateAbilityRange += InitiateAbilityHighlights;
         UnitStateHandler.onUnitMoving += ClearHighlights;
-        UnitStateHandler.onUnitAttacking += ClearHighlights;
+        UnitStateHandler.onUnitActing += ClearHighlights;
         GameGrid.requestingHighlights += SpawnHighlightsForNode;
         pathList = new List<GameObject>();
     }
@@ -69,13 +69,28 @@ public class GridEffects : MonoBehaviour
         CreateHighlightForNodes(_nodesToHighlight, movementHighlight, movementName);
     }
 
-    private void InitiateAttackHighlights(Unit _unit, List<Node> _nodesToHighlight)
+    private void InitiateAbilityHighlights(Unit _unit, List<Node> _nodesToHighlight)
     {
         if (selectionArray.Length > 0)
         {
             ClearHighlights(_unit);
         }
         CreateHighlightForNodes(_nodesToHighlight, attackHighlight, attackName);
+    }
+
+    public void InitiateAbilityHighlights(List<Node> _nodesToHighlight)
+    {
+        Debug.Log("ability hilights called");
+        if (selectionArray.Length > 0)
+        {
+            ClearHighlights();
+        }
+        CreateHighlightForNodes(_nodesToHighlight, attackHighlight, attackName);
+    }
+
+    public void RenderSelectorHighlights(List<Node> _nodesToHighlight)
+    {
+        GeneratePath(_nodesToHighlight);
     }
 
     private void CreateHighlightForNodes(List<Node> _nodesToHighlight, Sprite _highlightToUse, string _name)
@@ -155,6 +170,74 @@ public class GridEffects : MonoBehaviour
         {
             if (pathList.Count > 0)
             {
+                foreach (GameObject _pathHighlight in pathList)
+                {
+                    _pathHighlight.SetActive(false);
+                }
+            }
+            pathList.Clear();
+        }
+    }
+
+    private void ClearHighlights(Unit _unit, Ability abil)
+    {
+        if (selectionArray != null)
+        {
+            // better way to check?
+            if (selectionArray[0] != null)
+            {
+                foreach (GameObject _tileGameObject in selectionArray)
+                {
+                    if (_tileGameObject.transform.Find(movementName).gameObject.activeInHierarchy)
+                    {
+                        _tileGameObject.transform.Find(movementName).gameObject.SetActive(false);
+                    }
+                    else if (_tileGameObject.transform.Find(attackName).gameObject.activeInHierarchy)
+                    {
+                        _tileGameObject.transform.Find(attackName).gameObject.SetActive(false);
+                    }
+                }
+            }
+            Array.Clear(selectionArray, 0, selectionArray.Length);
+        }
+        if (pathList != null)
+        {
+            if (pathList.Count > 0)
+            {
+                foreach (GameObject _pathHighlight in pathList)
+                {
+                    _pathHighlight.SetActive(false);
+                }
+            }
+            pathList.Clear();
+        }
+    }
+    private void ClearHighlights()
+    {
+        if (selectionArray != null)
+        {
+            // better way to check?
+            if (selectionArray[0] != null)
+            {
+                foreach (GameObject _tileGameObject in selectionArray)
+                {
+                    if (_tileGameObject.transform.Find(movementName).gameObject.activeInHierarchy)
+                    {
+                        _tileGameObject.transform.Find(movementName).gameObject.SetActive(false);
+                    }
+                    else if (_tileGameObject.transform.Find(attackName).gameObject.activeInHierarchy)
+                    {
+                        _tileGameObject.transform.Find(attackName).gameObject.SetActive(false);
+                    }
+                }
+            }
+            Array.Clear(selectionArray, 0, selectionArray.Length);
+        }
+        if (pathList != null)
+        {
+            if (pathList.Count > 0)
+            {
+                Debug.Log("pathlist");
                 foreach (GameObject _pathHighlight in pathList)
                 {
                     _pathHighlight.SetActive(false);

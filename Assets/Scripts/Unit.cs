@@ -22,8 +22,10 @@ public class Unit : MonoBehaviour, IDamageable
     public static event Action<Unit> OnUnitDeath = delegate { };
 
     public static event Action<Unit, int, int, int> OnDamageTaken = delegate { };
+    private CollisionDetection colDet;
+    private GameGrid gridRef;
 
-    void Start()
+    void Awake()
     {
         currentUnitState = UnitState.idle;
         currentSelectionState = SelectionState.notSelected;
@@ -34,7 +36,15 @@ public class Unit : MonoBehaviour, IDamageable
         attackPower = 1;
         attackRange = 1;
         currentMovementPoints = maxMovementPointsPerTurn;
+
+        gridRef = FindObjectOfType<GameGrid>().GetComponent<GameGrid>();
+
+        colDet = GetComponentInChildren<Collider>().gameObject.AddComponent<CollisionDetection>();
+        colDet.Initializer(GetComponentInChildren<BoxCollider>(), gridRef);
+        colDet.enabled = false;
+
     }
+
 
     protected void UnitDeath()
     {
@@ -55,5 +65,21 @@ public class Unit : MonoBehaviour, IDamageable
         {
             UnitDeath();
         }
+    }
+
+    internal void EnableDet(Action<Unit> onCollision)
+    {
+        colDet.EnableAlerts(onCollision);
+    }
+
+    internal void EnableDetWithAlerts(Action<Unit> onCollision, Action<List<Node>> nodesCollector)
+    {
+        colDet.EnableAlertsWithNodes(onCollision, nodesCollector);
+    }
+
+    public void DisableDet()
+    {
+        colDet.enabled = false;
+        // colDet.DisableAlerts(abil);
     }
 }

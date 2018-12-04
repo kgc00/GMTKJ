@@ -11,8 +11,8 @@ public class WorldManager : MonoBehaviour
     public static WorldManager instance;
     [SerializeField]
     private bool anyUnitSelected = false;
-    private bool test = false;
     public static event Func<bool> onRequestGridState;
+    private BashKnight dummyAbility;
 
     void Start()
     {
@@ -28,7 +28,7 @@ public class WorldManager : MonoBehaviour
         UnitSelectionHandler.onUnitSelected += DeselectOtherUnits;
         UnitSelectionHandler.onUnitUnselected += SetNoUnitsSelected;
         UnitStateHandler.onUnitMoving += SetNoUnitsSelected;
-        UnitStateHandler.onUnitAttacking += SetNoUnitsSelected;
+        UnitStateHandler.onUnitActing += SetNoUnitsSelected;
         Unit.OnUnitDeath += RemoveUnitFromList;
         allUnits = new List<Unit>(FindObjectsOfType<Unit>());
     }
@@ -48,7 +48,12 @@ public class WorldManager : MonoBehaviour
         selectedUnit = _selectedUnit;
     }
 
-    private void SetNoUnitsSelected(Unit unit)
+    public void SetNoUnitsSelected(Unit unit)
+    {
+        anyUnitSelected = false;
+    }
+
+    private void SetNoUnitsSelected(Unit unit, Ability abil)
     {
         anyUnitSelected = false;
     }

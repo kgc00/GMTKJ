@@ -26,8 +26,8 @@ public class UnitStateHandler : MonoBehaviour
     public static Action<Unit, float> onUnitStunned;
 
     private Ability.AbilityInfo currentAbilityInfo = new Ability.AbilityInfo();
-    Ability curAbil;
-
+    public Ability curAbil;
+    public int curAbilSlot;
     void Start()
     {
         #region dictionary
@@ -45,6 +45,7 @@ public class UnitStateHandler : MonoBehaviour
         grid = GameGrid.instance;
         worldManager = WorldManager.instance;
         curAbil = new BashKnight();
+        curAbilSlot = 0;
         unit = GetComponent<Unit>();
     }
 
@@ -86,6 +87,11 @@ public class UnitStateHandler : MonoBehaviour
         }
     }
 
+    internal void SetAbilSlot(Unit unit, int abilitySlot)
+    {
+        curAbilSlot = abilitySlot;
+    }
+
     private void SetActing(Unit unit, Unit.UnitState state)
     {
         onUnitActing(unit, curAbil);
@@ -93,15 +99,19 @@ public class UnitStateHandler : MonoBehaviour
 
     private void SetPlanningAction(Unit unit, Unit.UnitState state)
     {
+        foreach (Node node in grid.grid)
+        {
+            ResetCosts(node);
+        }
         onUnitPlanningAction(unit, curAbil);
     }
 
-    internal void GetAttackData(Ability.AbilityInfo _abilityInfo)
+    internal void SetAttackData(Ability.AbilityInfo _abilityInfo)
     {
         currentAbilityInfo = _abilityInfo;
     }
 
-    internal void GetAbil(Ability _abil)
+    internal void SetAbil(Ability _abil)
     {
         curAbil = _abil;
     }

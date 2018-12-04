@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+// not using
 public class NodeUpdater : MonoBehaviour
 {
     GameGrid grid;
@@ -23,6 +24,7 @@ public class NodeUpdater : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log(other.name);
         Node tile = other.GetComponent<Node>();
         if (tile != null)
         {

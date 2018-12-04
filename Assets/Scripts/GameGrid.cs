@@ -255,6 +255,7 @@ public class GameGrid : MonoBehaviour
 
         return grid[x, y];
     }
+
     public void TryAddNodeToUnitList(Node node)
     {
         if (!nodesContainingUnits.Contains(node))

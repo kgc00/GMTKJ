@@ -70,6 +70,19 @@ public class UnitTimer : MonoBehaviour
         StartTimer(_unit, _timeToAddToTimer);
     }
 
+    public void AddTimeToTimerAbil(Unit _unit, float timeToAdd)
+    {
+        if (currentTimer == null)
+        {
+            float _timeToAddToTimer = timeToAdd;
+            StartTimer(_unit, _timeToAddToTimer);
+        }
+        else
+        {
+            Debug.LogError("somehow we got double timers");
+        }
+    }
+
     private void StartTimer(Unit _unit, float _timeToAddToTimer)
     {
         TimerInfo info = new TimerInfo(_timeToAddToTimer, _unit);

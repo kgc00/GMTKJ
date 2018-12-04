@@ -8,7 +8,7 @@ public class AttackHandler : MonoBehaviour
 
     void Start()
     {
-        AttackTargeting.onCommitToAttack += HandleCommitToAttack;
+        AbilityTargeting.onCommitToAttack += HandleCommitToAttack;
     }
 
     // need to figure out how to handle extremely different cases
@@ -26,7 +26,7 @@ public class AttackHandler : MonoBehaviour
         FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>().AttackFinished(_attackingUnit);
     }
 
-    private void DealDamage(Unit _targetUnit, Unit _attackingUnit)
+    public void DealDamage(Unit _targetUnit, Unit _attackingUnit)
     {
         int _incomingDamage = _attackingUnit.attackPower;
         _targetUnit.TakeDamage(_incomingDamage);
