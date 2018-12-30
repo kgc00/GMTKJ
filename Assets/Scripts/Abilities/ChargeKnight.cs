@@ -62,6 +62,7 @@ public class ChargeKnight : AttackAbility {
         stateHandler.SetState (unit, Unit.UnitState.cooldown);
         timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
     }
+
     private void SetRefs (Unit unit) {
         if (!stateHandler) {
             stateHandler = FindObjectOfType<UnitStateHandler> ().GetComponent<UnitStateHandler> ();
