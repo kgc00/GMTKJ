@@ -23,7 +23,8 @@ public class AttackHandler : MonoBehaviour
                 _attackAbility.OnAbilityConnected(_targetUnit);
             }
         }
-        FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>().AttackFinished(_attackingUnit);
+        // some callback
+        // FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>().AttackFinished(_attackingUnit);
     }
 
     public void DealDamage(Unit _targetUnit, Unit _attackingUnit)

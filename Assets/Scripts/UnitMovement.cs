@@ -24,8 +24,6 @@ public class UnitMovement : MonoBehaviour
         aStar = FindObjectOfType<AStar>().GetComponent<AStar>();
         movementHandler = FindObjectOfType<MovementHandler>().GetComponent<MovementHandler>();
         grid = GameGrid.instance;
-        inputHandler.onRequestingMovementLogic += MovementLogic;
-        UnitStateHandler.onUnitPlanningMovement += PrepForMovement;
         WorldManager.onRequestGridState += ReturnDisplayGrid;
     }
 
@@ -64,10 +62,8 @@ public class UnitMovement : MonoBehaviour
     public void CommitMovement(Vector3 startPos, Vector3 targetPos, Unit _unit)
     {
         StoreTargetInfo(startPos, targetPos);
-        // unitStateHandler.SetState(_unit, Unit.UnitState.moving);
         gridShoulDisplay = false;
         movementHandler.StartMovementPathLogic(_unit);
-        // _unit.GetComponent<AbilityManager>().AnimateAbilityUse(0);
 
     }
 

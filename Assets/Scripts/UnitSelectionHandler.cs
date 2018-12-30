@@ -15,10 +15,10 @@ public class UnitSelectionHandler : MonoBehaviour
             {Unit.SelectionState.selected, onUnitSelected},
             {Unit.SelectionState.notSelected, onUnitUnselected},
         };
-        UnitStateHandler.onUnitMoving += SetUnselected;
+        UnitStateHandler.onUnitActing += SetUnselected;
     }
 
-    public static void SetSelection(Unit _unit, Unit.SelectionState _selectionState)
+    public static void SetSelection(Unit _unit, Unit.SelectionState _selectionState, Ability curAbil)
     {
         _unit.currentSelectionState = _selectionState;
         switch (_selectionState)
@@ -27,14 +27,14 @@ public class UnitSelectionHandler : MonoBehaviour
                 SetSelected(_unit, _selectionState);
                 break;
             case Unit.SelectionState.notSelected:
-                SetUnselected(_unit);
+                SetUnselected(_unit, curAbil);
                 break;
             default:
                 break;
         }
     }
 
-    private static void SetUnselected(Unit _unit)
+    private static void SetUnselected(Unit _unit, Ability abil)
     {
         onUnitUnselected(_unit);
     }

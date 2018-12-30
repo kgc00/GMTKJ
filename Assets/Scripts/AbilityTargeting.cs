@@ -17,7 +17,7 @@ public class AbilityTargeting : MonoBehaviour
     [SerializeField]
     private Transform target;
     List<Node> targetNode = new List<Node>(1);
-    private RelevantAbilityInfo relevantAbilityInfo = new RelevantAbilityInfo(
+    private AbilityTargetingData relevantAbilityInfo = new AbilityTargetingData(
         new Vector3(0, 0, 0), new Vector3(0, 0, 0), 0);
 
     void Start()
@@ -86,8 +86,8 @@ public class AbilityTargeting : MonoBehaviour
         return targetNode;
     }
 
-    public RelevantAbilityInfo CacheRelevantInfo(Vector3 startPos, Vector3 targetPos, int slot)
+    public AbilityTargetingData CacheRelevantInfo(Vector3 startPos, Vector3 targetPos, int slot)
     {
-        return new RelevantAbilityInfo(startPos, targetPos, slot);
+        return new AbilityTargetingData(startPos, targetPos, slot);
     }
 }

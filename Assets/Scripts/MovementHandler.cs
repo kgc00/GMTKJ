@@ -26,7 +26,6 @@ public class MovementHandler : MonoBehaviour
         unitMovement = FindObjectOfType<UnitMovement>().GetComponent<UnitMovement>();
         inputHandler = FindObjectOfType<InputHandler>().GetComponent<InputHandler>();
         unitStateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
-        UnitStateHandler.onUnitMoving += StartMovementPathLogic;
     }
 
     public void StartMovementPathLogic(Unit _unit)
@@ -120,7 +119,7 @@ public class MovementHandler : MonoBehaviour
                 targetIndex++;
                 if (targetIndex >= path.Length)
                 {
-                    unitStateHandler.DestinationReached(_unit);
+                    // unitStateHandler.DestinationReached(_unit);
                     yield break;
                 }
                 currentWaypoint = path[targetIndex];

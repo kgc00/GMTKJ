@@ -5,7 +5,7 @@ public abstract class MovementAbility : Ability
 {
     public override void OnCalled(Unit unit)
     {
-        FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>().SetState(unit, Unit.UnitState.planningMovement);
+        FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>().SetState(unit, Unit.UnitState.planningAction);
     }
 
     public override void OnCommited(Unit unit)

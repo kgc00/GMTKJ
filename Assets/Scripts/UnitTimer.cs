@@ -26,8 +26,6 @@ public class UnitTimer : MonoBehaviour
     {
         unitStateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
         unitSelectionHandler = FindObjectOfType<UnitSelectionHandler>().GetComponent<UnitSelectionHandler>();
-        UnitStateHandler.onMovementFinished += AddTimeToTimerMovement;
-        UnitStateHandler.onAttackFinished += AddTimeToTimerAttack;
         UnitStateHandler.onUnitStunned += AddTimeToTimerStunned;
     }
 
@@ -56,18 +54,6 @@ public class UnitTimer : MonoBehaviour
     private void ReadyUnit(Unit _unit)
     {
         EndTimer(_unit);
-    }
-
-    private void AddTimeToTimerMovement(Unit _unit)
-    {
-        float _timeToAddToTimer = 2.5f;
-        StartTimer(_unit, _timeToAddToTimer);
-    }
-
-    private void AddTimeToTimerAttack(Unit _unit)
-    {
-        float _timeToAddToTimer = 3.5f;
-        StartTimer(_unit, _timeToAddToTimer);
     }
 
     public void AddTimeToTimerAbil(Unit _unit, float timeToAdd)

@@ -5,21 +5,14 @@ using UnityEngine;
 
 public class InputHandler : MonoBehaviour
 {
-    Camera cam;
     public Transform target;
-    SceneManager sceneManager;
     GameGrid grid;
     Unit selectedUnit;
     UnitStateHandler unitStateHandler;
     AbilityTargeting abilityTargeting;
-    public event Action<TargetingInformation> onAbilityCalled = delegate { };
-    public event Action<Vector3, Vector3, Unit> onRequestingMovementLogic = delegate { };
-    public event Action<Vector3, Vector3, Unit, int> onRequestingAttackLogic = delegate { };
     void Start()
     {
-        sceneManager = SceneManager.instance;
         grid = GameGrid.instance;
-        cam = Camera.main;
         abilityTargeting = FindObjectOfType<AbilityTargeting>().GetComponentInChildren<AbilityTargeting>();
         unitStateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
         if (target == null)
@@ -39,7 +32,7 @@ public class InputHandler : MonoBehaviour
             if (selectedUnit.currentUnitState == Unit.UnitState.planningAction)
             {
                 abilityTargeting.HandleAbilityInput();
-                AbilityInput(selectedUnit: selectedUnit, startPos: selectedUnit.transform.position,
+                HandleCallAbility(selectedUnit: selectedUnit, startPos: selectedUnit.transform.position,
                 targetPos: target.position, slot: unitStateHandler.curAbilSlot);
                 return;
             }
@@ -48,7 +41,6 @@ public class InputHandler : MonoBehaviour
             {
                 SelectedLogic(selectedUnit);
             }
-            MovementLogic(selectedUnit);
         }
         else
         {
@@ -80,8 +72,6 @@ public class InputHandler : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // unitStateHandler.SetState(_unit, Unit.UnitState.idle);
-            // UnitSelectionHandler.SetSelection(_unit, Unit.SelectionState.notSelected);
             Debug.LogError("scripts are not set up to handle this request");
             return;
         }
@@ -105,8 +95,7 @@ public class InputHandler : MonoBehaviour
     {
         if (_unit.currentSelectionState == Unit.SelectionState.selected)
         {
-            if (_unit.currentUnitState == Unit.UnitState.planningMovement ||
-            _unit.currentUnitState == Unit.UnitState.planningAttack ||
+            if (
             _unit.currentUnitState == Unit.UnitState.planningAction ||
             _unit.currentUnitState == Unit.UnitState.idle)
             {
@@ -117,14 +106,6 @@ public class InputHandler : MonoBehaviour
         else
         {
             return false;
-        }
-    }
-
-    private void MovementLogic(Unit _unit)
-    {
-        if (_unit.currentUnitState == Unit.UnitState.planningMovement)
-        {
-            onRequestingMovementLogic(_unit.transform.position, target.position, _unit);
         }
     }
 
@@ -147,7 +128,7 @@ public class InputHandler : MonoBehaviour
         }
     }
 
-    public void AbilityInput(Unit selectedUnit, Vector3 startPos, Vector3 targetPos, int slot)
+    public void HandleCallAbility(Unit selectedUnit, Vector3 startPos, Vector3 targetPos, int slot)
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -158,7 +139,7 @@ public class InputHandler : MonoBehaviour
 
     private static void SelectUnit(Unit _selectedUnit)
     {
-        UnitSelectionHandler.SetSelection(_selectedUnit, Unit.SelectionState.selected);
+        UnitSelectionHandler.SetSelection(_selectedUnit, Unit.SelectionState.selected, null);
         return;
     }
 }

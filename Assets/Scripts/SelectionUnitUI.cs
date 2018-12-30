@@ -8,7 +8,6 @@ public class SelectionUnitUI : MonoBehaviour
     void Awake()
     {
         UnitSelectionHandler.onUnitSelected += ShowSelection;
-        UnitStateHandler.onUnitMoving += HideSelection;
         UnitStateHandler.onUnitActing += HideSelection;
     }
 

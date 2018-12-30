@@ -1,13 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
-using System;
+using UnityEngine;
 
-[CreateAssetMenu(menuName = "Ability/Knight/ChargeKnight")]
-public class ChargeKnight : AttackAbility
-{
+[CreateAssetMenu (menuName = "Ability/Knight/ChargeKnight")]
+public class ChargeKnight : AttackAbility {
     UnitStateHandler stateHandler;
     AbilityTargeting abilityTargeting;
     GameGrid grid;
+    GridEffects gridFX;
     UnitMovement unitMovement;
     AttackHandler attackHandler;
     MovementHandler movementHandler;
@@ -16,77 +16,75 @@ public class ChargeKnight : AttackAbility
     UnitTimer timer;
     Unit owner;
 
-    public override void OnCalled(Unit unit)
-    {
-        if (!stateHandler)
-        {
-            stateHandler = FindObjectOfType<UnitStateHandler>().GetComponent<UnitStateHandler>();
+    public override void OnCalled (Unit unit) {
+        SetRefs (unit);
+        List<Node> _nodesInAbilityRange = abilityTargeting.InitiateAbilityTargeting (unit, this);
+        gridFX.InitiateAbilityHighlights (unit, _nodesInAbilityRange);
+    }
+
+    public override void OnCommited (Unit unit) {
+        stateHandler.SetState (owner, Unit.UnitState.acting);
+        unitMovement.CommitMovement (abilityInfo.infoTheSecond.startPos,
+            abilityInfo.infoTheSecond.targetPos,
+            owner
+            // some callback
+            //  OnFinished
+        );
+        owner.EnableDetWithAlerts (OnAbilityConnected, SetNodesTraveled);
+    }
+
+    public override void OnAbilityConnected (Unit unit) {
+        attackHandler.DealDamage (unit, owner);
+        SetNewUnitPosition (owner);
+        Debug.Log ("blah, unit: " + unit);
+    }
+
+    private void SetNewUnitPosition (Unit thisUnit) {
+        movementHandler.OnStopPath (nodeBeforeCollision.transform.position, thisUnit, OnFinished);
+    }
+
+    public void SetNodesTraveled (List<Node> nodes) {
+        Debug.Log ("passed in: " + nodes.Count);
+        if (nodes[0]) {
+            nodesTraveled = nodes;
+            if (nodesTraveled.Count > 2) {
+                Debug.Log (nodesTraveled.Count);
+                nodeBeforeCollision = nodesTraveled[nodesTraveled.Count - 2];
+            } else {
+                Debug.Log ("nodes count: " + nodesTraveled.Count + ".  0: " + nodesTraveled[0]);
+                nodeBeforeCollision = nodesTraveled[0];
+            }
         }
-        if (!abilityTargeting)
-        {
-            abilityTargeting = FindObjectOfType<AbilityTargeting>().GetComponent<AbilityTargeting>();
+    }
+
+    public override void OnFinished (Unit unit) {
+        unit.DisableDet ();
+        stateHandler.SetState (unit, Unit.UnitState.cooldown);
+        timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
+    }
+    private void SetRefs (Unit unit) {
+        if (!stateHandler) {
+            stateHandler = FindObjectOfType<UnitStateHandler> ().GetComponent<UnitStateHandler> ();
         }
-        if (!attackHandler)
-        {
-            attackHandler = FindObjectOfType<AttackHandler>().GetComponent<AttackHandler>();
+        if (!abilityTargeting) {
+            abilityTargeting = FindObjectOfType<AbilityTargeting> ().GetComponent<AbilityTargeting> ();
         }
-        if (!unitMovement)
-        {
-            unitMovement = FindObjectOfType<UnitMovement>().GetComponent<UnitMovement>();
+        if (!attackHandler) {
+            attackHandler = FindObjectOfType<AttackHandler> ().GetComponent<AttackHandler> ();
         }
-        if (!movementHandler)
-        {
-            movementHandler = FindObjectOfType<MovementHandler>().GetComponent<MovementHandler>();
+        if (!unitMovement) {
+            unitMovement = FindObjectOfType<UnitMovement> ().GetComponent<UnitMovement> ();
         }
-        if (!timer)
-        {
-            timer = FindObjectOfType<UnitTimer>().GetComponent<UnitTimer>();
+        if (!movementHandler) {
+            movementHandler = FindObjectOfType<MovementHandler> ().GetComponent<MovementHandler> ();
+        }
+        if (!timer) {
+            timer = FindObjectOfType<UnitTimer> ().GetComponent<UnitTimer> ();
+        }
+        if (!gridFX) {
+            gridFX = FindObjectOfType<GridEffects> ().GetComponent<GridEffects> ();
         }
         grid = GameGrid.instance;
         owner = unit;
-        List<Node> _nodesInAbilityRange = abilityTargeting.InitiateAbilityTargeting(unit, this);
-    }
-
-    public override void OnCommited(Unit unit)
-    {
-        stateHandler.SetState(unit, Unit.UnitState.acting);
-        unitMovement.CommitMovement(abilityInfo.infoTheSecond.startPos,
-         abilityInfo.infoTheSecond.targetPos,
-         unit);
-        unit.EnableDetWithAlerts(OnAbilityConnected, SetNodesTraveled);
-    }
-
-    public override void OnAbilityConnected(Unit unit)
-    {
-        attackHandler.DealDamage(unit, owner);
-        SetNewUnitPosition(owner);
-    }
-
-    private void SetNewUnitPosition(Unit thisUnit)
-    {
-        movementHandler.OnStopPath(nodeBeforeCollision.transform.position, thisUnit, OnFinished);
-    }
-
-    public void SetNodesTraveled(List<Node> nodes)
-    {
-        if (nodes[0])
-        {
-            nodesTraveled = nodes;
-            if (nodesTraveled.Count > 1)
-            {
-                nodeBeforeCollision = nodesTraveled[nodesTraveled.Count - 2];
-            }
-            else
-            {
-                nodeBeforeCollision = nodesTraveled[nodesTraveled.Count - 1];
-            }
-        }
-    }
-
-    public override void OnFinished(Unit unit)
-    {
-        unit.DisableDet();
-        stateHandler.SetState(unit, Unit.UnitState.cooldown);
-        timer.AddTimeToTimerAbil(unit, abilityInfo.cooldownTime);
     }
 }

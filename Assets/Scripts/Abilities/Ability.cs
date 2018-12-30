@@ -24,11 +24,11 @@ public abstract class Ability : ScriptableObject
         public Sprite abilityIcon;
         public TargetingBehavior targetingBehavior;
         public AbilityType abilityType;
-        public RelevantAbilityInfo infoTheSecond;
+        public AbilityTargetingData infoTheSecond;
 
         [SerializeField]
         public AbilityInfo(int _attackpower, float _cooldownTime, int _attackRange, AbilityType _abilityType,
-        Sprite _abilityIcon, TargetingBehavior _targetingBehavior, System.Action _onCalled, RelevantAbilityInfo _infoTheSecond)
+        Sprite _abilityIcon, TargetingBehavior _targetingBehavior, System.Action _onCalled, AbilityTargetingData _infoTheSecond)
         {
             attackPower = _attackpower;
             cooldownTime = _cooldownTime;
