@@ -67,7 +67,6 @@ public class GridEffects : MonoBehaviour {
             ClearHighlights (_unit);
         }
         ActivateHighlightForNodes (_nodesToHighlight, attackHighlight, attackName);
-        Debug.Log ("asd");
     }
 
     public void RenderSelectorHighlights (List<Node> _nodesToHighlight) {

@@ -537,7 +537,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1852716760076434, guid: 9f5a6cdbdf906884cb32e2c7dae69dba, type: 2}
       propertyPath: m_Name
-      value: Knight (1)
+      value: Jerry
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9f5a6cdbdf906884cb32e2c7dae69dba, type: 2}
@@ -1062,6 +1062,10 @@ Prefab:
     - target: {fileID: 4537905095243180, guid: 9f5a6cdbdf906884cb32e2c7dae69dba, type: 2}
       propertyPath: m_RootOrder
       value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 1852716760076434, guid: 9f5a6cdbdf906884cb32e2c7dae69dba, type: 2}
+      propertyPath: m_Name
+      value: Steve
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9f5a6cdbdf906884cb32e2c7dae69dba, type: 2}

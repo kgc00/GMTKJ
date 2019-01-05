@@ -26,9 +26,8 @@ public class ChargeKnight : AttackAbility {
         stateHandler.SetState (owner, Unit.UnitState.acting);
         unitMovement.CommitMovement (abilityInfo.infoTheSecond.startPos,
             abilityInfo.infoTheSecond.targetPos,
-            owner
-            // some callback
-            //  OnFinished
+            owner,
+            OnFinished
         );
         owner.EnableDetWithAlerts (OnAbilityConnected, SetNodesTraveled);
     }
@@ -36,18 +35,18 @@ public class ChargeKnight : AttackAbility {
     public override void OnAbilityConnected (Unit unit) {
         attackHandler.DealDamage (unit, owner);
         SetNewUnitPosition (owner);
-        Debug.Log ("blah, unit: " + unit);
+        // Debug.Log ("damage has been dealt to: " + unit);
     }
 
     private void SetNewUnitPosition (Unit thisUnit) {
-        movementHandler.OnStopPath (nodeBeforeCollision.transform.position, thisUnit, OnFinished);
+        movementHandler.OnStopPath (nodeBeforeCollision.transform.position, thisUnit);
     }
 
     public void SetNodesTraveled (List<Node> nodes) {
         Debug.Log ("passed in: " + nodes.Count);
         if (nodes[0]) {
             nodesTraveled = nodes;
-            if (nodesTraveled.Count > 2) {
+            if (nodesTraveled.Count >= 2) {
                 Debug.Log (nodesTraveled.Count);
                 nodeBeforeCollision = nodesTraveled[nodesTraveled.Count - 2];
             } else {
@@ -58,9 +57,10 @@ public class ChargeKnight : AttackAbility {
     }
 
     public override void OnFinished (Unit unit) {
-        unit.DisableDet ();
+        unit.DisableDet (this);
         stateHandler.SetState (unit, Unit.UnitState.cooldown);
         timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
+        Debug.Log ("onFinished was called");
     }
 
     private void SetRefs (Unit unit) {
