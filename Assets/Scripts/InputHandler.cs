@@ -101,7 +101,13 @@ public class InputHandler : MonoBehaviour {
     public void HandleCallAbility (Unit selectedUnit, Vector3 startPos, Vector3 targetPos, int slot) {
         if (Input.GetMouseButtonDown (0)) {
             unitStateHandler.curAbil.abilityInfo.infoTheSecond = abilityTargeting.CacheRelevantInfo (startPos, targetPos, slot);
-            unitStateHandler.curAbil.OnCommited (selectedUnit);
+            // if selected node is a valid node to travel
+            if (unitStateHandler.curAbil.abilityInfo.nodesInAbilityRange != null &&
+                unitStateHandler.curAbil.abilityInfo.nodesInAbilityRange.Contains (grid.NodeFromWorldPosition (targetPos))) {
+                unitStateHandler.curAbil.OnCommited (selectedUnit);
+            } else {
+                Debug.Log ("not a valid selection");
+            }
         }
     }
 

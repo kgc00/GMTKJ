@@ -18,8 +18,8 @@ public class ChargeKnight : AttackAbility {
 
     public override void OnCalled (Unit unit) {
         SetRefs (unit);
-        List<Node> _nodesInAbilityRange = abilityTargeting.InitiateAbilityTargeting (unit, this);
-        gridFX.InitiateAbilityHighlights (unit, _nodesInAbilityRange);
+        abilityInfo.nodesInAbilityRange = abilityTargeting.InitiateAbilityTargeting (unit, this);
+        gridFX.InitiateAbilityHighlights (unit, abilityInfo.nodesInAbilityRange);
     }
 
     public override void OnCommited (Unit unit) {

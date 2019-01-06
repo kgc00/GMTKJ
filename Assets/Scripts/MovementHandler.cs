@@ -31,10 +31,11 @@ public class MovementHandler : MonoBehaviour {
         Action<Unit> onDestReached
     ) {
         targetInfo = unitMovement.PassTargetInfo ();
-        StartCoroutine (GenerateMovementPath (targetInfo.startingPoint, targetInfo.targetPoint, _unit, onDestReached));
-        MoveUnit (_unit,
-            onDestReached
+        StartCoroutine (
+            GenerateMovementPath (targetInfo.startingPoint,
+                targetInfo.targetPoint, _unit, onDestReached)
         );
+        MoveUnit (_unit, onDestReached);
     }
 
     public IEnumerator GenerateMovementPath (Vector3 _startPos, Vector3 _targetPos, Unit _unit, Action<Unit> onDestReached) {

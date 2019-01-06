@@ -54,10 +54,7 @@ public class UnitMovement : MonoBehaviour {
         Vector3 targetPos, Unit _unit, Action<Unit> onDestReached) {
         StoreTargetInfo (startPos, targetPos);
         gridShoulDisplay = false;
-        movementHandler.StartMovementPathLogic (
-            _unit,
-            onDestReached
-        );
+        movementHandler.StartMovementPathLogic (_unit, onDestReached);
 
     }
 
