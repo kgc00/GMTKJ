@@ -30,6 +30,7 @@ public class ChargeKnight : AttackAbility {
             OnFinished
         );
         owner.EnableDetWithAlerts (OnAbilityConnected, SetNodesTraveled);
+        unit.GetComponent<AbilityManager> ().AnimateAbilityUse (abilityInfo.infoTheSecond.slot);
     }
 
     public override void OnAbilityConnected (Unit unit) {

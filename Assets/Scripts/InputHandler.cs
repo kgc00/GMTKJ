@@ -88,10 +88,9 @@ public class InputHandler : MonoBehaviour {
             Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast (ray, out hit, 50, 1 << 11)) {
-                Node _selectedNode = grid.NodeFromWorldPosition (hit.transform.position);
                 Unit _selectedUnit = hit.transform.parent.gameObject.GetComponent<Unit> ();
-                if (_selectedNode.occupiedByUnit == Node.OccupiedByUnit.ally &&
-                    _selectedUnit.currentUnitState == Unit.UnitState.idle) {
+                // need to add spport for enemy/ally distinction
+                if (_selectedUnit.currentUnitState == Unit.UnitState.idle) {
                     SelectUnit (_selectedUnit);
                 }
             }
