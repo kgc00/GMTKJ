@@ -6,7 +6,7 @@ using UnityEngine;
 public class AttackHandler : MonoBehaviour {
 
     void Start () {
-        AbilityTargeting.onCommitToAttack += HandleCommitToAttack;
+        AbilityTargeting.onCommitToMeleeAttack += HandleCommitToAttack;
     }
 
     // need to figure out how to handle extremely different cases

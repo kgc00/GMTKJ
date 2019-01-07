@@ -26,7 +26,7 @@ public class InputHandler : MonoBehaviour {
             if (selectedUnit.currentUnitState == Unit.UnitState.planningAction) {
                 abilityTargeting.HandleAbilityInput ();
                 HandleCallAbility (selectedUnit: selectedUnit, startPos: selectedUnit.transform.position,
-                    targetPos: target.position, slot: unitStateHandler.curAbilSlot);
+                    targetPos: grid.NodeFromWorldPosition (target.position).transform.position, slot: unitStateHandler.curAbilSlot);
                 return;
             }
 

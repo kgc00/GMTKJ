@@ -12,7 +12,7 @@ public class AbilityTargeting : MonoBehaviour {
     UnitStateHandler unitStateHandler;
     InputHandler inputHandler;
     public static event Action<Unit, List<Node>> onGenerateAbilityRange = delegate { };
-    public static event Action<Node, Unit, Ability, Unit> onCommitToAttack = delegate { };
+    public static event Action<Node, Unit, Ability, Unit> onCommitToMeleeAttack = delegate { };
     [SerializeField]
     private Transform target;
     List<Node> targetNode = new List<Node> (1);
@@ -57,9 +57,12 @@ public class AbilityTargeting : MonoBehaviour {
         Node _selectedNode = grid.NodeFromWorldPosition (_targetPos);
         Unit _target = UnitFromNode.SingleUnitFromNode (_selectedNode);
         Unit _attackingUnit = UnitFromNode.SingleUnitFromNode (grid.NodeFromWorldPosition (_startPos));
-        _attackingUnit.GetComponent<AbilityManager> ().AnimateAbilityUse (slot);
         Ability _ability = _attackingUnit.GetComponent<AbilityManager> ().ReturnAbility ();
-        onCommitToAttack (_selectedNode, _attackingUnit, _ability, _target);
+        onCommitToMeleeAttack (_selectedNode, _attackingUnit, _ability, _target);
+    }
+
+    internal void CommitToRangedAttack (Vector3 startPos, Vector3 targetPos, int slot, Action<Unit> callback = null) {
+
     }
 
     private bool IsLegalMove (Vector3 targetPos) {
