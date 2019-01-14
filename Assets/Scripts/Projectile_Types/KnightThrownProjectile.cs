@@ -54,14 +54,9 @@ public class KnightThrownProjectile : ProjectileGMTK {
     private void OnTriggerEnter (Collider other) {
         if (other.GetComponentInParent<Unit> ()) {
             if (other.transform.parent.gameObject != owner.gameObject) {
-                Debug.Log ("got thru if statement: " + other.transform);
                 if (callback != null) {
                     callback (other.GetComponentInParent<Unit> ());
-                } else {
-                    Debug.Log ("hit a collider");
                 }
-            } else {
-                Debug.Log (other);
             }
         }
     }

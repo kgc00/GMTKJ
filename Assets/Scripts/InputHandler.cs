@@ -9,8 +9,10 @@ public class InputHandler : MonoBehaviour {
     Unit selectedUnit;
     UnitStateHandler unitStateHandler;
     AbilityTargeting abilityTargeting;
+    GridEffects gridFX;
     void Start () {
         grid = GameGrid.instance;
+        gridFX = FindObjectOfType<GridEffects> ().GetComponentInChildren<GridEffects> ();
         abilityTargeting = FindObjectOfType<AbilityTargeting> ().GetComponentInChildren<AbilityTargeting> ();
         unitStateHandler = FindObjectOfType<UnitStateHandler> ().GetComponent<UnitStateHandler> ();
         if (target == null) {
@@ -107,6 +109,11 @@ public class InputHandler : MonoBehaviour {
             } else {
                 Debug.Log ("not a valid selection");
             }
+        } else if (Input.GetKeyDown (KeyCode.Escape)) {
+            // set state to idle, keep unit selected, reset nodes
+            unitStateHandler.SetState (selectedUnit, Unit.UnitState.idle);
+            grid.ResetNodeCosts ();
+            gridFX.ClearHighlights ();
         }
     }
 

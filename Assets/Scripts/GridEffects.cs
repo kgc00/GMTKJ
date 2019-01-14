@@ -161,7 +161,7 @@ public class GridEffects : MonoBehaviour {
             pathList.Clear ();
         }
     }
-    private void ClearHighlights () {
+    public void ClearHighlights () {
         if (selectionArray != null) {
             // better way to check?
             if (selectionArray[0] != null) {
@@ -177,7 +177,6 @@ public class GridEffects : MonoBehaviour {
         }
         if (pathList != null) {
             if (pathList.Count > 0) {
-                Debug.Log ("pathlist");
                 foreach (GameObject _pathHighlight in pathList) {
                     _pathHighlight.SetActive (false);
                 }

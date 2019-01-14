@@ -54,9 +54,7 @@ public class UnitStateHandler : MonoBehaviour {
     }
 
     private void SetPlanningAction (Unit unit, Unit.UnitState state) {
-        foreach (Node node in grid.grid) {
-            ResetCosts (node);
-        }
+        grid.ResetNodeCosts ();
         onUnitPlanningAction (unit, curAbil);
     }
 
@@ -72,10 +70,5 @@ public class UnitStateHandler : MonoBehaviour {
 
     private void SetOnCooldown (Unit _unit, Unit.UnitState _state) {
 
-    }
-
-    private static void ResetCosts (Node node) {
-        node.gCost = 0;
-        node.hCost = 0;
     }
 }
