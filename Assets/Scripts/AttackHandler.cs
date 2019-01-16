@@ -7,6 +7,7 @@ public class AttackHandler : MonoBehaviour {
 
     void Start () {
         AbilityTargeting.onCommitToMeleeAttack += HandleCommitToAttack;
+        AbilityTargeting.onCommitToMeleeAOEAttack += HandleMeleeAOEAttack;
     }
 
     // need to figure out how to handle extremely different cases
@@ -28,5 +29,14 @@ public class AttackHandler : MonoBehaviour {
     public void DealDamage (Unit _targetUnit, Unit _attackingUnit) {
         int _incomingDamage = _attackingUnit.attackPower;
         _targetUnit.TakeDamage (_incomingDamage);
+    }
+
+    private void HandleMeleeAOEAttack (List<Unit> unitsAffected, Unit attackingUnit, AttackAbility ability, Action<Unit> callback = null) {
+        foreach (Unit unit in unitsAffected) {
+            if (callback != null) {
+                callback (unit);
+            }
+        }
+        ability.OnFinished (attackingUnit);
     }
 }

@@ -3,7 +3,6 @@ using UnityEngine;
 
 [CreateAssetMenu (menuName = "Ability/Knight/BashKnight")]
 public class BashKnight : AttackAbility {
-    [SerializeField]
     private float lengthOfStun = 2.0f;
     UnitStateHandler stateHandler;
     AbilityTargeting abilityTargeting;
@@ -28,10 +27,8 @@ public class BashKnight : AttackAbility {
 
     public override void OnAbilityConnected (Unit targetedUnit) {
         attackHandler.DealDamage (targetedUnit, owner);
-        if (targetedUnit.currentUnitState != Unit.UnitState.cooldown) {
-            UnitStateHandler.onUnitStunned (targetedUnit, lengthOfStun);
-            stateHandler.SetState (targetedUnit, Unit.UnitState.cooldown);
-        }
+        UnitStateHandler.onUnitStunned (targetedUnit, lengthOfStun);
+        stateHandler.SetState (targetedUnit, Unit.UnitState.cooldown);
         OnFinished (owner);
     }
 

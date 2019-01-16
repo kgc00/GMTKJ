@@ -44,14 +44,14 @@ public class ChargeKnight : AttackAbility {
     }
 
     public void SetNodesTraveled (List<Node> nodes) {
-        Debug.Log ("passed in: " + nodes.Count);
+        // Debug.Log ("passed in: " + nodes.Count);
         if (nodes[0]) {
             nodesTraveled = nodes;
             if (nodesTraveled.Count >= 2) {
                 Debug.Log (nodesTraveled.Count);
                 nodeBeforeCollision = nodesTraveled[nodesTraveled.Count - 2];
             } else {
-                Debug.Log ("nodes count: " + nodesTraveled.Count + ".  0: " + nodesTraveled[0]);
+                // Debug.Log ("nodes count: " + nodesTraveled.Count + ".  0: " + nodesTraveled[0]);
                 nodeBeforeCollision = nodesTraveled[0];
             }
         }

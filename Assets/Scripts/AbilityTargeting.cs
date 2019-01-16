@@ -13,6 +13,7 @@ public class AbilityTargeting : MonoBehaviour {
     InputHandler inputHandler;
     public static event Action<Unit, List<Node>> onGenerateAbilityRange = delegate { };
     public static event Action<Node, Unit, Ability, Unit> onCommitToMeleeAttack = delegate { };
+    public static event Action<List<Unit>, Unit, AttackAbility, Action<Unit>> onCommitToMeleeAOEAttack = delegate { };
     [SerializeField]
     private Transform target;
     List<Node> targetNode = new List<Node> (1);
@@ -61,6 +62,23 @@ public class AbilityTargeting : MonoBehaviour {
         onCommitToMeleeAttack (_selectedNode, _attackingUnit, _ability, _target);
     }
 
+    internal void CommitToAoEAttack (List<Node> nodesInAbilityRange, Unit attackingUnit, int slot, Action<Unit> callback = null) {
+        List<Unit> unitsAffected = new List<Unit> ();
+        foreach (Node node in nodesInAbilityRange) {
+            if (UnitFromNode.SingleUnitFromNode (node)) {
+                unitsAffected.Add (UnitFromNode.SingleUnitFromNode (node));
+            }
+        }
+        Ability ability = attackingUnit.GetComponent<AbilityManager> ().ReturnAbility ();
+        AttackAbility attackAbility = null;
+        if (ability is AttackAbility) {
+            attackAbility = (AttackAbility) ability;
+            ability = attackAbility;
+            onCommitToMeleeAOEAttack (unitsAffected, attackingUnit, attackAbility, callback);
+        } else {
+            Debug.LogError ("No attack ability found");
+        }
+    }
     internal void CommitToRangedAttack (Vector3 startPos, Vector3 targetPos, int slot, Action<Unit> callback = null) {
 
     }

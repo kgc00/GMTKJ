@@ -95,7 +95,12 @@ public class UnitTimer : MonoBehaviour {
     private IEnumerator InitiateCooldown (TimerInfo info) {
         while (info.timeLeft > 0) {
             info.timeLeft -= Time.deltaTime;
-            yield return new WaitForSeconds (.1f);
+            yield return null;
+
+            // this will make less calls and optimize logic, but not sure how 
+            // to make the timer accurate when using this method.
+
+            // yield return new WaitForSeconds (.1f);
         }
         ReadyUnit (info.unit);
         currentCoroutines.Remove (info.unit);
