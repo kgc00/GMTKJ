@@ -50,6 +50,7 @@ public class CollisionDetection : MonoBehaviour {
         alertsEnabled = false;
         onCollision = null;
         withNodes = null;
+        nodesTraversedSinceEnabled.Clear ();
     }
 
     internal void EnableAlerts (Action<Unit> collisionCallback) {

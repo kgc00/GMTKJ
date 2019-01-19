@@ -61,7 +61,6 @@ public class UnitTimer : MonoBehaviour {
     private void EndTimer (Unit _unit) {
         unitStateHandler.SetState (_unit, Unit.UnitState.idle);
         onTimerStopped (_unit, Unit.UnitState.idle);
-        // currentTimer = null;
         if (_unit == WorldManager.ReturnSelectedUnit ()) {
             FindObjectOfType<AbilityUI> ().GetComponent<AbilityUI> ().PopulateAbilityPanel (_unit);
         }
@@ -104,6 +103,5 @@ public class UnitTimer : MonoBehaviour {
         }
         ReadyUnit (info.unit);
         currentCoroutines.Remove (info.unit);
-        Debug.Log ("coroutine count: " + currentCoroutines.Count);
     }
 }

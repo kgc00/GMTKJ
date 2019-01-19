@@ -515,8 +515,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5e6d7e0dba722041ae6139633c05017, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentUnitState: 0
-  currentSelectionState: 0
+  currentUnitState: 3
+  currentSelectionState: 1
   maxMovementPointsPerTurn: 0
   currentMovementPoints: 0
   movementCost: 0

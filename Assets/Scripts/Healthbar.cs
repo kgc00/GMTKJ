@@ -4,63 +4,71 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Healthbar : MonoBehaviour
-{
+public class Healthbar : MonoBehaviour {
 
-    public Image foregroundImage;
-    Unit unit;
     public float updateSpeed = .5f;
-    private Coroutine CoroutineHandler;
-    private struct HealthFillInfo
-    {
+    private Dictionary<Unit, CoroutineInfo> currentCoroutines;
+
+    private struct CoroutineInfo {
+        public HealthFillInfo healthFillInfo;
+        public Coroutine coroutine;
+        public CoroutineInfo (HealthFillInfo _healthFillInfo, Coroutine _coroutine) {
+            healthFillInfo = _healthFillInfo;
+            coroutine = _coroutine;
+        }
+    }
+    private struct HealthFillInfo {
         public float newTotal;
         public Unit unit;
-        public HealthFillInfo(float _newTotal, Unit _unit)
-        {
+        public HealthFillInfo (float _newTotal, Unit _unit) {
             newTotal = _newTotal;
             unit = _unit;
         }
     }
 
     // Use this for initialization
-    void Start()
-    {
+    void Start () {
+        currentCoroutines = new Dictionary<Unit, CoroutineInfo> ();
         Unit.OnDamageTaken += OnDamageTaken;
     }
 
-    private void OnDamageTaken(Unit unit, int currentHealth, int maxHealth, int damageTaken)
-    {
-        float newTotal = (float)(currentHealth - damageTaken) / (float)maxHealth;
-        if (newTotal < 0)
-        {
+    private void OnDamageTaken (Unit unit, int currentHealth, int maxHealth, int damageTaken) {
+        if (currentCoroutines.ContainsKey (unit)) {
+            // refactor and test for the case where a unit gets
+            // damaged while it's healthbar is already animating
+            CoroutineInfo temp = currentCoroutines[unit];
+            StopCoroutine (temp.coroutine);
+            currentCoroutines.Remove (unit);
+        }
+        float newTotal = (float) (currentHealth - damageTaken) / (float) maxHealth;
+        if (newTotal < 0) {
             newTotal = 0;
         }
-        if (CoroutineHandler != null)
-        {
-            StopCoroutine(CoroutineHandler);
-        }
-        HealthFillInfo info = new HealthFillInfo(newTotal, unit);
-        CoroutineHandler = StartCoroutine(AnimateHealthBar(info));
+        HealthFillInfo info = new HealthFillInfo (newTotal, unit);
+        Coroutine thisCoroutine = StartCoroutine ("AnimateHealthBar", info);
+        CoroutineInfo coroutineInfo = new CoroutineInfo (info, thisCoroutine);
+        currentCoroutines.Add (unit, coroutineInfo);
     }
 
-    private IEnumerator AnimateHealthBar(HealthFillInfo info)
-    {
+    private IEnumerator AnimateHealthBar (HealthFillInfo info) {
         float newTotal = info.newTotal;
-        if (info.unit.transform.Find("Health Canvas/Health Foreground").GetComponent<Image>())
-        {
-            foregroundImage = info.unit.transform.Find("Health Canvas/Health Foreground").GetComponent<Image>();
+        Image foregroundImage = null;
+        if (info.unit.transform.Find ("Health Canvas/Health Foreground").GetComponent<Image> ()) {
+            foregroundImage = info.unit.transform.Find ("Health Canvas/Health Foreground").GetComponent<Image> ();
         } else {
-            Debug.LogError("Could not find healthbar image");
+            Debug.LogError ("Could not find healthbar image");
+            yield break;
         }
         float preChangePct = foregroundImage.fillAmount;
         float elapsed = 0f;
 
-        while (elapsed < updateSpeed)
-        {
+        while (elapsed < updateSpeed) {
             elapsed += Time.deltaTime;
-            foregroundImage.fillAmount = Mathf.Lerp(preChangePct, newTotal, elapsed / updateSpeed);
+            foregroundImage.fillAmount = Mathf.Lerp (preChangePct, newTotal, elapsed / updateSpeed);
             yield return null;
         }
+
         foregroundImage.fillAmount = newTotal;
+        currentCoroutines.Remove (info.unit);
     }
 }

@@ -127,6 +127,22 @@ public class GameGrid : MonoBehaviour {
         return nodesWithinRange;
     }
 
+    // hard to only return the right nodes..
+    public List<Node> GetAOERange (Node node, int range) {
+        List<Node> nodesWithinAttackRange = new List<Node> ();
+        nodesWithinAttackRange.Add (node);
+        for (int x = -range; x <= range; x++) {
+            for (int y = -range; y <= range; y++) {
+                int checkX = node.gridX + x;
+                int checkY = node.gridY + y;
+                if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY) {
+                    nodesWithinAttackRange.Add (grid[checkX, checkY]);
+                }
+            }
+        }
+        return nodesWithinAttackRange;
+    }
+
     public List<Node> GetAttackRange (Node node, Ability.AbilityInfo abilityInfo) {
         int range = abilityInfo.attackRange;
         List<Node> nodesWithinAttackRange = new List<Node> ();
