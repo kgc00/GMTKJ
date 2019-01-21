@@ -767,7 +767,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 302ae1ceee6daf9489677090df2a917d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  foregroundImage: {fileID: 0}
   updateSpeed: 0.5
 --- !u!114 &912812202
 MonoBehaviour:
@@ -1163,11 +1162,6 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 114797362154159598, guid: 17d8cb128adf0d3429aee48f39498607,
-        type: 2}
-      propertyPath: equippedAbilities.Array.size
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 4081510561996646, guid: 17d8cb128adf0d3429aee48f39498607, type: 2}
       propertyPath: m_LocalPosition.x
       value: -5.02
@@ -1204,12 +1198,6 @@ Prefab:
       propertyPath: m_Name
       value: Alice
       objectReference: {fileID: 0}
-    - target: {fileID: 114797362154159598, guid: 17d8cb128adf0d3429aee48f39498607,
-        type: 2}
-      propertyPath: equippedAbilities.Array.data[1]
-      value: 
-      objectReference: {fileID: 11400000, guid: db0b97731cf7a7b48a97310bbc5a7a60,
-        type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 17d8cb128adf0d3429aee48f39498607, type: 2}
   m_IsPrefabAsset: 0

@@ -467,7 +467,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   equippedAbilities:
   - {fileID: 11400000, guid: 9f06e60c7a561874ab06ebbe7fa859cf, type: 2}
-  - {fileID: 11400000, guid: db0b97731cf7a7b48a97310bbc5a7a60, type: 2}
+  - {fileID: 11400000, guid: b7650ec4a53366a46a25883ad38980f9, type: 2}
+  - {fileID: 11400000, guid: 5de19e355a95b274e8a96ac5c95368fc, type: 2}
+  - {fileID: 11400000, guid: 49ab1756d3a5f3f4296373374d08fdc4, type: 2}
   equipAbilitiesInEditor: 1
 --- !u!114 &114876396779458832
 MonoBehaviour:

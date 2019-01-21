@@ -143,6 +143,48 @@ public class GameGrid : MonoBehaviour {
         return nodesWithinAttackRange;
     }
 
+    // will get the horizontal strip of nodes 
+    // according to input range and direction 
+    // from starting point.
+
+    //  targeting will look like this:
+    //   (with a range of 3)            //
+    //               x x x              //
+    //                 0                //
+    //                 0     x          //
+    //                 0 0 0 x          //
+    //                       x          //
+    //                                  //
+    //                                  //
+    //                                  //
+    public List<Node> GetAOEHorizontalRange (
+        Node startingNode, int range, Node targetNode
+    ) {
+        List<Node> nodesWithinAttackRange = new List<Node> ();
+        nodesWithinAttackRange.Add (targetNode);
+
+        if (targetNode.worldPosition.x != startingNode.worldPosition.x) {
+            // y stuff
+            for (int y = -range; y <= range; y++) {
+                int checkX = targetNode.gridX;
+                int checkY = targetNode.gridY + y;
+                if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY) {
+                    nodesWithinAttackRange.Add (grid[checkX, checkY]);
+                }
+            }
+        } else if (targetNode.worldPosition.y != startingNode.worldPosition.y) {
+            // x stuff
+            for (int x = -range; x <= range; x++) {
+                int checkX = targetNode.gridX + x;
+                int checkY = targetNode.gridY;
+                if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY) {
+                    nodesWithinAttackRange.Add (grid[checkX, checkY]);
+                }
+            }
+        }
+        return nodesWithinAttackRange;
+    }
+
     public List<Node> GetAttackRange (Node node, Ability.AbilityInfo abilityInfo) {
         int range = abilityInfo.attackRange;
         List<Node> nodesWithinAttackRange = new List<Node> ();

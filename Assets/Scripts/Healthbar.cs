@@ -19,9 +19,11 @@ public class Healthbar : MonoBehaviour {
     }
     private struct HealthFillInfo {
         public float newTotal;
+        public float currentHealth;
         public Unit unit;
-        public HealthFillInfo (float _newTotal, Unit _unit) {
+        public HealthFillInfo (float _newTotal, float _currentHealth, Unit _unit) {
             newTotal = _newTotal;
+            currentHealth = _currentHealth;
             unit = _unit;
         }
     }
@@ -34,17 +36,16 @@ public class Healthbar : MonoBehaviour {
 
     private void OnDamageTaken (Unit unit, int currentHealth, int maxHealth, int damageTaken) {
         if (currentCoroutines.ContainsKey (unit)) {
-            // refactor and test for the case where a unit gets
-            // damaged while it's healthbar is already animating
             CoroutineInfo temp = currentCoroutines[unit];
             StopCoroutine (temp.coroutine);
             currentCoroutines.Remove (unit);
+            Debug.Log ("hi");
         }
         float newTotal = (float) (currentHealth - damageTaken) / (float) maxHealth;
         if (newTotal < 0) {
             newTotal = 0;
         }
-        HealthFillInfo info = new HealthFillInfo (newTotal, unit);
+        HealthFillInfo info = new HealthFillInfo (newTotal, currentHealth, unit);
         Coroutine thisCoroutine = StartCoroutine ("AnimateHealthBar", info);
         CoroutineInfo coroutineInfo = new CoroutineInfo (info, thisCoroutine);
         currentCoroutines.Add (unit, coroutineInfo);

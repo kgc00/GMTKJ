@@ -24,7 +24,7 @@ public class Fireball : AttackAbility {
     }
 
     private void CreateProjectile (Unit unit) {
-        GameObject go = new GameObject ("throwing thing projectile");
+        GameObject go = new GameObject ("fireball projectile");
         // go.AddComponent<Sprite>();
         FireballProjectile fireballProjectile = go.AddComponent<FireballProjectile> ();
         SphereCollider so = go.AddComponent<SphereCollider> ();
@@ -34,7 +34,6 @@ public class Fireball : AttackAbility {
         fireballProjectile.FireProjectile (abilityInfo.infoTheSecond.startPos, abilityInfo.infoTheSecond.targetPos, unit, Explode);
     }
 
-    // doesnt hit owner for some reason
     public void Explode (Node node) {
         Vector3 impactPoint = node.transform.position;
         List<Node> nodesImpacted = grid.GetNeighbors (node);
