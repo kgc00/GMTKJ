@@ -56,7 +56,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridWorldSize: {x: 20, y: 20}
   nodeRadius: 0.5
-  nodeDiameter: 0
+  nodeSize: 0
   obstacleMask:
     serializedVersion: 2
     m_Bits: 512

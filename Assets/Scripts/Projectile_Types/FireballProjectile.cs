@@ -58,6 +58,7 @@ public class FireballProjectile : ProjectileGMTK {
     }
 
     private void onFinished () {
+        GetComponent<SphereCollider> ().enabled = false;
         Destroy (gameObject, .25f);
     }
 

@@ -28,6 +28,7 @@ public class Fireball : AttackAbility {
         // go.AddComponent<Sprite>();
         FireballProjectile fireballProjectile = go.AddComponent<FireballProjectile> ();
         SphereCollider so = go.AddComponent<SphereCollider> ();
+        so.isTrigger = true;
         so.radius = .25f;
         go.transform.transform.position = abilityInfo.infoTheSecond.startPos;
 

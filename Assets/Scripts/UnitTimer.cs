@@ -84,6 +84,7 @@ public class UnitTimer : MonoBehaviour {
             if (info.maxTime > temp.timerInfo.timeLeft) {
                 StopCoroutine (temp.coroutine);
             }
+            currentCoroutines.Remove (_unit);
         }
 
         CoroutineInfo coroutineInfo = new CoroutineInfo (info, thisCoroutine);

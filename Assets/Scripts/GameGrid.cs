@@ -143,21 +143,22 @@ public class GameGrid : MonoBehaviour {
         return nodesWithinAttackRange;
     }
 
-    // will get the horizontal strip of nodes 
+    // will get the Perpendicular strip of nodes 
     // according to input range and direction 
     // from starting point.
 
     //  targeting will look like this:
     //   (with a range of 3)            //
+    //                 0                
     //               x x x              //
     //                 0                //
     //                 0     x          //
-    //                 0 0 0 x          //
+    //                 0 0 0 x 0        //
     //                       x          //
     //                                  //
     //                                  //
     //                                  //
-    public List<Node> GetAOEHorizontalRange (
+    public List<Node> GetAOEPerpendicularRange (
         Node startingNode, int range, Node targetNode
     ) {
         List<Node> nodesWithinAttackRange = new List<Node> ();
@@ -177,6 +178,49 @@ public class GameGrid : MonoBehaviour {
             for (int x = -range; x <= range; x++) {
                 int checkX = targetNode.gridX + x;
                 int checkY = targetNode.gridY;
+                if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY) {
+                    nodesWithinAttackRange.Add (grid[checkX, checkY]);
+                }
+            }
+        }
+        return nodesWithinAttackRange;
+    }
+
+    // will get the extending strip of nodes 
+    // according to input range and direction 
+    // from starting point.
+
+    // (only hits from target point and beyond)
+
+    //  targeting will look like this:
+    //   (with a range of 3)            //
+    //                                  //
+    //           x                      //
+    //           x                      //
+    //           x                      //
+    //           0                      //
+    //           0                      //
+    //           0 0 0 x x x            //
+    //                                  //
+    public List<Node> GetAOEExtendingRange (
+        Node startingNode, int range, Node targetNode
+    ) {
+        List<Node> nodesWithinAttackRange = new List<Node> ();
+
+        if (targetNode.worldPosition.x != startingNode.worldPosition.x) {
+            // x stuff
+            for (int x = 0; x < range; x++) {
+                int checkX = targetNode.gridX + x;
+                int checkY = targetNode.gridY;
+                if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY) {
+                    nodesWithinAttackRange.Add (grid[checkX, checkY]);
+                }
+            }
+        } else if (targetNode.worldPosition.y != startingNode.worldPosition.y) {
+            // y stuff
+            for (int y = 0; y < range; y++) {
+                int checkX = targetNode.gridX;
+                int checkY = targetNode.gridY + y;
                 if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY) {
                     nodesWithinAttackRange.Add (grid[checkX, checkY]);
                 }

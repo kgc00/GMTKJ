@@ -39,7 +39,6 @@ public class Healthbar : MonoBehaviour {
             CoroutineInfo temp = currentCoroutines[unit];
             StopCoroutine (temp.coroutine);
             currentCoroutines.Remove (unit);
-            Debug.Log ("hi");
         }
         float newTotal = (float) (currentHealth - damageTaken) / (float) maxHealth;
         if (newTotal < 0) {

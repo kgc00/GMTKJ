@@ -1,18 +1,18 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu (menuName = "Ability/Mage/WallOfFire")]
-public class WallOfFire : AttackAbility {
+[CreateAssetMenu (menuName = "Ability/Archer/Run")]
+public class Run : MovementAbility {
+
 	UnitStateHandler stateHandler;
 	AbilityTargeting abilityTargeting;
 	GameGrid grid;
 	GridEffects gridFX;
-	AttackHandler attackHandler;
+	UnitMovement unitMovement;
+	MovementHandler movementHandler;
 	UnitTimer timer;
 	Unit owner;
-	[SerializeField]
-	int targetRadius;
 
 	public override void OnCalled (Unit unit) {
 		SetRefs (unit);
@@ -22,32 +22,16 @@ public class WallOfFire : AttackAbility {
 
 	public override void OnCommited (Unit unit) {
 		stateHandler.SetState (owner, Unit.UnitState.acting);
-		List<Node> targetedNodes = grid.GetAOEPerpendicularRange (
-			grid.NodeFromWorldPosition (
-				abilityInfo.infoTheSecond.startPos),
-			targetRadius,
-			grid.NodeFromWorldPosition (
-				abilityInfo.infoTheSecond.targetPos));
-		abilityTargeting.CommitToAoEAttack (targetedNodes,
+		unitMovement.CommitMovement (abilityInfo.infoTheSecond.startPos,
+			abilityInfo.infoTheSecond.targetPos,
 			owner,
-			abilityInfo.infoTheSecond.slot,
-			OnAbilityConnected);
+			OnDestinationReached
+		);
 		unit.GetComponent<AbilityManager> ().AnimateAbilityUse (abilityInfo.infoTheSecond.slot);
 	}
-	public void Explode (Node node) {
-		Vector3 impactPoint = node.transform.position;
-		List<Node> nodesImpacted = grid.GetNeighbors (node);
-		nodesImpacted.Add (node);
-		foreach (Node targetNode in nodesImpacted) {
-			if (grid.UnitFromNode (targetNode)) {
-				OnAbilityConnected (grid.UnitFromNode (targetNode));
-			}
-		}
-		// spawns whatever visual special effects
-		OnFinished (owner);
-	}
-	public override void OnAbilityConnected (Unit targetedUnit) {
-		attackHandler.DealDamage (targetedUnit, owner);
+
+	public override void OnDestinationReached (Unit unit) {
+		OnFinished (unit);
 	}
 
 	public override void OnFinished (Unit unit) {
@@ -63,8 +47,11 @@ public class WallOfFire : AttackAbility {
 		if (!abilityTargeting) {
 			abilityTargeting = FindObjectOfType<AbilityTargeting> ().GetComponent<AbilityTargeting> ();
 		}
-		if (!attackHandler) {
-			attackHandler = FindObjectOfType<AttackHandler> ().GetComponent<AttackHandler> ();
+		if (!unitMovement) {
+			unitMovement = FindObjectOfType<UnitMovement> ().GetComponent<UnitMovement> ();
+		}
+		if (!movementHandler) {
+			movementHandler = FindObjectOfType<MovementHandler> ().GetComponent<MovementHandler> ();
 		}
 		if (!timer) {
 			timer = FindObjectOfType<UnitTimer> ().GetComponent<UnitTimer> ();

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu (menuName = "Ability/Mage/WallOfFire")]
-public class WallOfFire : AttackAbility {
+[CreateAssetMenu (menuName = "Ability/Archer/PrecisionShot")]
+public class PrecisionShot : AttackAbility {
 	UnitStateHandler stateHandler;
 	AbilityTargeting abilityTargeting;
 	GameGrid grid;
@@ -11,8 +11,6 @@ public class WallOfFire : AttackAbility {
 	AttackHandler attackHandler;
 	UnitTimer timer;
 	Unit owner;
-	[SerializeField]
-	int targetRadius;
 
 	public override void OnCalled (Unit unit) {
 		SetRefs (unit);
@@ -22,32 +20,38 @@ public class WallOfFire : AttackAbility {
 
 	public override void OnCommited (Unit unit) {
 		stateHandler.SetState (owner, Unit.UnitState.acting);
-		List<Node> targetedNodes = grid.GetAOEPerpendicularRange (
-			grid.NodeFromWorldPosition (
-				abilityInfo.infoTheSecond.startPos),
-			targetRadius,
-			grid.NodeFromWorldPosition (
-				abilityInfo.infoTheSecond.targetPos));
-		abilityTargeting.CommitToAoEAttack (targetedNodes,
-			owner,
-			abilityInfo.infoTheSecond.slot,
-			OnAbilityConnected);
+		CreateProjectile (unit);
 		unit.GetComponent<AbilityManager> ().AnimateAbilityUse (abilityInfo.infoTheSecond.slot);
-	}
-	public void Explode (Node node) {
-		Vector3 impactPoint = node.transform.position;
-		List<Node> nodesImpacted = grid.GetNeighbors (node);
-		nodesImpacted.Add (node);
-		foreach (Node targetNode in nodesImpacted) {
-			if (grid.UnitFromNode (targetNode)) {
-				OnAbilityConnected (grid.UnitFromNode (targetNode));
-			}
-		}
-		// spawns whatever visual special effects
 		OnFinished (owner);
 	}
-	public override void OnAbilityConnected (Unit targetedUnit) {
-		attackHandler.DealDamage (targetedUnit, owner);
+	private void CreateProjectile (Unit unit) {
+		GameObject go = new GameObject ("precision arrow");
+		// go.AddComponent<Sprite>();
+		PiercingArrow arrowProjectile = go.AddComponent<PiercingArrow> ();
+		SphereCollider so = go.AddComponent<SphereCollider> ();
+		so.isTrigger = true;
+		so.radius = .25f;
+		go.transform.transform.position = abilityInfo.infoTheSecond.startPos;
+
+		arrowProjectile.FireProjectile (abilityInfo.infoTheSecond.startPos, abilityInfo.infoTheSecond.targetPos, unit, Impact);
+	}
+	public void Impact (Vector3 impactPoint) {
+		Node impactNode = grid.NodeFromWorldPosition (impactPoint);
+		Node targetNode = grid.NodeFromWorldPosition (
+			abilityInfo.infoTheSecond.targetPos
+		);
+		Unit impactedUnit = grid.UnitFromNode (impactNode);
+		if (impactNode == targetNode) {
+			OnAbilityConnected (impactedUnit, (int) (abilityInfo.attackPower * 1));
+		} else {
+			OnAbilityConnected (impactedUnit, (int) (abilityInfo.attackPower * .5));
+		}
+		// spawns whatever visual special effects
+	}
+	public override void OnAbilityConnected (Unit targetedUnit) { }
+
+	public void OnAbilityConnected (Unit targetedUnit, int dmg) {
+		attackHandler.DealAbilityDamage (targetedUnit, owner, dmg);
 	}
 
 	public override void OnFinished (Unit unit) {

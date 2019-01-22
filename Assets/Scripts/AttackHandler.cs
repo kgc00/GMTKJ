@@ -31,6 +31,10 @@ public class AttackHandler : MonoBehaviour {
         _targetUnit.TakeDamage (_incomingDamage);
     }
 
+    public void DealAbilityDamage (Unit _targetUnit, Unit _attackingUnit, int abilityDamage = -1) {
+        _targetUnit.TakeDamage (abilityDamage);
+    }
+
     private void HandleMeleeAOEAttack (List<Unit> unitsAffected, Unit attackingUnit, AttackAbility ability, Action<Unit> callback = null) {
         foreach (Unit unit in unitsAffected) {
             if (callback != null) {
