@@ -35,6 +35,8 @@ public class AbilityTargeting : MonoBehaviour {
 
     private List<Node> GenerateTargeting (Unit _unit, Vector3 startPos, Ability abil) {
         nodesWithinRange = new List<Node> ();
+        Debug.Log (startPos);
+        Debug.Log (grid.NodeFromWorldPosition (_unit.transform.position));
         Ability.AbilityInfo info = abil.abilityInfo;
         Node targetNode = grid.NodeFromWorldPosition (startPos);
         foreach (Node node in grid.GetAttackRange (targetNode, info)) {
@@ -88,10 +90,10 @@ public class AbilityTargeting : MonoBehaviour {
     }
 
     private List<Node> CacheSelectedTile (Vector3 targetPos) {
-        if (!targetNode.Contains (grid.NodeFromWorldPosition (targetPos))) {
-            targetNode.Clear ();
-            targetNode.Add (grid.NodeFromWorldPosition (targetPos));
-        }
+        // if (!targetNode.Contains (grid.NodeFromWorldPosition (targetPos))) {
+        targetNode.Clear ();
+        targetNode.Add (grid.NodeFromWorldPosition (targetPos));
+        // }
         return targetNode;
     }
 

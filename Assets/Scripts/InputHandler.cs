@@ -27,8 +27,12 @@ public class InputHandler : MonoBehaviour {
             }
             if (selectedUnit.currentUnitState == Unit.UnitState.planningAction) {
                 abilityTargeting.HandleAbilityInput ();
-                HandleCallAbility (selectedUnit: selectedUnit, startPos: selectedUnit.transform.position,
-                    targetPos: grid.NodeFromWorldPosition (target.position).transform.position, slot: unitStateHandler.curAbilSlot);
+                HandleCallAbility (
+                    selectedUnit: selectedUnit,
+                    startPos: selectedUnit.transform.position,
+                    targetPos: target.position,
+                    slot: unitStateHandler.curAbilSlot
+                );
                 return;
             }
 
@@ -104,10 +108,12 @@ public class InputHandler : MonoBehaviour {
             unitStateHandler.curAbil.abilityInfo.infoTheSecond = abilityTargeting.CacheRelevantInfo (startPos, targetPos, slot);
             // if selected node is a valid node to travel
             if (unitStateHandler.curAbil.abilityInfo.nodesInAbilityRange != null &&
-                unitStateHandler.curAbil.abilityInfo.nodesInAbilityRange.Contains (grid.NodeFromWorldPosition (targetPos))) {
+                unitStateHandler.curAbil.abilityInfo.nodesInAbilityRange.Contains (
+                    grid.NodeFromWorldPosition (targetPos)
+                )) {
                 unitStateHandler.curAbil.OnCommited (selectedUnit);
             } else {
-                Debug.Log ("not a valid selection");
+                Debug.Log (grid.NodeFromWorldPosition (targetPos) + " is not a valid selection");
             }
         } else if (Input.GetKeyDown (KeyCode.Escape)) {
             // set state to idle, keep unit selected, reset nodes

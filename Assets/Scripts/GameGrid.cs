@@ -34,6 +34,7 @@ public class GameGrid : MonoBehaviour {
             Destroy (this);
         }
         nodeSize = possibleNodeImages[0].bounds.size.x;
+        nodeRadius = nodeSize / 2;
         gridSizeX = Mathf.RoundToInt (gridWorldSize.x / nodeSize);
         gridSizeY = Mathf.RoundToInt (gridWorldSize.y / nodeSize);
         nodesContainingUnits = new List<Node> ();
@@ -297,6 +298,7 @@ public class GameGrid : MonoBehaviour {
     }
 
     public Node NodeFromWorldPosition (Vector3 worldPosition) {
+        // possibly fixed
         float percentX = (worldPosition.x + gridWorldSize.x / 2) / gridWorldSize.x;
         float percentY = (worldPosition.y + gridWorldSize.y / 2) / gridWorldSize.y;
         percentX = Mathf.Clamp01 (percentX);
