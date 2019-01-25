@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4169040881589528}
   - component: {fileID: 114251445448249914}
-  - component: {fileID: 114314058700553454}
   - component: {fileID: 114564240876149726}
   - component: {fileID: 114711471641692496}
   m_Layer: 9
@@ -54,7 +53,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9be6f341b32d3094c87b6f8e4efcaa40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridWorldSize: {x: 20, y: 20}
+  gridWorldSize: {x: 16, y: 16}
   nodeRadius: 0.5
   nodeSize: 0
   obstacleMask:
@@ -84,18 +83,6 @@ MonoBehaviour:
   - {fileID: 4648570002132654, guid: d9976431f7ec89b4bbb637ea7226a946, type: 2}
   - {fileID: 4247521811878506, guid: 21451546a2429cd42aacc37a08fa9873, type: 2}
   pixelsPerUnit: 100
---- !u!114 &114314058700553454
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1183413669182236}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd3e423d9d993e34a89af64afad8c387, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movementText: {fileID: 0}
 --- !u!114 &114564240876149726
 MonoBehaviour:
   m_ObjectHideFlags: 1
