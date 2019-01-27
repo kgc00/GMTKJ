@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu (menuName = "Ability/Knight/ChargeKnight")]
-public class ChargeKnight : AttackAbility {
+public class ChargeKnight : MovementAbility {
     UnitStateHandler stateHandler;
     AbilityTargeting abilityTargeting;
     GameGrid grid;
@@ -23,7 +23,7 @@ public class ChargeKnight : AttackAbility {
     }
 
     public override void OnCommited (Unit unit) {
-        stateHandler.SetState (owner, Unit.UnitState.acting);
+        stateHandler.SetStatePlayerUnit (owner, Unit.UnitState.acting);
         unitMovement.CommitMovement (abilityInfo.infoTheSecond.startPos,
             abilityInfo.infoTheSecond.targetPos,
             owner,
@@ -33,7 +33,7 @@ public class ChargeKnight : AttackAbility {
         unit.GetComponent<AbilityManager> ().AnimateAbilityUse (abilityInfo.infoTheSecond.slot);
     }
 
-    public override void OnAbilityConnected (Unit unit) {
+    public void OnAbilityConnected (Unit unit) {
         attackHandler.DealDamage (unit, owner);
         SetNewUnitPosition (owner);
         // Debug.Log ("damage has been dealt to: " + unit);
@@ -41,8 +41,10 @@ public class ChargeKnight : AttackAbility {
 
     private void SetNewUnitPosition (Unit thisUnit) {
         movementHandler.OnStopPath (nodeBeforeCollision.transform.position, thisUnit);
+        OnDestinationReached (thisUnit);
     }
 
+    public override void OnDestinationReached (Unit unit) { }
     public void SetNodesTraveled (List<Node> nodes) {
         Debug.Log ("charge passed in: " + nodes.Count);
         if (nodes[0]) {
@@ -59,7 +61,7 @@ public class ChargeKnight : AttackAbility {
 
     public override void OnFinished (Unit unit) {
         unit.DisableDet (this);
-        stateHandler.SetState (unit, Unit.UnitState.cooldown);
+        stateHandler.SetStatePlayerUnit (unit, Unit.UnitState.cooldown);
         timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
         Debug.Log ("onFinished was called");
     }

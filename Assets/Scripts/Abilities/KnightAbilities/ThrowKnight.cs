@@ -17,7 +17,7 @@ public class ThrowKnight : AttackAbility {
     }
 
     public override void OnCommited (Unit unit) {
-        stateHandler.SetState (owner, Unit.UnitState.acting);
+        stateHandler.SetStatePlayerUnit (owner, Unit.UnitState.acting);
         CreateProjectile (unit);
         unit.GetComponent<AbilityManager> ().AnimateAbilityUse (abilityInfo.infoTheSecond.slot);
     }
@@ -39,7 +39,7 @@ public class ThrowKnight : AttackAbility {
     }
 
     public override void OnFinished (Unit unit) {
-        stateHandler.SetState (unit, Unit.UnitState.cooldown);
+        stateHandler.SetStatePlayerUnit (unit, Unit.UnitState.cooldown);
         timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
         Debug.Log ("onFinished was called");
     }

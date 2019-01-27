@@ -6,6 +6,7 @@ using UnityEngine;
 public class AbilityTargeting : MonoBehaviour {
     [SerializeField]
     List<Node> nodesWithinRange = new List<Node> ();
+    List<Node> nodesWithinRangeAI = new List<Node> ();
     GameGrid grid;
     GridEffects gridfx;
     AStar aStar;
@@ -81,9 +82,6 @@ public class AbilityTargeting : MonoBehaviour {
             Debug.LogError ("No attack ability found");
         }
     }
-    internal void CommitToRangedAttack (Vector3 startPos, Vector3 targetPos, int slot, Action<Unit> callback = null) {
-
-    }
 
     private bool IsLegalMove (Vector3 targetPos) {
         return nodesWithinRange.Contains (grid.NodeFromWorldPosition (targetPos));
@@ -99,5 +97,25 @@ public class AbilityTargeting : MonoBehaviour {
 
     public AbilityTargetingData CacheRelevantInfo (Vector3 startPos, Vector3 targetPos, int slot) {
         return new AbilityTargetingData (startPos, targetPos, slot);
+    }
+
+    public List<Node> GenerateTargetingForAI (Unit _unit, Vector3 startPos, Ability abil) {
+        nodesWithinRangeAI = new List<Node> ();
+        Ability.AbilityInfo info = abil.abilityInfo;
+        Node targetNode = grid.NodeFromWorldPosition (startPos);
+        foreach (Node node in grid.GetAttackRange (targetNode, info)) {
+            if (aStar.PathFindingLogic (false, targetNode, node, info.attackRange)) {
+                nodesWithinRangeAI.Add (node);
+            }
+        }
+        // onGenerateAbilityRange (_unit, nodesWithinRangeAI);
+        return nodesWithinRangeAI;
+    }
+
+    public void ValidateAbilityAI (Ability abil) {
+        if (IsLegalMove (abil.abilityInfo.infoTheSecond.targetPos)) {
+            targetNode = CacheSelectedTile (abil.abilityInfo.infoTheSecond.targetPos);
+            gridfx.RenderSelectorHighlights (targetNode);
+        }
     }
 }

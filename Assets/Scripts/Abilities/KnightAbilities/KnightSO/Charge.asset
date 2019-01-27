@@ -17,5 +17,24 @@ MonoBehaviour:
     cooldownTime: 2
     abilityIcon: {fileID: 21300000, guid: ea182fcd42b8a9a4e855f8478fa39983, type: 3}
     targetingBehavior: 0
-    abilityType: 0
-    nodesInAbilityRange: []
+    abilityType: 1
+    nodesInAbilityRange:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}

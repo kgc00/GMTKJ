@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class SelectionUnitUI : MonoBehaviour {
     void Awake () {
-        UnitSelectionHandler.onUnitSelected += ShowSelection;
-        UnitSelectionHandler.onUnitUnselected += HideSelection;
+        UnitSelectionHandler.onUnitSelectedByPlayer += ShowSelection;
+        UnitSelectionHandler.onUnitUnselectedByPlayer += HideSelection;
         UnitStateHandler.onUnitActing += HideSelection;
     }
 

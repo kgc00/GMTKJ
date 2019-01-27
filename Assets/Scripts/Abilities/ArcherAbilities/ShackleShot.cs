@@ -27,7 +27,7 @@ public class ShackleShot : AttackAbility {
 	}
 
 	public override void OnCommited (Unit unit) {
-		stateHandler.SetState (owner, Unit.UnitState.acting);
+		stateHandler.SetStatePlayerUnit (owner, Unit.UnitState.acting);
 		CreateProjectile (unit);
 		unit.GetComponent<AbilityManager> ().AnimateAbilityUse (abilityInfo.infoTheSecond.slot);
 		OnFinished (owner);
@@ -75,11 +75,11 @@ public class ShackleShot : AttackAbility {
 			} else {
 				UnitStateHandler.onUnitStunned (unitsImpacted[i], stunLengthShort);
 			}
-			stateHandler.SetState (unitsImpacted[i], Unit.UnitState.cooldown);
+			stateHandler.SetStatePlayerUnit (unitsImpacted[i], Unit.UnitState.cooldown);
 		}
 	}
 	public override void OnFinished (Unit unit) {
-		stateHandler.SetState (unit, Unit.UnitState.cooldown);
+		stateHandler.SetStatePlayerUnit (unit, Unit.UnitState.cooldown);
 		timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
 		Debug.Log ("onFinished was called");
 	}

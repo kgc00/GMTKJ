@@ -4,25 +4,24 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class UnitStateHandler : MonoBehaviour {
-    Unit unit;
-    UnitSelectionHandler unitSelectionHandler;
     GameGrid grid;
     WorldManager worldManager;
     public static Action<Unit, Ability> onUnitPlanningAction = delegate { };
     public static Action<Unit, Ability> onUnitActing = delegate { };
     public static Action<Unit, float> onUnitStunned;
 
-    private Ability.AbilityInfo currentAbilityInfo = new Ability.AbilityInfo ();
-    public Ability curAbil;
-    public int curAbilSlot;
+    private Ability.AbilityInfo currentPlayerAbilityInfo = new Ability.AbilityInfo ();
+    public Ability curPlayerAbil;
+    public int curPlayerAbilSlot;
+    private Ability.AbilityInfo currentAIAbilityInfo = new Ability.AbilityInfo ();
+    public Ability curAIAbil;
+    public int curAIAbilSlot;
     void Start () {
-        unitSelectionHandler = FindObjectOfType<UnitSelectionHandler> ().GetComponent<UnitSelectionHandler> ();
         grid = GameGrid.instance;
         worldManager = WorldManager.instance;
-        unit = GetComponent<Unit> ();
     }
 
-    public void SetState (Unit _unit, Unit.UnitState _state) {
+    public void SetStatePlayerUnit (Unit _unit, Unit.UnitState _state) {
         _unit.currentUnitState = _state;
         switch (_unit.currentUnitState) {
             case Unit.UnitState.idle:
@@ -43,27 +42,60 @@ public class UnitStateHandler : MonoBehaviour {
         }
     }
 
-    internal void SetAbilSlot (Unit unit, int abilitySlot) {
-        curAbilSlot = abilitySlot;
+    internal void SetAbilSlotPlayer (Unit unit, int abilitySlot) {
+        curPlayerAbilSlot = abilitySlot;
     }
 
-    private void SetActing (Unit unit, Unit.UnitState state) {
-        UnitSelectionHandler.SetSelection (unit,
-            Unit.SelectionState.notSelected, curAbil);
-        onUnitActing (unit, curAbil);
+    internal void SetAbilPlayer (Ability _abil) {
+        curPlayerAbil = _abil;
+    }
+
+    internal void SetAttackDataPlayer (Ability.AbilityInfo _abilityInfo) {
+        currentPlayerAbilityInfo = _abilityInfo;
+    }
+
+    public void SetStateAIUnit (Unit _unit, Unit.UnitState _state) {
+        _unit.currentUnitState = _state;
+        switch (_unit.currentUnitState) {
+            case Unit.UnitState.idle:
+                SetIdle (_unit, _state);
+                break;
+            case Unit.UnitState.planningAction:
+                SetPlanningAction (_unit, _state);
+                break;
+            case Unit.UnitState.acting:
+                SetActing (_unit, _state);
+                break;
+            case Unit.UnitState.cooldown:
+                SetOnCooldown (_unit, _state);
+                break;
+            default:
+                Debug.LogError ("Unrecognized unit state");
+                break;
+        }
+    }
+
+    internal void SetAttackDataAI (Ability.AbilityInfo _abilityInfo) {
+        currentAIAbilityInfo = _abilityInfo;
+    }
+
+    internal void SetAbilAI (Ability _abil) {
+        curAIAbil = _abil;
+    }
+
+    internal void SetAbilSlotAI (Unit unit, int abilitySlot) {
+        curAIAbilSlot = abilitySlot;
     }
 
     private void SetPlanningAction (Unit unit, Unit.UnitState state) {
         grid.ResetNodeCosts ();
-        onUnitPlanningAction (unit, curAbil);
+        onUnitPlanningAction (unit, curPlayerAbil);
     }
 
-    internal void SetAttackData (Ability.AbilityInfo _abilityInfo) {
-        currentAbilityInfo = _abilityInfo;
-    }
-
-    internal void SetAbil (Ability _abil) {
-        curAbil = _abil;
+    private void SetActing (Unit unit, Unit.UnitState state) {
+        UnitSelectionHandler.SetSelectionForPlayer (unit,
+            Unit.SelectionState.notSelected, curPlayerAbil);
+        onUnitActing (unit, curPlayerAbil);
     }
 
     private void SetIdle (Unit _unit, Unit.UnitState _state) { }

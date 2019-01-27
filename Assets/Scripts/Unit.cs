@@ -14,6 +14,12 @@ public class Unit : MonoBehaviour, IDamageable {
         cooldown,
         idle
         };
+        public enum Faction {
+        Player,
+        Enemy
+        };
+        [SerializeField]
+        public Faction faction;
         [SerializeField]
         public UnitState currentUnitState;
         public SelectionState currentSelectionState;

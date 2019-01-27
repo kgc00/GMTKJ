@@ -22,8 +22,8 @@ public class InputHandler : MonoBehaviour {
 
     void Update () {
         if (WorldManager.instance.ReturnUnitSelected ()) {
-            if (WorldManager.ReturnSelectedUnit () != selectedUnit) {
-                selectedUnit = WorldManager.ReturnSelectedUnit ();
+            if (WorldManager.ReturnSelectedPlayerUnit () != selectedUnit) {
+                selectedUnit = WorldManager.ReturnSelectedPlayerUnit ();
             }
             if (selectedUnit.currentUnitState == Unit.UnitState.planningAction) {
                 abilityTargeting.HandleAbilityInput ();
@@ -31,7 +31,7 @@ public class InputHandler : MonoBehaviour {
                     selectedUnit: selectedUnit,
                     startPos: selectedUnit.transform.position,
                     targetPos: target.position,
-                    slot: unitStateHandler.curAbilSlot
+                    slot: unitStateHandler.curPlayerAbilSlot
                 );
                 return;
             }
@@ -58,8 +58,8 @@ public class InputHandler : MonoBehaviour {
             PrepActionData (_unit, 3);
             return;
         } else if (Input.GetKeyDown (KeyCode.Escape)) {
-            unitStateHandler.SetState (_unit, Unit.UnitState.idle);
-            UnitSelectionHandler.SetSelection (_unit, Unit.SelectionState.notSelected, null);
+            unitStateHandler.SetStatePlayerUnit (_unit, Unit.UnitState.idle);
+            UnitSelectionHandler.SetSelectionForPlayer (_unit, Unit.SelectionState.notSelected, null);
             return;
         }
     }
@@ -70,10 +70,10 @@ public class InputHandler : MonoBehaviour {
 
     private void PrepActionData (Unit _unit, int _abilitySlot) {
         CallForAnimation (_unit, _abilitySlot);
-        unitStateHandler.SetAttackData (_unit.GetComponent<AbilityManager> ().ReturnAbilityInfo ());
-        unitStateHandler.SetAbil (_unit.GetComponent<AbilityManager> ().ReturnAbility ());
-        unitStateHandler.SetState (_unit, Unit.UnitState.planningAction);
-        unitStateHandler.SetAbilSlot (_unit, _abilitySlot);
+        unitStateHandler.SetAttackDataPlayer (_unit.GetComponent<AbilityManager> ().ReturnAbilityInfo ());
+        unitStateHandler.SetAbilPlayer (_unit.GetComponent<AbilityManager> ().ReturnAbility ());
+        unitStateHandler.SetStatePlayerUnit (_unit, Unit.UnitState.planningAction);
+        unitStateHandler.SetAbilSlotPlayer (_unit, _abilitySlot);
     }
 
     private bool ValidSelectedState (Unit _unit) {
@@ -105,26 +105,26 @@ public class InputHandler : MonoBehaviour {
 
     public void HandleCallAbility (Unit selectedUnit, Vector3 startPos, Vector3 targetPos, int slot) {
         if (Input.GetMouseButtonDown (0)) {
-            unitStateHandler.curAbil.abilityInfo.infoTheSecond = abilityTargeting.CacheRelevantInfo (startPos, targetPos, slot);
+            unitStateHandler.curPlayerAbil.abilityInfo.infoTheSecond = abilityTargeting.CacheRelevantInfo (startPos, targetPos, slot);
             // if selected node is a valid node to travel
-            if (unitStateHandler.curAbil.abilityInfo.nodesInAbilityRange != null &&
-                unitStateHandler.curAbil.abilityInfo.nodesInAbilityRange.Contains (
+            if (unitStateHandler.curPlayerAbil.abilityInfo.nodesInAbilityRange != null &&
+                unitStateHandler.curPlayerAbil.abilityInfo.nodesInAbilityRange.Contains (
                     grid.NodeFromWorldPosition (targetPos)
                 )) {
-                unitStateHandler.curAbil.OnCommited (selectedUnit);
+                unitStateHandler.curPlayerAbil.OnCommited (selectedUnit);
             } else {
                 Debug.Log (grid.NodeFromWorldPosition (targetPos) + " is not a valid selection");
             }
         } else if (Input.GetKeyDown (KeyCode.Escape)) {
             // set state to idle, keep unit selected, reset nodes
-            unitStateHandler.SetState (selectedUnit, Unit.UnitState.idle);
+            unitStateHandler.SetStatePlayerUnit (selectedUnit, Unit.UnitState.idle);
             grid.ResetNodeCosts ();
             gridFX.ClearHighlights ();
         }
     }
 
     private static void SelectUnit (Unit _selectedUnit) {
-        UnitSelectionHandler.SetSelection (_selectedUnit, Unit.SelectionState.selected, null);
+        UnitSelectionHandler.SetSelectionForPlayer (_selectedUnit, Unit.SelectionState.selected, null);
         return;
     }
 }

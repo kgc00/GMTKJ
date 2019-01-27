@@ -5,34 +5,56 @@ using UnityEngine;
 
 public class UnitSelectionHandler : MonoBehaviour {
 
-    public static event Action<Unit> onUnitSelected = delegate { };
-    public static event Action<Unit> onUnitUnselected = delegate { };
-    public static Dictionary<Unit.SelectionState, Action<Unit>> unitSelectionDictionary;
+    public static event Action<Unit> onUnitSelectedByPlayer = delegate { };
+    public static event Action<Unit> onUnitSelectedByAI = delegate { };
+    public static event Action<Unit> onUnitUnselectedByPlayer = delegate { };
+    public static event Action<Unit> onUnitUnselectedByAI = delegate { };
     void Start () {
-        unitSelectionDictionary = new Dictionary<Unit.SelectionState, Action<Unit>> () { { Unit.SelectionState.selected, onUnitSelected }, { Unit.SelectionState.notSelected, onUnitUnselected },
-        };
-        UnitStateHandler.onUnitActing += SetUnselected;
+        UnitStateHandler.onUnitActing += SetUnselectedByPlayer;
     }
 
-    public static void SetSelection (Unit _unit, Unit.SelectionState _selectionState, Ability curAbil) {
+    public static void SetSelectionForPlayer (Unit _unit, Unit.SelectionState _selectionState, Ability curAbil) {
         _unit.currentSelectionState = _selectionState;
         switch (_selectionState) {
             case Unit.SelectionState.selected:
-                SetSelected (_unit, _selectionState);
+                SetSelectedByPlayer (_unit, _selectionState);
                 break;
             case Unit.SelectionState.notSelected:
-                SetUnselected (_unit, curAbil);
+                SetUnselectedByPlayer (_unit, curAbil);
                 break;
             default:
                 break;
         }
     }
 
-    private static void SetUnselected (Unit _unit, Ability abil) {
-        onUnitUnselected (_unit);
+    public static void SetSelectionForAI (Unit _unit, Unit.SelectionState _selectionState, Ability curAbil) {
+        _unit.currentSelectionState = _selectionState;
+        switch (_selectionState) {
+            case Unit.SelectionState.selected:
+                SetSelectedByAI (_unit, _selectionState);
+                break;
+            case Unit.SelectionState.notSelected:
+                SetUnselectedByPlayer (_unit, curAbil);
+                break;
+            default:
+                break;
+        }
     }
 
-    private static void SetSelected (Unit _unit, Unit.SelectionState _selectionState) {
-        onUnitSelected (_unit);
+    private static void SetUnselectedByPlayer (Unit _unit, Ability abil) {
+        onUnitUnselectedByPlayer (_unit);
     }
+
+    private static void SetSelectedByPlayer (Unit _unit, Unit.SelectionState _selectionState) {
+        onUnitSelectedByPlayer (_unit);
+    }
+
+    private static void SetUnselectedByAI (Unit _unit, Ability abil) {
+        onUnitUnselectedByAI (_unit);
+    }
+
+    private static void SetSelectedByAI (Unit _unit, Unit.SelectionState _selectionState) {
+        onUnitSelectedByAI (_unit);
+    }
+
 }
