@@ -46,13 +46,19 @@ public class MovementHandler : MonoBehaviour {
         Node targetNode = grid.NodeFromWorldPosition (_targetPos);
 
         if (startNode.walkable && targetNode.walkable && startNode != targetNode) {
-            pathSuccess = aStar.PathFindingLogic (pathSuccess, startNode, targetNode, _unit.currentMovementPoints);
+            // if there is a null error, set current ability for unit in the oncalled method of the ability
+            pathSuccess = aStar.PathFindingLogic (
+                pathSuccess,
+                startNode,
+                targetNode,
+                _unit.currentAbility.abilityInfo.attackRange
+            );
         }
         yield return null;
         if (pathSuccess) {
             waypoints = RetracePath (startNode, targetNode, _unit);
         } else {
-            Debug.LogError ("Path requested was not valid.");
+            Debug.Log ("Unable to reach target within alotted range.");
         }
         requestManager.FinishedProcessingPath (waypoints, pathSuccess, _unit, onDestReached, this);
     }
@@ -88,7 +94,7 @@ public class MovementHandler : MonoBehaviour {
             path = newPath;
             targetIndex = 0;
             if (currentRoutine != null) {
-                StopCoroutine ("FollowPath");
+                StopCoroutine ("FollowPathAbil");
             }
             currentRoutine = StartCoroutine (FollowPathAbil (_unit, onDestReached));
         }
@@ -127,5 +133,40 @@ public class MovementHandler : MonoBehaviour {
             _unit.transform.position = Vector3.MoveTowards (_unit.transform.position, currentWaypoint, speed * Time.deltaTime);
             yield return null;
         }
+    }
+
+    public IEnumerator GeneratePathForAI (Vector3 _startPos, Vector3 _targetPos, Ability abil,
+        Unit unitToControl, Node targetNode, List<Node> possibleNodes,
+        Action<Ability, Unit, Node, List<Node>> onFinishedRequest) {
+        Vector3[] waypoints = new Vector3[0];
+        bool pathSuccess = false;
+
+        Node startNode = grid.NodeFromWorldPosition (_startPos);
+        Node ultimateTarget = grid.NodeFromWorldPosition (_targetPos);
+
+        if (startNode.walkable && ultimateTarget.walkable && startNode != ultimateTarget) {
+            // if there is a null error, set current ability for unit in the oncalled method of the ability
+            pathSuccess = aStar.PathFindingLogic (
+                pathSuccess,
+                startNode,
+                ultimateTarget,
+                99
+                //_unit.currentAbility.abilityInfo.attackRange
+            );
+        }
+        yield return null;
+        if (pathSuccess) {
+            waypoints = RetracePath (startNode, targetNode, unitToControl);
+        } else {
+            Debug.Log ("Unable to reach target within alotted range.");
+        }
+        requestManager.FinishedProcessingPath (waypoints, pathSuccess, unitToControl, SomeFakeFunction, this);
+        onFinishedRequest (abil,
+            unitToControl,
+            targetNode,
+            possibleNodes);
+    }
+    public void SomeFakeFunction (Unit unit) {
+
     }
 }

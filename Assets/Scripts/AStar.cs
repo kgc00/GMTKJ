@@ -8,7 +8,6 @@ public class AStar : MonoBehaviour {
     PathRequestManager requestManager;
 
     void Start () {
-        // De-clutter our start method
         InitialAssignment ();
     }
 
@@ -19,7 +18,7 @@ public class AStar : MonoBehaviour {
 
     // Our central location for path finding logic.  We call it from multiple locations and do different
     // actions with the results of whether we could find a path within movement range or not.
-    public bool PathFindingLogic (bool pathSuccess, Node startNode, Node targetNode, int currentMovementPoints) {
+    public bool PathFindingLogic (bool pathSuccess, Node startNode, Node targetNode, int range) {
         List<Node> openSet = new List<Node> ();
         HashSet<Node> closedSet = new HashSet<Node> ();
         openSet.Add (startNode);
@@ -37,7 +36,7 @@ public class AStar : MonoBehaviour {
 
             openSet.Remove (currentNode);
             closedSet.Add (currentNode);
-            if (currentNode.fCost <= currentMovementPoints) {
+            if (currentNode.fCost <= range) {
                 if (currentNode == targetNode) {
                     // If we were able to reach the target node, we've found a path.
                     pathSuccess = true;
@@ -76,5 +75,49 @@ public class AStar : MonoBehaviour {
         } else {
             return (2 * distanceX) + (distanceY - distanceX);
         }
+    }
+
+    public int ReturnGCost (Node startNode, Node targetNode) {
+        int cost = -1;
+        List<Node> openSet = new List<Node> ();
+        HashSet<Node> closedSet = new HashSet<Node> ();
+        openSet.Add (startNode);
+
+        // Basically we iterate through all nearby nodes in a line to the target. We calculate distance to target and 
+        // distance starting point, then use that info to find the best path.  Return true if path is under max moves/turn.
+        while (openSet.Count > 0) {
+            Node currentNode = openSet[0];
+            for (int i = 1; i < openSet.Count; i++) {
+                if (openSet[i].fCost < currentNode.fCost || openSet[i].fCost == currentNode.fCost) {
+                    if (openSet[i].hCost < currentNode.hCost)
+                        currentNode = openSet[i];
+                }
+            }
+
+            openSet.Remove (currentNode);
+            closedSet.Add (currentNode);
+            if (currentNode == targetNode) {
+                // If we were able to reach the target node, we've found a path.
+                cost = currentNode.gCost;
+                break;
+            }
+
+            foreach (Node neighbor in grid.GetNeighbors (currentNode)) {
+                if (!neighbor.walkable || closedSet.Contains (neighbor)) {
+                    continue;
+                }
+
+                int newCostToNeighbor = currentNode.gCost + GetDistance (currentNode, neighbor);
+                if (newCostToNeighbor < neighbor.gCost || !openSet.Contains (neighbor)) {
+                    neighbor.gCost = newCostToNeighbor;
+                    neighbor.hCost = GetDistance (neighbor, targetNode);
+                    neighbor.parent = currentNode;
+
+                    if (!openSet.Contains (neighbor))
+                        openSet.Add (neighbor);
+                }
+            }
+        }
+        return cost;
     }
 }

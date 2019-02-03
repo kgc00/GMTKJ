@@ -29,6 +29,7 @@ public class Unit : MonoBehaviour, IDamageable {
         public static event Action<Unit, int, int, int> OnDamageTaken = delegate { };
         private CollisionDetection colDet;
         private GameGrid gridRef;
+        public Ability currentAbility = null;
 
         void Awake () {
         currentUnitState = UnitState.idle;
@@ -77,5 +78,9 @@ public class Unit : MonoBehaviour, IDamageable {
     public void DisableDet (Ability abil) {
         colDet.DisableAlerts (abil);
         colDet.enabled = false;
+    }
+
+    public void SetCurrentAbility (Ability abil) {
+        currentAbility = abil;
     }
 }

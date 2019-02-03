@@ -18,8 +18,6 @@ public class AbilityTargeting : MonoBehaviour {
     [SerializeField]
     private Transform target;
     List<Node> targetNode = new List<Node> (1);
-    private AbilityTargetingData relevantAbilityInfo = new AbilityTargetingData (
-        new Vector3 (0, 0, 0), new Vector3 (0, 0, 0), 0);
 
     void Start () {
         aStar = FindObjectOfType<AStar> ().GetComponent<AStar> ();
@@ -36,8 +34,8 @@ public class AbilityTargeting : MonoBehaviour {
 
     private List<Node> GenerateTargeting (Unit _unit, Vector3 startPos, Ability abil) {
         nodesWithinRange = new List<Node> ();
-        Debug.Log (startPos);
-        Debug.Log (grid.NodeFromWorldPosition (_unit.transform.position));
+        // Debug.Log (startPos);
+        // Debug.Log (grid.NodeFromWorldPosition (_unit.transform.position));
         Ability.AbilityInfo info = abil.abilityInfo;
         Node targetNode = grid.NodeFromWorldPosition (startPos);
         foreach (Node node in grid.GetAttackRange (targetNode, info)) {
@@ -87,33 +85,30 @@ public class AbilityTargeting : MonoBehaviour {
         return nodesWithinRange.Contains (grid.NodeFromWorldPosition (targetPos));
     }
 
+    private bool IsLegalMoveAI (Vector3 targetPos) {
+        return nodesWithinRangeAI.Contains (grid.NodeFromWorldPosition (targetPos));
+    }
+
     private List<Node> CacheSelectedTile (Vector3 targetPos) {
-        // if (!targetNode.Contains (grid.NodeFromWorldPosition (targetPos))) {
-        targetNode.Clear ();
-        targetNode.Add (grid.NodeFromWorldPosition (targetPos));
-        // }
-        return targetNode;
+        List<Node> target = new List<Node> ();
+        target.Add (grid.NodeFromWorldPosition (targetPos));
+        return target;
     }
 
     public AbilityTargetingData CacheRelevantInfo (Vector3 startPos, Vector3 targetPos, int slot) {
         return new AbilityTargetingData (startPos, targetPos, slot);
     }
 
-    public List<Node> GenerateTargetingForAI (Unit _unit, Vector3 startPos, Ability abil) {
+    public List<Node> RequestPathForAI (Unit unit, Node targetNode, Ability abil) {
         nodesWithinRangeAI = new List<Node> ();
         Ability.AbilityInfo info = abil.abilityInfo;
-        Node targetNode = grid.NodeFromWorldPosition (startPos);
-        foreach (Node node in grid.GetAttackRange (targetNode, info)) {
-            if (aStar.PathFindingLogic (false, targetNode, node, info.attackRange)) {
-                nodesWithinRangeAI.Add (node);
-            }
-        }
-        // onGenerateAbilityRange (_unit, nodesWithinRangeAI);
+        MovementHandler movementHandler = FindObjectOfType<MovementHandler> ().GetComponent<MovementHandler> ();
+        nodesWithinRangeAI = grid.GetAttackRange (grid.NodeFromWorldPosition (unit.transform.position), info);
         return nodesWithinRangeAI;
     }
 
     public void ValidateAbilityAI (Ability abil) {
-        if (IsLegalMove (abil.abilityInfo.infoTheSecond.targetPos)) {
+        if (IsLegalMoveAI (abil.abilityInfo.infoTheSecond.targetPos)) {
             targetNode = CacheSelectedTile (abil.abilityInfo.infoTheSecond.targetPos);
             gridfx.RenderSelectorHighlights (targetNode);
         }

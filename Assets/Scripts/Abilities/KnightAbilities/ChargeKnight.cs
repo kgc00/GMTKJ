@@ -23,6 +23,7 @@ public class ChargeKnight : MovementAbility {
     }
 
     public override void OnCommited (Unit unit) {
+        unit.SetCurrentAbility (this);
         stateHandler.SetStatePlayerUnit (owner, Unit.UnitState.acting);
         unitMovement.CommitMovement (abilityInfo.infoTheSecond.startPos,
             abilityInfo.infoTheSecond.targetPos,

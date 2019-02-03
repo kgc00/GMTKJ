@@ -22,6 +22,7 @@ public class Run : MovementAbility {
 
 	public override void OnCommited (Unit unit) {
 		stateHandler.SetStatePlayerUnit (owner, Unit.UnitState.acting);
+		// grid.NodeFromWorldPosition (abilityInfo.infoTheSecond.targetPos).GetComponent<SpriteRenderer> ().enabled = false;
 		unitMovement.CommitMovement (abilityInfo.infoTheSecond.startPos,
 			abilityInfo.infoTheSecond.targetPos,
 			owner,

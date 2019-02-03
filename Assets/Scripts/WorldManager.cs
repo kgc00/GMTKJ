@@ -41,6 +41,15 @@ public class WorldManager : MonoBehaviour {
             AI_Manager.Store_AI_Units (allAIUnits);
         }
         // Debug.Log (allPlayerUnits.Count + " " + allAIUnits.Count);
+        AlignUnitsToGrid (allUnits);
+    }
+
+    private void AlignUnitsToGrid (List<Unit> allUnits) {
+        GameGrid grid = GameGrid.instance;
+        foreach (Unit unit in allUnits) {
+            Node unitNode = grid.NodeFromWorldPosition (unit.transform.position);
+            unit.transform.position = unitNode.transform.position;
+        }
     }
 
     public void AddUnitToList (Unit unit) {

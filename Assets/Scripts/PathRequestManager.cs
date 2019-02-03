@@ -6,8 +6,8 @@ using UnityEngine;
 // Processes requests for movement and executes callbacks.
 public class PathRequestManager : MonoBehaviour {
 
-    Queue<PathRequest> pathRequestQueue = new Queue<PathRequest> ();
-    PathRequest currentPathRequest;
+    public Queue<PathRequest> pathRequestQueue = new Queue<PathRequest> ();
+    public PathRequest currentPathRequest;
 
     public static PathRequestManager instance;
 
@@ -33,11 +33,21 @@ public class PathRequestManager : MonoBehaviour {
 
     void TryProcessNext (MovementHandler movementHandler, Unit _unit, Action<Unit> onDestReached) {
         // if we aren't already processing a request and there is a request to process...
-        if (!isProcessingPath && pathRequestQueue.Count > 0) {
-            currentPathRequest = pathRequestQueue.Dequeue ();
-            isProcessingPath = true;
+        if (processing ()) {
+            NewPathLogic ();
             movementHandler.GenerateMovementPath (currentPathRequest.pathStart, currentPathRequest.pathEnd, _unit, onDestReached);
+        } else {
+            Debug.LogError ("cant proccess 2 requests at the same time");
         }
+    }
+
+    public void NewPathLogic () {
+        currentPathRequest = pathRequestQueue.Dequeue ();
+        isProcessingPath = true;
+    }
+
+    public bool processing () {
+        return !isProcessingPath && pathRequestQueue.Count > 0;
     }
 
     // Our method to finish path logic on the request manager, and pass a callback method
@@ -52,13 +62,13 @@ public class PathRequestManager : MonoBehaviour {
 
     // Data structure which contains all the information necessary to communicate a complex command
     // between AStar, RequestManager, and Unit.
-    struct PathRequest {
+    public struct PathRequest {
         public Vector3 pathStart;
         public Vector3 pathEnd;
         public Action<Unit> onDestReached;
         public Action<Vector3[], bool, Unit, Action<Unit>> callback;
 
-        public PathRequest (Vector3 _start, Vector3 _end, Action<Vector3[], bool, Unit, Action<Unit>> _callback, Action<Unit> _onDestReached) {
+        public PathRequest (Vector3 _start, Vector3 _end, Action<Vector3[], bool, Unit, Action<Unit>> _callback = null, Action<Unit> _onDestReached = null) {
             pathStart = _start;
             pathEnd = _end;
             callback = _callback;

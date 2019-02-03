@@ -58,16 +58,16 @@ public class UnitStateHandler : MonoBehaviour {
         _unit.currentUnitState = _state;
         switch (_unit.currentUnitState) {
             case Unit.UnitState.idle:
-                SetIdle (_unit, _state);
+                SetIdleAI (_unit, _state);
                 break;
             case Unit.UnitState.planningAction:
-                SetPlanningAction (_unit, _state);
+                SetPlanningActionAI (_unit, _state);
                 break;
             case Unit.UnitState.acting:
-                SetActing (_unit, _state);
+                SetActingAI (_unit, _state);
                 break;
             case Unit.UnitState.cooldown:
-                SetOnCooldown (_unit, _state);
+                SetOnCooldownAI (_unit, _state);
                 break;
             default:
                 Debug.LogError ("Unrecognized unit state");
@@ -101,6 +101,23 @@ public class UnitStateHandler : MonoBehaviour {
     private void SetIdle (Unit _unit, Unit.UnitState _state) { }
 
     private void SetOnCooldown (Unit _unit, Unit.UnitState _state) {
+
+    }
+
+    private void SetPlanningActionAI (Unit unit, Unit.UnitState state) {
+        grid.ResetNodeCosts ();
+        onUnitPlanningAction (unit, curAIAbil);
+    }
+
+    private void SetActingAI (Unit unit, Unit.UnitState state) {
+        UnitSelectionHandler.SetSelectionForAI (unit,
+            Unit.SelectionState.notSelected, curAIAbil);
+        onUnitActing (unit, curAIAbil);
+    }
+
+    private void SetIdleAI (Unit _unit, Unit.UnitState _state) { }
+
+    private void SetOnCooldownAI (Unit _unit, Unit.UnitState _state) {
 
     }
 }

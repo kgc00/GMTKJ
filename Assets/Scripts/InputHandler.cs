@@ -96,7 +96,8 @@ public class InputHandler : MonoBehaviour {
             if (Physics.Raycast (ray, out hit, 50, 1 << 11)) {
                 Unit _selectedUnit = hit.transform.parent.gameObject.GetComponent<Unit> ();
                 // need to add spport for enemy/ally distinction
-                if (_selectedUnit.currentUnitState == Unit.UnitState.idle) {
+                if (_selectedUnit.currentUnitState == Unit.UnitState.idle &&
+                    _selectedUnit.faction == Unit.Faction.Player) {
                     SelectUnit (_selectedUnit);
                 }
             }

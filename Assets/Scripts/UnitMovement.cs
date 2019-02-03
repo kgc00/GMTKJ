@@ -16,12 +16,15 @@ public class UnitMovement : MonoBehaviour {
     public static event Action<List<Node>> onGeneratePath = delegate { };
     MovementHandler movementHandler;
 
-    private void Start () {
+    private void Awake () {
         unitStateHandler = FindObjectOfType<UnitStateHandler> ().GetComponent<UnitStateHandler> ();
         inputHandler = FindObjectOfType<InputHandler> ().GetComponent<InputHandler> ();
         aStar = FindObjectOfType<AStar> ().GetComponent<AStar> ();
         movementHandler = FindObjectOfType<MovementHandler> ().GetComponent<MovementHandler> ();
         grid = GameGrid.instance;
+    }
+
+    private void Start () {
         WorldManager.onRequestGridState += ReturnDisplayGrid;
     }
 
@@ -55,7 +58,6 @@ public class UnitMovement : MonoBehaviour {
         StoreTargetInfo (startPos, targetPos);
         gridShoulDisplay = false;
         movementHandler.StartMovementPathLogic (_unit, onDestReached);
-
     }
 
     private bool IsLegalMove (Vector3 _startPos, Vector3 _targetPos) {
