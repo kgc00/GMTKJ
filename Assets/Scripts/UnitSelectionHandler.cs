@@ -10,7 +10,7 @@ public class UnitSelectionHandler : MonoBehaviour {
     public static event Action<Unit> onUnitUnselectedByPlayer = delegate { };
     public static event Action<Unit> onUnitUnselectedByAI = delegate { };
     void Start () {
-        UnitStateHandler.onUnitActing += SetUnselectedByPlayer;
+        UnitStateHandler.onUnitActing += UnselectedParser;
     }
 
     public static void SetSelectionForPlayer (Unit _unit, Unit.SelectionState _selectionState, Ability curAbil) {
@@ -34,11 +34,25 @@ public class UnitSelectionHandler : MonoBehaviour {
                 SetSelectedByAI (_unit, _selectionState);
                 break;
             case Unit.SelectionState.notSelected:
-                SetUnselectedByPlayer (_unit, curAbil);
+                SetUnselectedByAI (_unit, curAbil);
                 break;
             default:
                 break;
         }
+    }
+
+    private static void UnselectedParser (Unit _unit, Ability abil) {
+        switch (_unit.faction) {
+            case Unit.Faction.Player:
+                SetUnselectedByPlayer (_unit, abil);
+                break;
+            case Unit.Faction.Enemy:
+                SetUnselectedByAI (_unit, abil);
+                break;
+            default:
+                break;
+        }
+
     }
 
     private static void SetUnselectedByPlayer (Unit _unit, Ability abil) {

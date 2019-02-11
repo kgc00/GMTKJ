@@ -22,7 +22,8 @@ public class AI_Manager : MonoBehaviour {
 		movementHandler = FindObjectOfType<MovementHandler> ().GetComponent<MovementHandler> ();
 		requestManager = FindObjectOfType<PathRequestManager> ().GetComponent<PathRequestManager> ();
 		if (ai_units.Count > 0) {
-			StartManagerCommands ();
+			// StartManagerCommands ();
+			StartCoroutine ("WaitForNextCommand", timeBetweenCommands);
 		}
 	}
 	internal void Store_AI_Units (List<Unit> inc_ai_units) {
@@ -72,6 +73,7 @@ public class AI_Manager : MonoBehaviour {
 		List<Node> possibleNodes) {
 		Node newTarget = SortNodes (possibleNodes, abil);
 		FinishExecution (abil, unitToControl, targetNode, newTarget);
+		grid.ResetNodeCosts ();
 	}
 
 	private void FinishExecution (Ability abil, Unit unitToControl, Node targetNode, Node newTarget) {
@@ -91,14 +93,12 @@ public class AI_Manager : MonoBehaviour {
 		Node correctNode = null;
 		int highestCost = -1;
 		foreach (Node node in possibleNodes) {
-			Debug.Log (node.gCost);
 			if (node.gCost > highestCost && node.gCost <= abil.abilityInfo.attackRange) {
 				if (grid.UnitFromNode (node) != null) {
 					// a unit will be on the node and it will not be a valid place to move
 				} else {
 					highestCost = node.gCost;
 					correctNode = node;
-					Debug.Log ("highestNode gcost: " + node.gCost);
 				}
 			}
 		}

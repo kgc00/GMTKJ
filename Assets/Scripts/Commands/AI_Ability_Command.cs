@@ -7,7 +7,7 @@ public class AI_Ability_Command : Command {
 		inputHandler.SelectUnit (unit);
 		inputHandler.PrepActionData (unit, ability, targetNode);
 		inputHandler.PlanAction (unit, ability);
-		// GameGrid.instance.ResetNodeCosts ();
+		GameGrid.instance.ResetNodeCosts ();
 		inputHandler.InitiateAbility (unit, ability);
 	}
 }

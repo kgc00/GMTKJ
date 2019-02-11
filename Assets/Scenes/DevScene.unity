@@ -601,7 +601,7 @@ Prefab:
     - target: {fileID: 114986204852996212, guid: 9f5a6cdbdf906884cb32e2c7dae69dba,
         type: 2}
       propertyPath: faction
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1852716760076434, guid: 9f5a6cdbdf906884cb32e2c7dae69dba, type: 2}
       propertyPath: m_IsActive
@@ -820,6 +820,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 098102acbf791b84e84485b7d88efc31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movementHandler: {fileID: 0}
 --- !u!4 &741891267
 Transform:
   m_ObjectHideFlags: 0

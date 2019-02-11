@@ -59,7 +59,7 @@ public class UnitTimer : MonoBehaviour {
     }
 
     private void EndTimer (Unit _unit) {
-        unitStateHandler.SetStatePlayerUnit (_unit, Unit.UnitState.idle);
+        unitStateHandler.SetUnitState (_unit, Unit.UnitState.idle);
         onTimerStopped (_unit, Unit.UnitState.idle);
         if (_unit == WorldManager.ReturnSelectedPlayerUnit ()) {
             FindObjectOfType<AbilityUI> ().GetComponent<AbilityUI> ().PopulateAbilityPanel (_unit);

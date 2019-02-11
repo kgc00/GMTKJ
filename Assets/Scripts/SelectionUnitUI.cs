@@ -7,7 +7,7 @@ public class SelectionUnitUI : MonoBehaviour {
     void Awake () {
         UnitSelectionHandler.onUnitSelectedByPlayer += ShowSelection;
         UnitSelectionHandler.onUnitUnselectedByPlayer += HideSelection;
-        UnitStateHandler.onUnitActing += HideSelection;
+        UnitStateHandler.onUnitActing += HideSelectionParser;
     }
 
     void Start () {
@@ -20,6 +20,19 @@ public class SelectionUnitUI : MonoBehaviour {
 
     void HideSelection (Unit _unit) {
         _unit.transform.Find ("Selected Canvas/Selected Image").GetComponent<Image> ().enabled = false;
+    }
+
+    void HideSelectionParser (Unit _unit, Ability abil) {
+        switch (_unit.faction) {
+            case Unit.Faction.Player:
+                HideSelection (_unit, abil);
+                break;
+            case Unit.Faction.Enemy:
+                HideSelection (_unit, abil);
+                break;
+            default:
+                break;
+        }
     }
 
     void HideSelection (Unit _unit, Ability abil) {

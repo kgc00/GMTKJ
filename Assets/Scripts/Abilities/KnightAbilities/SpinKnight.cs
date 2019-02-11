@@ -16,7 +16,8 @@ public class SpinKnight : AttackAbility {
 
     }
     public override void OnCommited (Unit thisUnit) {
-        stateHandler.SetStatePlayerUnit (thisUnit, Unit.UnitState.acting);
+        thisUnit.SetCurrentAbility (this);
+        stateHandler.SetUnitState (thisUnit, Unit.UnitState.acting);
         abilityTargeting.CommitToAoEAttack (
             abilityInfo.nodesInAbilityRange, thisUnit, abilityInfo.infoTheSecond.slot, OnAbilityConnected
         );
@@ -26,7 +27,8 @@ public class SpinKnight : AttackAbility {
         attackHandler.DealDamage (targetedUnit, owner);
     }
     public override void OnFinished (Unit thisUnit) {
-        stateHandler.SetStatePlayerUnit (thisUnit, Unit.UnitState.cooldown);
+        thisUnit.SetCurrentAbility (null);
+        stateHandler.SetUnitState (thisUnit, Unit.UnitState.cooldown);
         timer.AddTimeToTimerAbil (thisUnit, abilityInfo.cooldownTime);
         Debug.Log ("onFinished was called");
     }

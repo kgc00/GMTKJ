@@ -21,7 +21,7 @@ public class UnitStateHandler : MonoBehaviour {
         worldManager = WorldManager.instance;
     }
 
-    public void SetStatePlayerUnit (Unit _unit, Unit.UnitState _state) {
+    public void SetUnitState (Unit _unit, Unit.UnitState _state) {
         _unit.currentUnitState = _state;
         switch (_unit.currentUnitState) {
             case Unit.UnitState.idle:
@@ -54,27 +54,6 @@ public class UnitStateHandler : MonoBehaviour {
         currentPlayerAbilityInfo = _abilityInfo;
     }
 
-    public void SetStateAIUnit (Unit _unit, Unit.UnitState _state) {
-        _unit.currentUnitState = _state;
-        switch (_unit.currentUnitState) {
-            case Unit.UnitState.idle:
-                SetIdleAI (_unit, _state);
-                break;
-            case Unit.UnitState.planningAction:
-                SetPlanningActionAI (_unit, _state);
-                break;
-            case Unit.UnitState.acting:
-                SetActingAI (_unit, _state);
-                break;
-            case Unit.UnitState.cooldown:
-                SetOnCooldownAI (_unit, _state);
-                break;
-            default:
-                Debug.LogError ("Unrecognized unit state");
-                break;
-        }
-    }
-
     internal void SetAttackDataAI (Ability.AbilityInfo _abilityInfo) {
         currentAIAbilityInfo = _abilityInfo;
     }
@@ -89,35 +68,38 @@ public class UnitStateHandler : MonoBehaviour {
 
     private void SetPlanningAction (Unit unit, Unit.UnitState state) {
         grid.ResetNodeCosts ();
-        onUnitPlanningAction (unit, curPlayerAbil);
+        switch (unit.faction) {
+            case Unit.Faction.Enemy:
+                onUnitPlanningAction (unit, curAIAbil);
+                break;
+            case Unit.Faction.Player:
+                onUnitPlanningAction (unit, curPlayerAbil);
+                break;
+            default:
+                break;
+        }
     }
 
     private void SetActing (Unit unit, Unit.UnitState state) {
-        UnitSelectionHandler.SetSelectionForPlayer (unit,
-            Unit.SelectionState.notSelected, curPlayerAbil);
-        onUnitActing (unit, curPlayerAbil);
+        switch (unit.faction) {
+            case Unit.Faction.Enemy:
+                UnitSelectionHandler.SetSelectionForAI (unit,
+                    Unit.SelectionState.notSelected, curAIAbil);
+                onUnitActing (unit, curAIAbil);
+                break;
+            case Unit.Faction.Player:
+                UnitSelectionHandler.SetSelectionForPlayer (unit,
+                    Unit.SelectionState.notSelected, curPlayerAbil);
+                onUnitActing (unit, curPlayerAbil);
+                break;
+            default:
+                break;
+        }
     }
 
     private void SetIdle (Unit _unit, Unit.UnitState _state) { }
 
     private void SetOnCooldown (Unit _unit, Unit.UnitState _state) {
-
-    }
-
-    private void SetPlanningActionAI (Unit unit, Unit.UnitState state) {
-        grid.ResetNodeCosts ();
-        onUnitPlanningAction (unit, curAIAbil);
-    }
-
-    private void SetActingAI (Unit unit, Unit.UnitState state) {
-        UnitSelectionHandler.SetSelectionForAI (unit,
-            Unit.SelectionState.notSelected, curAIAbil);
-        onUnitActing (unit, curAIAbil);
-    }
-
-    private void SetIdleAI (Unit _unit, Unit.UnitState _state) { }
-
-    private void SetOnCooldownAI (Unit _unit, Unit.UnitState _state) {
 
     }
 }

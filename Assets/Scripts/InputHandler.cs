@@ -26,13 +26,14 @@ public class InputHandler : MonoBehaviour {
                 selectedUnit = WorldManager.ReturnSelectedPlayerUnit ();
             }
             if (selectedUnit.currentUnitState == Unit.UnitState.planningAction) {
-                abilityTargeting.HandleAbilityInput ();
+                abilityTargeting.HandleAbilityInput (selectedUnit);
                 HandleCallAbility (
                     selectedUnit: selectedUnit,
                     startPos: selectedUnit.transform.position,
                     targetPos: target.position,
                     slot: unitStateHandler.curPlayerAbilSlot
                 );
+                Debug.Log ("unit giving input is: " + selectedUnit);
                 return;
             }
 
@@ -58,7 +59,7 @@ public class InputHandler : MonoBehaviour {
             PrepActionData (_unit, 3);
             return;
         } else if (Input.GetKeyDown (KeyCode.Escape)) {
-            unitStateHandler.SetStatePlayerUnit (_unit, Unit.UnitState.idle);
+            unitStateHandler.SetUnitState (_unit, Unit.UnitState.idle);
             UnitSelectionHandler.SetSelectionForPlayer (_unit, Unit.SelectionState.notSelected, null);
             return;
         }
@@ -72,7 +73,7 @@ public class InputHandler : MonoBehaviour {
         CallForAnimation (_unit, _abilitySlot);
         unitStateHandler.SetAttackDataPlayer (_unit.GetComponent<AbilityManager> ().ReturnAbilityInfo ());
         unitStateHandler.SetAbilPlayer (_unit.GetComponent<AbilityManager> ().ReturnAbility ());
-        unitStateHandler.SetStatePlayerUnit (_unit, Unit.UnitState.planningAction);
+        unitStateHandler.SetUnitState (_unit, Unit.UnitState.planningAction);
         unitStateHandler.SetAbilSlotPlayer (_unit, _abilitySlot);
     }
 
@@ -118,9 +119,9 @@ public class InputHandler : MonoBehaviour {
             }
         } else if (Input.GetKeyDown (KeyCode.Escape)) {
             // set state to idle, keep unit selected, reset nodes
-            unitStateHandler.SetStatePlayerUnit (selectedUnit, Unit.UnitState.idle);
+            unitStateHandler.SetUnitState (selectedUnit, Unit.UnitState.idle);
             grid.ResetNodeCosts ();
-            gridFX.ClearHighlights ();
+            gridFX.ClearHighlights (selectedUnit);
         }
     }
 

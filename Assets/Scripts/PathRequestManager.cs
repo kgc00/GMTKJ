@@ -37,7 +37,7 @@ public class PathRequestManager : MonoBehaviour {
             NewPathLogic ();
             movementHandler.GenerateMovementPath (currentPathRequest.pathStart, currentPathRequest.pathEnd, _unit, onDestReached);
         } else {
-            Debug.LogError ("cant proccess 2 requests at the same time");
+            Debug.Log ("cant proccess 2 requests at the same time");
         }
     }
 

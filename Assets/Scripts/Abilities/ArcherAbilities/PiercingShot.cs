@@ -21,7 +21,8 @@ public class PiercingShot : AttackAbility {
 	}
 
 	public override void OnCommited (Unit unit) {
-		stateHandler.SetStatePlayerUnit (owner, Unit.UnitState.acting);
+		unit.SetCurrentAbility (this);
+		stateHandler.SetUnitState (owner, Unit.UnitState.acting);
 		CreateProjectile (unit);
 		unit.GetComponent<AbilityManager> ().AnimateAbilityUse (abilityInfo.infoTheSecond.slot);
 		OnFinished (owner);
@@ -56,7 +57,8 @@ public class PiercingShot : AttackAbility {
 	}
 
 	public override void OnFinished (Unit unit) {
-		stateHandler.SetStatePlayerUnit (unit, Unit.UnitState.cooldown);
+		unit.SetCurrentAbility (null);
+		stateHandler.SetUnitState (unit, Unit.UnitState.cooldown);
 		timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
 		Debug.Log ("onFinished was called");
 	}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GridEffects : MonoBehaviour {
@@ -9,23 +10,22 @@ public class GridEffects : MonoBehaviour {
     private const string pathName = "Path Highlight";
     [SerializeField]
     private GameObject selectionHighlight;
-    [SerializeField]
-    private GameObject[] selectionArray;
+    private Dictionary<Unit, GameObject[]> allSelections;
+    private List<GameObject> allActiveSelections;
     [SerializeField]
     private Sprite attackHighlight;
     [SerializeField]
     private Sprite movementHighlight;
     [SerializeField]
     private Sprite pathHighlight;
-    [SerializeField]
-    private List<GameObject> pathList;
+    private Dictionary<Unit, List<GameObject>> allPaths;
 
     void Start () {
-        UnitMovement.onGenerateMovementRange += InitiateMovementHighlights;
-        UnitMovement.onGeneratePath += GeneratePath;
-        UnitStateHandler.onUnitActing += ClearHighlights;
+        UnitStateHandler.onUnitActing += ClearHighlightsParser;
         GameGrid.requestingHighlights += SpawnHighlightsForNode;
-        pathList = new List<GameObject> ();
+        allPaths = new Dictionary<Unit, List<GameObject>> ();
+        allSelections = new Dictionary<Unit, GameObject[]> ();
+        allActiveSelections = new List<GameObject> ();
     }
 
     private void SpawnHighlightsForNode (Node _node) {
@@ -55,133 +55,145 @@ public class GridEffects : MonoBehaviour {
         _pathHighlightGO.SetActive (false);
     }
 
-    private void InitiateMovementHighlights (Unit _unit, List<Node> _nodesToHighlight) {
-        if (selectionArray.Length > 0) {
-            ClearHighlights (_unit);
-        }
-        ActivateHighlightForNodes (_nodesToHighlight, movementHighlight, movementName);
-    }
-
     public void InitiateAbilityHighlights (Unit _unit, List<Node> _nodesToHighlight) {
-        if (selectionArray.Length > 0) {
+        if (allSelections.ContainsKey (_unit)) {
             ClearHighlights (_unit);
         }
-        ActivateHighlightForNodes (_nodesToHighlight, attackHighlight, attackName);
+        ActivateHighlightForNodes (_nodesToHighlight, attackHighlight, attackName, _unit);
     }
 
-    public void RenderSelectorHighlights (List<Node> _nodesToHighlight) {
-        GeneratePath (_nodesToHighlight);
+    public void RenderSelectorHighlights (List<Node> _nodesToHighlight, Unit unit) {
+        if (unit.faction == Unit.Faction.Enemy) {
+            // add logic later
+        } else {
+            GeneratePath (_nodesToHighlight, unit);
+        }
     }
 
     private void ActivateHighlightForNodes (
-        List<Node> _nodesToHighlight, Sprite _highlightToUse, string _name
+        List<Node> _nodesToHighlight, Sprite _highlightToUse, string _name,
+        Unit _unit
     ) {
-        selectionArray = new GameObject[_nodesToHighlight.Count];
+        allSelections[_unit] = new GameObject[_nodesToHighlight.Count];
         int _arrayCount = 0;
         foreach (Node node in _nodesToHighlight) {
-            selectionArray[_arrayCount] = node.gameObject;
-            selectionArray[_arrayCount].transform.Find (_name).gameObject.SetActive (true);
+            allSelections[_unit][_arrayCount] = node.gameObject;
+            allSelections[_unit][_arrayCount].transform.Find (_name).gameObject.SetActive (true);
             _arrayCount++;
+            allActiveSelections.Add (node.gameObject);
         }
     }
 
-    private void GeneratePath (List<Node> _nodesToHighlight) {
-        List<GameObject> _incomingPathList = CreateNewPath (_nodesToHighlight);
-        RemoveOldPath (_incomingPathList);
+    private void GeneratePath (List<Node> _nodesToHighlight, Unit unit) {
+        Debug.Log ("Calling Generate Path for: " + unit.name);
+        if (!allPaths.ContainsKey (unit)) {
+            CreateNewPath (_nodesToHighlight, unit);
+        }
+        List<GameObject> _incomingPathList = AssignAndRenderPath (_nodesToHighlight, unit);
+        RemoveOldPath (_incomingPathList, unit);
     }
 
-    private List<GameObject> CreateNewPath (List<Node> _nodesToHighlight) {
+    private void CreateNewPath (List<Node> _nodesToHighlight, Unit unit) {
+        List<GameObject> tempPathList = new List<GameObject> ();
+        foreach (Node node in _nodesToHighlight) {
+            tempPathList.Add (node.transform.Find (pathName).gameObject);
+        }
+        allPaths.Add (unit, tempPathList);
+    }
+
+    private List<GameObject> AssignAndRenderPath (List<Node> _nodesToHighlight, Unit unit) {
         List<GameObject> _incomingPathList = _nodesToHighlight.ConvertAll (node => node.gameObject);
 
+        Debug.Log ("inc path list is: " + _incomingPathList.Count ());
         foreach (GameObject _nodeGameObject in _incomingPathList) {
             // foreach node see if we've already generated a  highlight
-            if (_nodeGameObject.transform.Find (pathName)) {
-                _nodeGameObject.transform.Find (pathName).gameObject.SetActive (true);
-                if (!pathList.Contains (_nodeGameObject.transform.Find (pathName).gameObject)) {
-                    pathList.Add (_nodeGameObject.transform.Find (pathName).gameObject);
-                } else { }
+            if (allSelections[unit].Contains (_nodeGameObject)) {
+                if (_nodeGameObject.transform.Find (pathName)) {
+                    _nodeGameObject.transform.Find (pathName).gameObject.SetActive (true);
+                    if (allPaths.ContainsKey (unit)) {
+                        if (!allPaths[unit].Contains (_nodeGameObject.transform.Find (pathName).gameObject)) {
+                            allPaths[unit].Add (_nodeGameObject.transform.Find (pathName).gameObject);
+                        } else {
+                            Debug.Log ("this node is already contained by allPaths");
+                        }
+                    } else {
+                        Debug.LogError ("allPaths does not contain a key for this unit");
+                    }
+                } else {
+                    Debug.LogError ("cannot find the requested child: path sprite");
+                }
+            } else {
+                Debug.LogError ("Cant find Node in selections list");
             }
         }
         return _incomingPathList;
     }
 
-    private void RemoveOldPath (List<GameObject> _incomingPathList) {
-        foreach (GameObject _childHighlight in pathList) {
-            if (!_incomingPathList.Contains (_childHighlight.transform.parent.gameObject)) {
-                _childHighlight.SetActive (false);
-            }
-        }
-        pathList.RemoveAll (_nodeGameObjects => !_incomingPathList.Contains (_nodeGameObjects.transform.parent.gameObject));
-    }
-
-    private void ClearHighlights (Unit _unit) {
-        if (selectionArray != null) {
-            // better way to check?
-            if (selectionArray[0] != null) {
-                foreach (GameObject _tileGameObject in selectionArray) {
-                    if (_tileGameObject.transform.Find (movementName).gameObject.activeInHierarchy) {
-                        _tileGameObject.transform.Find (movementName).gameObject.SetActive (false);
-                    } else if (_tileGameObject.transform.Find (attackName).gameObject.activeInHierarchy) {
-                        _tileGameObject.transform.Find (attackName).gameObject.SetActive (false);
-                    }
+    private void RemoveOldPath (List<GameObject> _incomingPathList, Unit unit) {
+        if (allPaths.ContainsKey (unit)) {
+            foreach (GameObject _childHighlight in allPaths[unit]) {
+                if (!_incomingPathList.Contains (_childHighlight.transform.parent.gameObject)) {
+                    _childHighlight.SetActive (false);
                 }
             }
-            Array.Clear (selectionArray, 0, selectionArray.Length);
-        }
-        if (pathList != null) {
-            if (pathList.Count > 0) {
-                foreach (GameObject _pathHighlight in pathList) {
-                    _pathHighlight.SetActive (false);
-                }
-            }
-            pathList.Clear ();
+            allPaths[unit].RemoveAll (_nodeGameObjects => !_incomingPathList.Contains (
+                _nodeGameObjects.transform.parent.gameObject
+            ));
         }
     }
 
-    private void ClearHighlights (Unit _unit, Ability abil) {
-        if (selectionArray != null) {
-            // better way to check?
-            if (selectionArray[0] != null) {
-                foreach (GameObject _tileGameObject in selectionArray) {
-                    if (_tileGameObject.transform.Find (movementName).gameObject.activeInHierarchy) {
-                        _tileGameObject.transform.Find (movementName).gameObject.SetActive (false);
-                    } else if (_tileGameObject.transform.Find (attackName).gameObject.activeInHierarchy) {
-                        _tileGameObject.transform.Find (attackName).gameObject.SetActive (false);
-                    }
-                }
-            }
-            Array.Clear (selectionArray, 0, selectionArray.Length);
-        }
-        if (pathList != null) {
-            if (pathList.Count > 0) {
-                foreach (GameObject _pathHighlight in pathList) {
-                    _pathHighlight.SetActive (false);
-                }
-            }
-            pathList.Clear ();
+    private void ClearHighlightsParser (Unit unit, Ability ability) {
+        switch (unit.faction) {
+            case Unit.Faction.Player:
+                ClearHighlights (unit);
+                break;
+            case Unit.Faction.Enemy:
+                ClearHighlights (unit);
+                break;
+            default:
+                break;
         }
     }
-    public void ClearHighlights () {
-        if (selectionArray != null) {
+
+    public void ClearHighlights (Unit _unit) {
+        if (allSelections[_unit] != null) {
             // better way to check?
-            if (selectionArray[0] != null) {
-                foreach (GameObject _tileGameObject in selectionArray) {
-                    if (_tileGameObject.transform.Find (movementName).gameObject.activeInHierarchy) {
-                        _tileGameObject.transform.Find (movementName).gameObject.SetActive (false);
-                    } else if (_tileGameObject.transform.Find (attackName).gameObject.activeInHierarchy) {
-                        _tileGameObject.transform.Find (attackName).gameObject.SetActive (false);
+            if (allSelections[_unit][0] != null) {
+                // make giant set
+
+                // sort through set to see if any duplicates are present
+                var duplicates = allActiveSelections
+                    .GroupBy (x => x)
+                    .Where (x => x.Count () > 1)
+                    .Select (x => x.Key);
+                // if so, remove them from set, but don't disable the highlights
+                // IEnumerable<GameObject> test;
+                // List<GameObject> thing;
+                foreach (GameObject _tileGameObject in allSelections[_unit]) {
+                    if (duplicates.Contains (_tileGameObject)) {
+                        // test = allSelections[_unit].Where (p => p).Select (p => _tileGameObject);
+                        // thing = test.ToList ();
+                    } else {
+                        if (_tileGameObject.transform.Find (movementName).gameObject.activeInHierarchy) {
+                            _tileGameObject.transform.Find (movementName).gameObject.SetActive (false);
+                        } else if (_tileGameObject.transform.Find (attackName).gameObject.activeInHierarchy) {
+                            _tileGameObject.transform.Find (attackName).gameObject.SetActive (false);
+                        }
                     }
+
+                    allActiveSelections.Remove (_tileGameObject);
                 }
             }
-            Array.Clear (selectionArray, 0, selectionArray.Length);
+            Array.Clear (allSelections[_unit], 0, allSelections[_unit].Length);
         }
-        if (pathList != null) {
-            if (pathList.Count > 0) {
-                foreach (GameObject _pathHighlight in pathList) {
+
+        if (allPaths.ContainsKey (_unit)) {
+            if (allPaths[_unit].Count > 0) {
+                foreach (GameObject _pathHighlight in allPaths[_unit]) {
                     _pathHighlight.SetActive (false);
                 }
             }
-            pathList.Clear ();
+            allPaths[_unit].Clear ();
         }
     }
 }

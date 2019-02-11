@@ -4,15 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class AbilityTargeting : MonoBehaviour {
-    [SerializeField]
-    List<Node> nodesWithinRange = new List<Node> ();
-    List<Node> nodesWithinRangeAI = new List<Node> ();
+    Dictionary<Unit, List<Node>> allNodesInRange = new Dictionary<Unit, List<Node>> ();
     GameGrid grid;
     GridEffects gridfx;
     AStar aStar;
     UnitStateHandler unitStateHandler;
     InputHandler inputHandler;
-    public static event Action<Unit, List<Node>> onGenerateAbilityRange = delegate { };
     public static event Action<Node, Unit, Ability, Unit> onCommitToMeleeAttack = delegate { };
     public static event Action<List<Unit>, Unit, AttackAbility, Action<Unit>> onCommitToMeleeAOEAttack = delegate { };
     [SerializeField]
@@ -33,25 +30,22 @@ public class AbilityTargeting : MonoBehaviour {
     }
 
     private List<Node> GenerateTargeting (Unit _unit, Vector3 startPos, Ability abil) {
-        nodesWithinRange = new List<Node> ();
-        // Debug.Log (startPos);
-        // Debug.Log (grid.NodeFromWorldPosition (_unit.transform.position));
+        allNodesInRange[_unit] = new List<Node> ();
         Ability.AbilityInfo info = abil.abilityInfo;
         Node targetNode = grid.NodeFromWorldPosition (startPos);
         foreach (Node node in grid.GetAttackRange (targetNode, info)) {
             if (aStar.PathFindingLogic (false, targetNode, node, info.attackRange)) {
-                nodesWithinRange.Add (node);
+                allNodesInRange[_unit].Add (node);
             }
         }
-        onGenerateAbilityRange (_unit, nodesWithinRange);
-        return nodesWithinRange;
+        return allNodesInRange[_unit];
     }
 
-    public void HandleAbilityInput () {
+    public void HandleAbilityInput (Unit unit) {
         Vector3 targetPos = target.position;
-        if (IsLegalMove (targetPos)) {
+        if (IsLegalMove (targetPos, unit)) {
             targetNode = CacheSelectedTile (targetPos);
-            gridfx.RenderSelectorHighlights (targetNode);
+            gridfx.RenderSelectorHighlights (targetNode, unit);
         }
     }
 
@@ -81,12 +75,8 @@ public class AbilityTargeting : MonoBehaviour {
         }
     }
 
-    private bool IsLegalMove (Vector3 targetPos) {
-        return nodesWithinRange.Contains (grid.NodeFromWorldPosition (targetPos));
-    }
-
-    private bool IsLegalMoveAI (Vector3 targetPos) {
-        return nodesWithinRangeAI.Contains (grid.NodeFromWorldPosition (targetPos));
+    private bool IsLegalMove (Vector3 targetPos, Unit unit) {
+        return allNodesInRange[unit].Contains (grid.NodeFromWorldPosition (targetPos));
     }
 
     private List<Node> CacheSelectedTile (Vector3 targetPos) {
@@ -100,17 +90,10 @@ public class AbilityTargeting : MonoBehaviour {
     }
 
     public List<Node> RequestPathForAI (Unit unit, Node targetNode, Ability abil) {
-        nodesWithinRangeAI = new List<Node> ();
+        allNodesInRange[unit] = new List<Node> ();
         Ability.AbilityInfo info = abil.abilityInfo;
         MovementHandler movementHandler = FindObjectOfType<MovementHandler> ().GetComponent<MovementHandler> ();
-        nodesWithinRangeAI = grid.GetAttackRange (grid.NodeFromWorldPosition (unit.transform.position), info);
-        return nodesWithinRangeAI;
-    }
-
-    public void ValidateAbilityAI (Ability abil) {
-        if (IsLegalMoveAI (abil.abilityInfo.infoTheSecond.targetPos)) {
-            targetNode = CacheSelectedTile (abil.abilityInfo.infoTheSecond.targetPos);
-            gridfx.RenderSelectorHighlights (targetNode);
-        }
+        allNodesInRange[unit] = grid.GetAttackRange (grid.NodeFromWorldPosition (unit.transform.position), info);
+        return allNodesInRange[unit];
     }
 }

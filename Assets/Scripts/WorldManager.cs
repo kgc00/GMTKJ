@@ -23,7 +23,7 @@ public class WorldManager : MonoBehaviour {
         }
         UnitSelectionHandler.onUnitSelectedByPlayer += UnitSelectedByPlayer;
         UnitSelectionHandler.onUnitSelectedByPlayer += DeselectOtherPlayerUnits;
-        UnitSelectionHandler.onUnitUnselectedByPlayer += SetNoUnitsSelected;
+        UnitSelectionHandler.onUnitUnselectedByPlayer += SetNoPlayerUnitsSelected;
         UnitStateHandler.onUnitActing += SetNoUnitsSelected;
         Unit.OnUnitDeath += RemoveUnitFromList;
         AI_Manager = FindObjectOfType<AI_Manager> ().GetComponent<AI_Manager> ();
@@ -66,12 +66,20 @@ public class WorldManager : MonoBehaviour {
         selectedUnit = _selectedUnit;
     }
 
-    public void SetNoUnitsSelected (Unit unit) {
+    public void SetNoPlayerUnitsSelected (Unit unit) {
         anyUnitSelectedByPlayer = false;
     }
 
     private void SetNoUnitsSelected (Unit unit, Ability abil) {
-        anyUnitSelectedByPlayer = false;
+        switch (unit.faction) {
+            case Unit.Faction.Player:
+                anyUnitSelectedByPlayer = false;
+                break;
+            case Unit.Faction.Enemy:
+                break;
+            default:
+                break;
+        }
     }
 
     public List<Unit> GetAllUnits () {

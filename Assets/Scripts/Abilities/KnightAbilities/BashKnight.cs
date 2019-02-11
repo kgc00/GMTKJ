@@ -18,7 +18,8 @@ public class BashKnight : AttackAbility {
     }
 
     public override void OnCommited (Unit unit) {
-        stateHandler.SetStatePlayerUnit (unit, Unit.UnitState.acting);
+        unit.SetCurrentAbility (this);
+        stateHandler.SetUnitState (unit, Unit.UnitState.acting);
         abilityTargeting.CommitToAttack (
             abilityInfo.infoTheSecond.startPos, abilityInfo.infoTheSecond.targetPos, abilityInfo.infoTheSecond.slot
         );
@@ -28,12 +29,13 @@ public class BashKnight : AttackAbility {
     public override void OnAbilityConnected (Unit targetedUnit) {
         attackHandler.DealDamage (targetedUnit, owner);
         UnitStateHandler.onUnitStunned (targetedUnit, lengthOfStun);
-        stateHandler.SetStatePlayerUnit (targetedUnit, Unit.UnitState.cooldown);
+        stateHandler.SetUnitState (targetedUnit, Unit.UnitState.cooldown);
         OnFinished (owner);
     }
 
     public override void OnFinished (Unit unit) {
-        stateHandler.SetStatePlayerUnit (unit, Unit.UnitState.cooldown);
+        unit.SetCurrentAbility (null);
+        stateHandler.SetUnitState (unit, Unit.UnitState.cooldown);
         timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
         Debug.Log ("onFinished was called");
     }

@@ -24,7 +24,7 @@ public class ChargeKnight : MovementAbility {
 
     public override void OnCommited (Unit unit) {
         unit.SetCurrentAbility (this);
-        stateHandler.SetStatePlayerUnit (owner, Unit.UnitState.acting);
+        stateHandler.SetUnitState (owner, Unit.UnitState.acting);
         unitMovement.CommitMovement (abilityInfo.infoTheSecond.startPos,
             abilityInfo.infoTheSecond.targetPos,
             owner,
@@ -61,8 +61,9 @@ public class ChargeKnight : MovementAbility {
     }
 
     public override void OnFinished (Unit unit) {
+        unit.SetCurrentAbility (null);
         unit.DisableDet (this);
-        stateHandler.SetStatePlayerUnit (unit, Unit.UnitState.cooldown);
+        stateHandler.SetUnitState (unit, Unit.UnitState.cooldown);
         timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
         Debug.Log ("onFinished was called");
     }
