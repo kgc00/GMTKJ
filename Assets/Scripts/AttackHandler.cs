@@ -32,7 +32,9 @@ public class AttackHandler : MonoBehaviour {
     }
 
     public void DealAbilityDamage (Unit _targetUnit, Unit _attackingUnit, int abilityDamage = -1) {
-        _targetUnit.TakeDamage (abilityDamage);
+        if (_targetUnit != null) {
+            _targetUnit.TakeDamage (abilityDamage);
+        }
     }
 
     private void HandleMeleeAOEAttack (List<Unit> unitsAffected, Unit attackingUnit, AttackAbility ability, Action<Unit> callback = null) {

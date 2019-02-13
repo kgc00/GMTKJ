@@ -26,6 +26,10 @@ public class InputHandler : MonoBehaviour {
                 selectedUnit = WorldManager.ReturnSelectedPlayerUnit ();
             }
             if (selectedUnit.currentUnitState == Unit.UnitState.planningAction) {
+                if (!selectedUnit.isAlive) {
+                    ClearSelectedUnit ();
+                    return;
+                }
                 abilityTargeting.HandleAbilityInput (selectedUnit);
                 HandleCallAbility (
                     selectedUnit: selectedUnit,
@@ -36,13 +40,19 @@ public class InputHandler : MonoBehaviour {
                 Debug.Log ("unit giving input is: " + selectedUnit);
                 return;
             }
-
             if (ValidSelectedState (selectedUnit)) {
                 SelectedLogic (selectedUnit);
             }
         } else {
             SelectionLogic ();
         }
+    }
+
+    private void ClearSelectedUnit () {
+        UnitSelectionHandler.SetSelectionForPlayer (selectedUnit,
+            Unit.SelectionState.notSelected, selectedUnit.currentAbility);
+        gridFX.ClearHighlights (selectedUnit);
+        selectedUnit = null;
     }
 
     private void SelectedLogic (Unit _unit) {
@@ -78,7 +88,7 @@ public class InputHandler : MonoBehaviour {
     }
 
     private bool ValidSelectedState (Unit _unit) {
-        if (_unit.currentSelectionState == Unit.SelectionState.selected) {
+        if (_unit.currentSelectionState == Unit.SelectionState.selected && _unit.isAlive) {
             if (
                 _unit.currentUnitState == Unit.UnitState.planningAction ||
                 _unit.currentUnitState == Unit.UnitState.idle) {

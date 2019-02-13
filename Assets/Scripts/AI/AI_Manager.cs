@@ -45,7 +45,7 @@ public class AI_Manager : MonoBehaviour {
 					StartCoroutine ("WaitForNextCommand", timeBetweenCommands);
 				}
 			} else {
-				Debug.LogError ("Can't find a unit");
+				Debug.Log ("No units availablse");
 			}
 		}
 	}

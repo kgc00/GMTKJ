@@ -30,6 +30,7 @@ public class Unit : MonoBehaviour, IDamageable {
         private CollisionDetection colDet;
         private GameGrid gridRef;
         public Ability currentAbility = null;
+        public bool isAlive = true;
 
         void Awake () {
         currentUnitState = UnitState.idle;
@@ -51,6 +52,9 @@ public class Unit : MonoBehaviour, IDamageable {
     }
 
     protected void UnitDeath () {
+        this.GetComponentInChildren<MeshRenderer> ().enabled = false;
+        this.GetComponentInChildren<BoxCollider> ().enabled = false;
+        this.isAlive = false;
         OnUnitDeath (this);
         Destroy (gameObject, 2.0f);
     }

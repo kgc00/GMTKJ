@@ -22,7 +22,12 @@ public class Teleport : MovementAbility {
 		unit.SetCurrentAbility (this);
 		stateHandler.SetUnitState (owner, Unit.UnitState.acting);
 		unit.GetComponent<AbilityManager> ().AnimateAbilityUse (abilityInfo.infoTheSecond.slot);
-		unit.transform.position = abilityInfo.infoTheSecond.targetPos;
+		var nodePosition = grid.NodeFromWorldPosition (abilityInfo.infoTheSecond.targetPos).transform.position;
+		var teleportLocation = new Vector3 (
+			nodePosition.x,
+			nodePosition.y,
+			unit.transform.position.z);
+		unit.transform.position = teleportLocation;
 		OnFinished (unit);
 		// vfx
 	}
