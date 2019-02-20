@@ -8,6 +8,7 @@ public class GridEffects : MonoBehaviour {
     private const string movementName = "Movement Highlight";
     private const string attackName = "Attack Highlight";
     private const string pathName = "Path Highlight";
+    public float masterAlphaValue = 0f;
     [SerializeField]
     private GameObject selectionHighlight;
     private Dictionary<Unit, GameObject[]> allSelections;
@@ -26,6 +27,10 @@ public class GridEffects : MonoBehaviour {
         allPaths = new Dictionary<Unit, List<GameObject>> ();
         allSelections = new Dictionary<Unit, GameObject[]> ();
         allActiveSelections = new List<GameObject> ();
+    }
+
+    private void Update () {
+        masterAlphaValue = Mathf.PingPong (Time.time, 0.8f);
     }
 
     private void SpawnHighlightsForNode (Node _node) {
@@ -47,7 +52,6 @@ public class GridEffects : MonoBehaviour {
         _pathSpriteRenderer.sprite = this.pathHighlight;
         _pathSpriteRenderer.sortingOrder = 2;
         _pathHighlightGO.name = pathName;
-        // come back here and polish
         _pathHighlightGO.GetComponent<Animation> ().enabled = false;
 
         _movementHighlightGO.SetActive (false);
@@ -64,7 +68,7 @@ public class GridEffects : MonoBehaviour {
 
     public void RenderSelectorHighlights (List<Node> _nodesToHighlight, Unit unit) {
         if (unit.faction == Unit.Faction.Enemy) {
-            // add logic later
+            GeneratePath (_nodesToHighlight, unit);
         } else {
             GeneratePath (_nodesToHighlight, unit);
         }
@@ -79,13 +83,14 @@ public class GridEffects : MonoBehaviour {
         foreach (Node node in _nodesToHighlight) {
             allSelections[_unit][_arrayCount] = node.gameObject;
             allSelections[_unit][_arrayCount].transform.Find (_name).gameObject.SetActive (true);
-            _arrayCount++;
+            node.ToggleAnimation (node.gameObject.transform.Find (_name).GetComponent<SpriteRenderer> ());
             allActiveSelections.Add (node.gameObject);
+            _arrayCount++;
         }
     }
 
     private void GeneratePath (List<Node> _nodesToHighlight, Unit unit) {
-        Debug.Log ("Calling Generate Path for: " + unit.name);
+        // Debug.Log ("Calling Generate Path for: " + unit.name);
         if (!allPaths.ContainsKey (unit)) {
             CreateNewPath (_nodesToHighlight, unit);
         }
@@ -104,7 +109,7 @@ public class GridEffects : MonoBehaviour {
     private List<GameObject> AssignAndRenderPath (List<Node> _nodesToHighlight, Unit unit) {
         List<GameObject> _incomingPathList = _nodesToHighlight.ConvertAll (node => node.gameObject);
 
-        Debug.Log ("inc path list is: " + _incomingPathList.Count ());
+        // Debug.Log ("inc path list is: " + _incomingPathList.Count ());
         foreach (GameObject _nodeGameObject in _incomingPathList) {
             // foreach node see if we've already generated a  highlight
             if (allSelections[unit].Contains (_nodeGameObject)) {
@@ -114,7 +119,7 @@ public class GridEffects : MonoBehaviour {
                         if (!allPaths[unit].Contains (_nodeGameObject.transform.Find (pathName).gameObject)) {
                             allPaths[unit].Add (_nodeGameObject.transform.Find (pathName).gameObject);
                         } else {
-                            Debug.Log ("this node is already contained by allPaths");
+                            // Debug.Log ("this node is already contained by allPaths");
                         }
                     } else {
                         Debug.LogError ("allPaths does not contain a key for this unit");
@@ -167,16 +172,15 @@ public class GridEffects : MonoBehaviour {
                     .Where (x => x.Count () > 1)
                     .Select (x => x.Key);
                 // if so, remove them from set, but don't disable the highlights
-                // IEnumerable<GameObject> test;
-                // List<GameObject> thing;
                 foreach (GameObject _tileGameObject in allSelections[_unit]) {
-                    if (duplicates.Contains (_tileGameObject)) {
-                        // test = allSelections[_unit].Where (p => p).Select (p => _tileGameObject);
-                        // thing = test.ToList ();
-                    } else {
+                    if (duplicates.Contains (_tileGameObject)) { } else {
                         if (_tileGameObject.transform.Find (movementName).gameObject.activeInHierarchy) {
+                            Node node = _tileGameObject.GetComponent<Node> ();
+                            node.GetComponent<Node> ().ToggleAnimation (node.gameObject.transform.Find (movementName).GetComponent<SpriteRenderer> ());
                             _tileGameObject.transform.Find (movementName).gameObject.SetActive (false);
                         } else if (_tileGameObject.transform.Find (attackName).gameObject.activeInHierarchy) {
+                            Node node = _tileGameObject.GetComponent<Node> ();
+                            node.GetComponent<Node> ().ToggleAnimation (node.gameObject.transform.Find (attackName).GetComponent<SpriteRenderer> ());
                             _tileGameObject.transform.Find (attackName).gameObject.SetActive (false);
                         }
                     }

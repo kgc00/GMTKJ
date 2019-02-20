@@ -10,12 +10,12 @@ public class MovementHandler : MonoBehaviour {
     AStar aStar;
     InputHandler inputHandler;
     TargetingInformation targetInfo;
-    private Vector3[] path;
+    private Dictionary<Unit, Vector3[]> pathDictionary;
     UnitStateHandler unitStateHandler;
     UnitMovement unitMovement;
     private int targetIndex;
     private float speed = 5f;
-    Coroutine currentRoutine;
+    private Dictionary<Unit, Coroutine> currentCoroutines;
 
     void Start () {
         grid = GameGrid.instance;
@@ -25,16 +25,23 @@ public class MovementHandler : MonoBehaviour {
         unitMovement = FindObjectOfType<UnitMovement> ().GetComponent<UnitMovement> ();
         inputHandler = FindObjectOfType<InputHandler> ().GetComponent<InputHandler> ();
         unitStateHandler = FindObjectOfType<UnitStateHandler> ().GetComponent<UnitStateHandler> ();
+        currentCoroutines = new Dictionary<Unit, Coroutine> ();
+        pathDictionary = new Dictionary<Unit, Vector3[]> ();
     }
 
     public void StartMovementPathLogic (Unit _unit,
         Action<Unit> onDestReached
     ) {
+        if (currentCoroutines.ContainsKey (_unit)) {
+            StopCoroutine (currentCoroutines[_unit]);
+            currentCoroutines.Remove (_unit);
+        }
         targetInfo = unitMovement.PassTargetInfo ();
-        StartCoroutine (
+        Coroutine currentRoutine = StartCoroutine (
             GenerateMovementPath (targetInfo.startingPoint,
                 targetInfo.targetPoint, _unit, onDestReached)
         );
+        currentCoroutines.Add (_unit, currentRoutine);
         MoveUnit (_unit, onDestReached);
     }
 
@@ -75,7 +82,18 @@ public class MovementHandler : MonoBehaviour {
         Array.Reverse (waypoints);
         return waypoints;
     }
+    Vector3[] RetracePathAI (Node startNode, Node endNode, Unit _unit) {
+        List<Node> path = new List<Node> ();
+        Node currentNode = endNode;
 
+        while (currentNode != startNode) {
+            path.Add (currentNode);
+            currentNode = currentNode.parent;
+        }
+        Vector3[] waypoints = ConvertPathAI (path, _unit);
+        Array.Reverse (waypoints);
+        return waypoints;
+    }
     Vector3[] ConvertPath (List<Node> path, Unit _unit) {
         Vector3[] waypoints = new Vector3[path.Count];
         for (int i = 0; i < path.Count; i++) {
@@ -83,44 +101,64 @@ public class MovementHandler : MonoBehaviour {
         }
         return waypoints;
     }
-
+    Vector3[] ConvertPathAI (List<Node> path, Unit _unit) {
+        Vector3[] waypoints = new Vector3[path.Count];
+        for (int i = 0; i < path.Count; i++) {
+            waypoints[i] = new Vector3 (path[i].worldPosition.x, path[i].worldPosition.y, _unit.transform.position.z);
+        }
+        return waypoints;
+    }
     public void MoveUnit (Unit _unit, Action<Unit> onDestReached) {
-        // work ondestreached to the request
         PathRequestManager.RequestPath (transform.position, target.position, OnPathFoundAbil, this, _unit, onDestReached);
     }
 
     public void OnPathFoundAbil (Vector3[] newPath, bool pathSuccessful, Unit _unit, Action<Unit> onDestReached) {
         if (pathSuccessful) {
-            path = newPath;
-            targetIndex = 0;
-            if (currentRoutine != null) {
-                StopCoroutine ("FollowPathAbil");
+            if (pathDictionary.ContainsKey (_unit)) {
+                pathDictionary.Remove (_unit);
             }
-            currentRoutine = StartCoroutine (FollowPathAbil (_unit, onDestReached));
+            pathDictionary.Add (_unit, newPath);
+
+            targetIndex = 0;
+            if (currentCoroutines.ContainsKey (_unit)) {
+                StopCoroutine ("FollowPathAbil");
+                currentCoroutines.Remove (_unit);
+            }
+            Coroutine currentRoutine = StartCoroutine (FollowPathAbil (_unit, onDestReached));
+            currentCoroutines.Add (_unit, currentRoutine);
         }
     }
 
     public void OnStopPath (Vector3 dest, Unit _unit, Action<Unit> onDestReached = null) {
-        if (currentRoutine != null) {
+        if (currentCoroutines.ContainsKey (_unit)) {
             StopCoroutine ("FollowPathAbil");
+            currentCoroutines.Remove (_unit);
         }
-        path = new Vector3[] { dest };
+        if (pathDictionary.ContainsKey (_unit)) {
+            pathDictionary[_unit] = new Vector3[] { dest };
+        } else {
+            Debug.LogError ("idk");
+        }
         targetIndex = 0;
         Debug.Log ("onStopPath called by: " + _unit);
-        if (onDestReached != null) {
-            currentRoutine = StartCoroutine (FollowPathAbil (_unit, onDestReached));
-        } else {
-            currentRoutine = StartCoroutine (FollowPathAbil (_unit, onDestReached));
-        }
+        Coroutine currentRoutine = StartCoroutine (FollowPathAbil (_unit, onDestReached));
+        currentCoroutines.Add (_unit, currentRoutine);
     }
 
     IEnumerator FollowPathAbil (Unit _unit, Action<Unit> onDestReached = null) {
         yield return new WaitForSeconds (.15f);
-        Vector3 currentWaypoint = path[0];
+        Vector3 currentWaypoint = new Vector3 (-999, -999, -999);
+        if (pathDictionary.ContainsKey (_unit)) {
+            currentWaypoint = pathDictionary[_unit][0];
+        } else {
+            Debug.LogError ("idk");
+            yield break;;
+        }
+
         while (true) {
             if (_unit.transform.position == currentWaypoint) {
                 targetIndex++;
-                if (targetIndex >= path.Length) {
+                if (targetIndex >= pathDictionary[_unit].Length) {
                     if (onDestReached != null) {
                         onDestReached (_unit);
                         yield break;
@@ -128,7 +166,7 @@ public class MovementHandler : MonoBehaviour {
                         yield break;
                     }
                 }
-                currentWaypoint = path[targetIndex];
+                currentWaypoint = pathDictionary[_unit][targetIndex];
             }
             _unit.transform.position = Vector3.MoveTowards (_unit.transform.position, currentWaypoint, speed * Time.deltaTime);
             yield return null;
@@ -156,7 +194,7 @@ public class MovementHandler : MonoBehaviour {
         }
         yield return null;
         if (pathSuccess) {
-            waypoints = RetracePath (startNode, targetNode, unitToControl);
+            waypoints = RetracePathAI (startNode, targetNode, unitToControl);
         } else {
             Debug.Log ("Unable to reach target within alotted range.");
         }

@@ -37,7 +37,7 @@ public class InputHandler : MonoBehaviour {
                     targetPos: target.position,
                     slot: unitStateHandler.curPlayerAbilSlot
                 );
-                Debug.Log ("unit giving input is: " + selectedUnit);
+                // Debug.Log ("unit giving input is: " + selectedUnit);
                 return;
             }
             if (ValidSelectedState (selectedUnit)) {

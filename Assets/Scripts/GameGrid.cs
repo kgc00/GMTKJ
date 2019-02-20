@@ -11,6 +11,7 @@ public class GameGrid : MonoBehaviour {
     public float nodeRadius, nodeSize;
     public LayerMask obstacleMask;
     public LayerMask enemyMask;
+    GridEffects gridfx;
 
     public LayerMask allyMask;
     public List<Node> nodesContainingUnits;
@@ -38,6 +39,7 @@ public class GameGrid : MonoBehaviour {
         gridSizeX = Mathf.RoundToInt (gridWorldSize.x / nodeSize);
         gridSizeY = Mathf.RoundToInt (gridWorldSize.y / nodeSize);
         nodesContainingUnits = new List<Node> ();
+        gridfx = FindObjectOfType<GridEffects> ().GetComponent<GridEffects> ();
         CreateGrid ();
         Unit.OnUnitDeath += RemoveNodeOnUnitDeath;
     }
@@ -70,18 +72,18 @@ public class GameGrid : MonoBehaviour {
                     Node.OccupiedByUnit occupiedByUnit = Node.OccupiedByUnit.ally;
                     grid[x, y] = currentNode.SetReferences (
                         walkable, worldPoint, x, y, Node.NodeType.plains, occupiedByUnit,
-                        possibleNodeImages[tileImageIndex]);
+                        possibleNodeImages[tileImageIndex], gridfx);
                     // nodesContainingUnits.Add(grid[x, y]);
                 } else if ((Physics.CheckSphere (worldPoint, nodeRadius / 2, enemyMask))) {
                     Node.OccupiedByUnit occupiedByUnit = Node.OccupiedByUnit.enemy;
                     grid[x, y] = currentNode.SetReferences (
                         walkable, worldPoint, x, y, Node.NodeType.plains, occupiedByUnit,
-                        possibleNodeImages[tileImageIndex]);
+                        possibleNodeImages[tileImageIndex], gridfx);
                     // nodesContainingUnits.Add(grid[x, y]);
                 } else {
                     grid[x, y] = currentNode.SetReferences (
                         walkable, worldPoint, x, y, Node.NodeType.plains, Node.OccupiedByUnit.noUnit,
-                        possibleNodeImages[tileImageIndex]);
+                        possibleNodeImages[tileImageIndex], gridfx);
                 }
             }
         }

@@ -6,8 +6,9 @@ using UnityEngine;
 public class AI_Manager : MonoBehaviour {
 	List<Unit> ai_units = new List<Unit> ();
 	private AI_InputHandler inputHandler;
-	Command currentCommand = null;
-	float timeBetweenCommands = 5f;
+	AI_Command currentCommand = null;
+	float timeBetweenCommands = 2f;
+	float delay = 2f;
 	WorldManager worldManager;
 	AStar pathfinding;
 	GameGrid grid;
@@ -41,11 +42,12 @@ public class AI_Manager : MonoBehaviour {
 					return;
 				} else {
 					currentCommand = new AI_Ability_Command ();
-					currentCommand.execute (abil, unitToControl, targetNode, inputHandler);
+					currentCommand.execute (abil, unitToControl, targetNode, inputHandler, timeBetweenCommands);
 					StartCoroutine ("WaitForNextCommand", timeBetweenCommands);
 				}
 			} else {
-				Debug.Log ("No units availablse");
+				Debug.Log ("No units available");
+				StartCoroutine ("WaitForNextCommand", timeBetweenCommands);
 			}
 		}
 	}
@@ -56,14 +58,16 @@ public class AI_Manager : MonoBehaviour {
 		PathRequestManager.PathRequest _newRequest = new PathRequestManager.PathRequest (
 			unitToControl.transform.position, targetNode.transform.position, SomeFakeCallback, SomeFakeMethod);
 		requestManager.pathRequestQueue.Enqueue (_newRequest);
-		if (requestManager.processing ()) {
+		if (requestManager.canProcessNewRequest ()) {
 			requestManager.NewPathLogic ();
+			StartCoroutine (
+				movementHandler.GeneratePathForAI (unitToControl.transform.position,
+					targetNode.transform.position, abil, unitToControl, targetNode,
+					possibleNodes, PathRequestFinishedForAI)
+			);
+		} else {
+			Debug.LogError ("i dont know what to do here");
 		}
-		StartCoroutine (
-			movementHandler.GeneratePathForAI (unitToControl.transform.position,
-				targetNode.transform.position, abil, unitToControl, targetNode,
-				possibleNodes, PathRequestFinishedForAI)
-		);
 	}
 
 	private void PathRequestFinishedForAI (
@@ -85,8 +89,8 @@ public class AI_Manager : MonoBehaviour {
 
 	private void ExecuteMovementRequest (Unit unitToControl, Node targetNode, Ability abil) {
 		currentCommand = new AI_Ability_Command ();
-		currentCommand.execute (abil, unitToControl, targetNode, inputHandler);
-		StartCoroutine ("WaitForNextCommand", timeBetweenCommands);
+		currentCommand.execute (abil, unitToControl, targetNode, inputHandler, delay);
+		StartCoroutine ("WaitForNextCommand", (timeBetweenCommands + delay));
 	}
 
 	private Node SortNodes (List<Node> possibleNodes, Ability abil) {

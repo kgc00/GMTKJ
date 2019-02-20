@@ -33,7 +33,7 @@ public class PathRequestManager : MonoBehaviour {
 
     void TryProcessNext (MovementHandler movementHandler, Unit _unit, Action<Unit> onDestReached) {
         // if we aren't already processing a request and there is a request to process...
-        if (processing ()) {
+        if (canProcessNewRequest ()) {
             NewPathLogic ();
             movementHandler.GenerateMovementPath (currentPathRequest.pathStart, currentPathRequest.pathEnd, _unit, onDestReached);
         } else {
@@ -46,7 +46,7 @@ public class PathRequestManager : MonoBehaviour {
         isProcessingPath = true;
     }
 
-    public bool processing () {
+    public bool canProcessNewRequest () {
         return !isProcessingPath && pathRequestQueue.Count > 0;
     }
 
@@ -74,6 +74,5 @@ public class PathRequestManager : MonoBehaviour {
             callback = _callback;
             onDestReached = _onDestReached;
         }
-
     }
 }

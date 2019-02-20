@@ -6,9 +6,14 @@ using UnityEngine;
 public class AI_InputHandler : MonoBehaviour {
 	UnitStateHandler unitStateHandler;
 	AbilityTargeting abilityTargeting;
+	GridEffects gridfx;
+	private Dictionary<Unit, Coroutine> currentCoroutines;
+
 	void Start () {
 		abilityTargeting = FindObjectOfType<AbilityTargeting> ().GetComponentInChildren<AbilityTargeting> ();
 		unitStateHandler = FindObjectOfType<UnitStateHandler> ().GetComponent<UnitStateHandler> ();
+		gridfx = FindObjectOfType<GridEffects> ().GetComponent<GridEffects> ();
+		currentCoroutines = new Dictionary<Unit, Coroutine> ();
 	}
 
 	public bool ValidUnitState (Unit _unit) {
@@ -18,7 +23,6 @@ public class AI_InputHandler : MonoBehaviour {
 			return false;
 		}
 	}
-
 	public void SelectUnit (Unit _selectedUnit) {
 		UnitSelectionHandler.SetSelectionForAI (_selectedUnit, Unit.SelectionState.selected, null);
 		return;
@@ -32,8 +36,11 @@ public class AI_InputHandler : MonoBehaviour {
 		SetInfoTheSecond (_unit, _ability, _targetNode);
 	}
 
-	public void PlanAction (Unit _unit, Ability _ability) {
+	public void PlanAction (Unit _unit, Ability _ability, Node targetNode) {
 		_ability.OnCalled (_unit);
+		List<Node> nodeList = new List<Node> ();
+		nodeList.Add (targetNode);
+		gridfx.RenderSelectorHighlights (nodeList, _unit);
 	}
 
 	private void SetInfoTheSecond (Unit unit, Ability ability, Node targetNode) {
@@ -67,4 +74,20 @@ public class AI_InputHandler : MonoBehaviour {
 		unitStateHandler.curAIAbil.OnCommited (selectedUnit);
 	}
 
+	internal void HandleExecution (Unit unit, Ability ability, float delay) {
+		if (currentCoroutines.ContainsKey (unit)) {
+			StopCoroutine (currentCoroutines[unit]);
+			currentCoroutines.Remove (unit);
+		}
+		Coroutine thisCoroutine = StartCoroutine (DelayExecution (() => InitiateAbility (unit, ability), delay));
+		currentCoroutines.Add (unit, thisCoroutine);
+	}
+
+	private IEnumerator DelayExecution (
+		Action callback,
+		float timeToWait) {
+		yield return new WaitForSeconds (timeToWait);
+		callback ();
+		yield break;
+	}
 }
