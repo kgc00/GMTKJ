@@ -83,7 +83,10 @@ public class GridEffects : MonoBehaviour {
         foreach (Node node in _nodesToHighlight) {
             allSelections[_unit][_arrayCount] = node.gameObject;
             allSelections[_unit][_arrayCount].transform.Find (_name).gameObject.SetActive (true);
-            node.ToggleAnimation (node.gameObject.transform.Find (_name).GetComponent<SpriteRenderer> ());
+            if (!allActiveSelections.Contains (node.gameObject)) {
+                node.ToggleAnimation (node.gameObject.transform.Find (_name).GetComponent<SpriteRenderer> ());
+
+            }
             allActiveSelections.Add (node.gameObject);
             _arrayCount++;
         }
@@ -173,7 +176,9 @@ public class GridEffects : MonoBehaviour {
                     .Select (x => x.Key);
                 // if so, remove them from set, but don't disable the highlights
                 foreach (GameObject _tileGameObject in allSelections[_unit]) {
-                    if (duplicates.Contains (_tileGameObject)) { } else {
+                    if (duplicates.Contains (_tileGameObject)) {
+                        // do nothing?
+                    } else {
                         if (_tileGameObject.transform.Find (movementName).gameObject.activeInHierarchy) {
                             Node node = _tileGameObject.GetComponent<Node> ();
                             node.GetComponent<Node> ().ToggleAnimation (node.gameObject.transform.Find (movementName).GetComponent<SpriteRenderer> ());
