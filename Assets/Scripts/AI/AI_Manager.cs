@@ -130,8 +130,29 @@ public class AI_Manager : MonoBehaviour {
 				movementAbilityToUse = ability;
 			}
 			if (ability.abilityInfo.attackRange >= distanceFromTarget) {
-				inAttackRange = true;
-				attackAbilityToUse = ability;
+				switch (ability.abilityInfo.targetingBehavior) {
+					case Ability.TargetingBehavior.line:
+						// if it is line targeting, we need to be directly facing the target
+						if (grid.NodeFromWorldPosition (
+								unitToControl.transform.position
+							).transform.position.x ==
+							targetNode.transform.position.x ||
+							grid.NodeFromWorldPosition (
+								unitToControl.transform.position
+							).transform.position.y ==
+							targetNode.transform.position.y
+						) {
+							inAttackRange = true;
+							attackAbilityToUse = ability;
+						}
+						break;
+					case Ability.TargetingBehavior.square:
+						inAttackRange = true;
+						attackAbilityToUse = ability;
+						break;
+					default:
+						break;
+				}
 			}
 		}
 		// Debug.Log (attackAbilityToUse + " " + movementAbilityToUse);
