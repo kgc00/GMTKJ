@@ -23,7 +23,6 @@ public class AI_Manager : MonoBehaviour {
 		movementHandler = FindObjectOfType<MovementHandler> ().GetComponent<MovementHandler> ();
 		requestManager = FindObjectOfType<PathRequestManager> ().GetComponent<PathRequestManager> ();
 		if (ai_units.Count > 0) {
-			// StartManagerCommands ();
 			StartCoroutine ("WaitForNextCommand", timeBetweenCommands);
 		}
 	}
@@ -67,6 +66,7 @@ public class AI_Manager : MonoBehaviour {
 			);
 		} else {
 			Debug.LogError ("i dont know what to do here");
+			StartCoroutine ("WaitForNextCommand", timeBetweenCommands);
 		}
 	}
 

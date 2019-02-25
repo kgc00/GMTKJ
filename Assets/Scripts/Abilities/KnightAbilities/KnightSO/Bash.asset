@@ -15,7 +15,11 @@ MonoBehaviour:
     attackPower: 2
     attackRange: 1
     cooldownTime: 2
-    abilityIcon: {fileID: 21300000, guid: 0b703b998fd3e5a4bb05e52977a25e67, type: 3}
+    abilityIcon: {fileID: 21300006, guid: 11720765206fde44eb7a92279862a5a0, type: 3}
     targetingBehavior: 1
     abilityType: 0
-    nodesInAbilityRange: []
+    nodesInAbilityRange:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}

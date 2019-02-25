@@ -164,7 +164,7 @@ public class GridEffects : MonoBehaviour {
     }
 
     public void ClearHighlights (Unit _unit) {
-        if (allSelections[_unit] != null) {
+        if (allSelections.ContainsKey (_unit)) {
             // better way to check?
             if (allSelections[_unit][0] != null) {
                 // make giant set

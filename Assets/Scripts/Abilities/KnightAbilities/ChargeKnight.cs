@@ -18,6 +18,7 @@ public class ChargeKnight : MovementAbility {
 
     public override void OnCalled (Unit unit) {
         SetRefs (unit);
+        unit.SetCurrentAbility (this);
         abilityInfo.nodesInAbilityRange = abilityTargeting.InitiateAbilityTargeting (unit, this);
         gridFX.InitiateAbilityHighlights (unit, abilityInfo.nodesInAbilityRange);
     }

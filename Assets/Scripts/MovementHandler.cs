@@ -54,6 +54,7 @@ public class MovementHandler : MonoBehaviour {
 
         if (startNode.walkable && targetNode.walkable && startNode != targetNode) {
             // if there is a null error, set current ability for unit in the oncalled method of the ability
+            Debug.Log (_unit.currentAbility);
             pathSuccess = aStar.PathFindingLogic (
                 pathSuccess,
                 startNode,

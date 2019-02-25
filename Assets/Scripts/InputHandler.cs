@@ -21,6 +21,9 @@ public class InputHandler : MonoBehaviour {
     }
 
     void Update () {
+        if (Input.GetKeyDown (KeyCode.O)) {
+            FindObjectOfType<LevelManager> ().GetComponent<LevelManager> ().ProgressGame ("2");
+        }
         if (WorldManager.instance.ReturnUnitSelected ()) {
             if (WorldManager.ReturnSelectedPlayerUnit () != selectedUnit) {
                 selectedUnit = WorldManager.ReturnSelectedPlayerUnit ();

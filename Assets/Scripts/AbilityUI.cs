@@ -12,19 +12,24 @@ public class AbilityUI : MonoBehaviour {
     private AnimationClip[] clips;
 
     void Start () {
+        if (abilityImages == null) {
+            Debug.Log ("we null");
+        }
         UnitSelectionHandler.onUnitSelectedByPlayer += PopulateAbilityPanel;
         StopAnimations ();
     }
 
     private void StopAnimations () {
-        foreach (Image panel in abilityImages) {
-            panel.GetComponent<Animation> ().Stop ();
+        foreach (Image image in abilityImages) {
+            image.GetComponent<Animation> ().Stop ();
         }
     }
 
     public void PopulateAbilityPanel (Unit _unit) {
         List<Ability> abilities = _unit.GetComponent<AbilityManager> ().ReturnEquippedAbilities ();
+        Debug.Log (abilities);
         for (int i = 0; i < abilities.Count; i++) {
+            Debug.Log (abilityImages);
             if (i <= abilityImages.Count) {
                 abilityImages[i].sprite = abilities[i].abilityInfo.abilityIcon;
                 abilityImages[i].color = Color.white;
