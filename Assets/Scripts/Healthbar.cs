@@ -49,15 +49,12 @@ public class Healthbar : MonoBehaviour {
             newTotal = 0;
         }
         HealthFillInfo info = new HealthFillInfo (newTotal, currentHealth, unit);
-        Debug.Log ("total: " + newTotal + "health: " + currentHealth + "unit: " + unit);
-        Debug.Log (info.unit.transform.Find ("Health Canvas/Health Foreground").GetComponent<Image> ());
         Coroutine thisCoroutine = StartCoroutine ("AnimateHealthBar", info);
         CoroutineInfo coroutineInfo = new CoroutineInfo (info, thisCoroutine);
         currentCoroutines.Add (unit, coroutineInfo);
     }
 
     private IEnumerator AnimateHealthBar (HealthFillInfo info) {
-        Debug.Log ("in corotuine");
         float newTotal = info.newTotal;
         Image foregroundImage = null;
         if (info.unit.transform.Find ("Health Canvas/Health Foreground").GetComponent<Image> ()) {

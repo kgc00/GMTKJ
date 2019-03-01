@@ -7,6 +7,7 @@ public class UnitTimer : MonoBehaviour {
     private UnitStateHandler unitStateHandler;
     private UnitSelectionHandler unitSelectionHandler;
     public static event Action<Unit> onTimerStarted = delegate { };
+    public static event Action<Unit, float> onFillChange = delegate { };
     public static event Action<Unit, Unit.UnitState> onTimerStopped = delegate { };
     private Dictionary<Unit, CoroutineInfo> currentCoroutines;
     private struct CoroutineInfo {
@@ -98,6 +99,7 @@ public class UnitTimer : MonoBehaviour {
 
     private IEnumerator InitiateCooldown (TimerInfo info) {
         while (info.timeLeft > 0) {
+            SetFill (info);
             info.timeLeft -= Time.deltaTime;
             yield return null;
 
@@ -108,5 +110,10 @@ public class UnitTimer : MonoBehaviour {
         }
         ReadyUnit (info.unit);
         currentCoroutines.Remove (info.unit);
+    }
+
+    private void SetFill (TimerInfo info) {
+        float fillAmount = (float) info.timeLeft / info.maxTime;
+        onFillChange (info.unit, fillAmount);
     }
 }

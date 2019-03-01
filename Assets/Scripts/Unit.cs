@@ -59,7 +59,6 @@ public class Unit : MonoBehaviour, IDamageable {
     }
 
     public void TakeDamage (int incomingDamage) {
-        Debug.Log ("take damage");
         OnDamageTaken (this, currentHealth, maxHealth, incomingDamage);
         currentHealth -= incomingDamage;
         CheckForUnitDeath ();

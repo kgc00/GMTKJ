@@ -4,26 +4,42 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class TimerUI : MonoBehaviour {
+    private Dictionary<Unit, Image> timerImages;
     void Awake () {
-        // pass in an array of all units.... or call a function on unit component enabled
+        timerImages = new Dictionary<Unit, Image> ();
         UnitTimer.onTimerStarted += StartTimer;
         UnitTimer.onTimerStopped += StopTimer;
+        UnitTimer.onFillChange += SetFill;
     }
 
     private void OnDestroy () {
         UnitTimer.onTimerStarted -= StartTimer;
         UnitTimer.onTimerStopped -= StopTimer;
+        UnitTimer.onFillChange -= SetFill;
     }
 
     void StartTimer (Unit _unit) {
-        _unit.transform.Find ("Cooldown Canvas/Cooldown Image").GetComponent<Image> ().enabled = true;
+        if (!timerImages.ContainsKey (_unit)) {
+            timerImages.Add (_unit, _unit.transform.Find ("Cooldown Canvas/Cooldown Image").GetComponent<Image> ());
+        }
+        timerImages[_unit].enabled = true;
+    }
+
+    void SetFill (Unit _unit, float fillAmount) {
+        if (!timerImages.ContainsKey (_unit)) {
+            timerImages.Add (_unit, _unit.transform.Find ("Cooldown Canvas/Cooldown Image").GetComponent<Image> ());
+        }
+        Debug.Log (fillAmount);
+        timerImages[_unit].fillAmount = fillAmount;
     }
 
     void StopTimer (Unit _unit, Unit.UnitState _state) {
-        // if a unit is killed while timer is counting do it will cause an error 
-        // on recieving the action call, hopefully this fixes it
+        // check for instances where the unit dies during the timer duration
         if (_unit) {
-            _unit.transform.Find ("Cooldown Canvas/Cooldown Image").GetComponent<Image> ().enabled = false;
+            if (!timerImages.ContainsKey (_unit)) {
+                timerImages.Add (_unit, _unit.transform.Find ("Cooldown Canvas/Cooldown Image").GetComponent<Image> ());
+            }
+            timerImages[_unit].enabled = false;
         }
     }
 }
