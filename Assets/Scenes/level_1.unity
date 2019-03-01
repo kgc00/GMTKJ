@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 15796023}
   - component: {fileID: 15796025}
   m_Layer: 5
-  m_Name: Ability Two
+  m_Name: 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -566,9 +566,10 @@ GameObject:
   - component: {fileID: 320614129}
   - component: {fileID: 320614128}
   - component: {fileID: 320614127}
+  - component: {fileID: 320614131}
   m_Layer: 5
   m_Name: Canvas
-  m_TagString: Untagged
+  m_TagString: UI_Holder
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -649,6 +650,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &320614131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 320614126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe8beb4998f45b442ac269f9fdcca6a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tagToSearch: UI_Holder
 --- !u!1 &534669902
 GameObject:
   m_ObjectHideFlags: 0
@@ -1015,7 +1028,7 @@ GameObject:
   - component: {fileID: 977326751}
   - component: {fileID: 977326753}
   m_Layer: 5
-  m_Name: Ability One
+  m_Name: 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1151,7 +1164,7 @@ GameObject:
   - component: {fileID: 1134974194}
   - component: {fileID: 1134974196}
   m_Layer: 5
-  m_Name: Move
+  m_Name: 0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1460,7 +1473,7 @@ GameObject:
   - component: {fileID: 1865319283}
   - component: {fileID: 1865319285}
   m_Layer: 5
-  m_Name: Ability Three
+  m_Name: 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -40,6 +40,10 @@ public class UnitTimer : MonoBehaviour {
         UnitStateHandler.onUnitStunned += AddTimeToTimerStunned;
     }
 
+    private void OnDestroy () {
+        UnitStateHandler.onUnitStunned -= AddTimeToTimerStunned;
+    }
+
     private void AddTimeToTimerStunned (Unit unitStunned, float timeStunned) {
         // currentCoroutines.ContainsKey (unitStunned);
         // if (currentCoroutines.ContainsKey (unitStunned)) {

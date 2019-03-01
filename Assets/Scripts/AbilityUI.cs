@@ -7,16 +7,32 @@ using UnityEngine.UI;
 public class AbilityUI : MonoBehaviour {
 
     [SerializeField]
-    private List<Image> abilityImages;
+    private Image[] abilityImages;
     [SerializeField]
     private AnimationClip[] clips;
 
     void Start () {
-        if (abilityImages == null) {
-            Debug.Log ("we null");
-        }
+        AssignImages ();
+        ResetAbilityPanelImages ();
         UnitSelectionHandler.onUnitSelectedByPlayer += PopulateAbilityPanel;
+        UnitSelectionHandler.onUnitUnselectedByPlayer += ResetAbilityPanelImages;
         StopAnimations ();
+    }
+
+    private void OnDestroy () {
+        UnitSelectionHandler.onUnitSelectedByPlayer -= PopulateAbilityPanel;
+        UnitSelectionHandler.onUnitUnselectedByPlayer -= ResetAbilityPanelImages;
+    }
+
+    private void AssignImages () {
+        abilityImages = new Image[4];
+        for (int i = 0; i < abilityImages.Length; i++) {
+            abilityImages[i] = GameObject.FindWithTag ("UI_Holder")
+                .transform.Find ("Ability Holder")
+                .transform.Find (i.ToString ())
+                .GetComponent<Image> ();
+
+        }
     }
 
     private void StopAnimations () {
@@ -25,12 +41,17 @@ public class AbilityUI : MonoBehaviour {
         }
     }
 
+    public void ResetAbilityPanelImages (Unit _unit = null) {
+        foreach (Image image in abilityImages) {
+            image.sprite = null;
+            image.color = Color.white;
+            image.enabled = true;
+        }
+    }
     public void PopulateAbilityPanel (Unit _unit) {
         List<Ability> abilities = _unit.GetComponent<AbilityManager> ().ReturnEquippedAbilities ();
-        Debug.Log (abilities);
         for (int i = 0; i < abilities.Count; i++) {
-            Debug.Log (abilityImages);
-            if (i <= abilityImages.Count) {
+            if (i <= abilityImages.Length) {
                 abilityImages[i].sprite = abilities[i].abilityInfo.abilityIcon;
                 abilityImages[i].color = Color.white;
                 abilityImages[i].enabled = true;

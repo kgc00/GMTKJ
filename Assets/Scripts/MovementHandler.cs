@@ -66,7 +66,7 @@ public class MovementHandler : MonoBehaviour {
         if (pathSuccess) {
             waypoints = RetracePath (startNode, targetNode, _unit);
         } else {
-            Debug.Log ("Unable to reach target within alotted range.");
+            requestManager.FinishedProcessingPath (waypoints, pathSuccess, _unit, onDestReached, this);
         }
         requestManager.FinishedProcessingPath (waypoints, pathSuccess, _unit, onDestReached, this);
     }

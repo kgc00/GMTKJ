@@ -29,6 +29,11 @@ public class GridEffects : MonoBehaviour {
         allActiveSelections = new List<GameObject> ();
     }
 
+    private void OnDestroy () {
+        UnitStateHandler.onUnitActing -= ClearHighlightsParser;
+        GameGrid.requestingHighlights -= SpawnHighlightsForNode;
+    }
+
     private void Update () {
         masterAlphaValue = Mathf.PingPong (Time.time, 0.8f);
     }

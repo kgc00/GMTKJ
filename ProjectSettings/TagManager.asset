@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Enemy
   - PlayerCharacter
+  - UI_Holder
+  - AI_Stuff
   layers:
   - Default
   - TransparentFX
@@ -20,7 +22,7 @@ TagManager:
   - Enemy
   - Ally
   - Terrain
-  - 
+  - UI_Holder
   - 
   - 
   - 

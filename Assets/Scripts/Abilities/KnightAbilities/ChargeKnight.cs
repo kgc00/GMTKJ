@@ -48,11 +48,11 @@ public class ChargeKnight : MovementAbility {
 
     public override void OnDestinationReached (Unit unit) { }
     public void SetNodesTraveled (List<Node> nodes) {
-        Debug.Log ("charge passed in: " + nodes.Count);
+        // Debug.Log ("charge passed in: " + nodes.Count);
         if (nodes[0]) {
             nodesTraveled = nodes;
             if (nodesTraveled.Count >= 2) {
-                Debug.Log ("charge passed in: " + nodesTraveled.Count);
+                // Debug.Log ("charge passed in: " + nodesTraveled.Count);
                 nodeBeforeCollision = nodesTraveled[nodesTraveled.Count - 2];
             } else {
                 // Debug.Log ("nodes count: " + nodesTraveled.Count + ".  0: " + nodesTraveled[0]);

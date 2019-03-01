@@ -13,6 +13,10 @@ public class UnitSelectionHandler : MonoBehaviour {
         UnitStateHandler.onUnitActing += UnselectedParser;
     }
 
+    private void OnDestroy () {
+        UnitStateHandler.onUnitActing -= UnselectedParser;
+    }
+
     public static void SetSelectionForPlayer (Unit _unit, Unit.SelectionState _selectionState, Ability curAbil) {
         _unit.currentSelectionState = _selectionState;
         switch (_selectionState) {

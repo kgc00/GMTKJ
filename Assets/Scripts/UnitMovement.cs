@@ -24,6 +24,10 @@ public class UnitMovement : MonoBehaviour {
         WorldManager.onRequestGridState += ReturnDisplayGrid;
     }
 
+    private void OnDestroy () {
+        WorldManager.onRequestGridState += ReturnDisplayGrid;
+    }
+
     public void CommitMovement (Vector3 startPos,
         Vector3 targetPos, Unit _unit, Action<Unit> onDestReached) {
         StoreTargetInfo (startPos, targetPos);

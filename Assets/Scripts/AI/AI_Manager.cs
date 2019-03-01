@@ -9,6 +9,7 @@ public class AI_Manager : MonoBehaviour {
 	AI_Command currentCommand = null;
 	float timeBetweenCommands = 2f;
 	float delay = 2f;
+	float delay_short = 1f;
 	WorldManager worldManager;
 	AStar pathfinding;
 	GameGrid grid;
@@ -91,6 +92,11 @@ public class AI_Manager : MonoBehaviour {
 		currentCommand = new AI_Ability_Command ();
 		currentCommand.execute (abil, unitToControl, targetNode, inputHandler, delay);
 		StartCoroutine ("WaitForNextCommand", (timeBetweenCommands + delay));
+	}
+
+	public void ResetAICommands () {
+		currentCommand = new AI_Ability_Command ();
+		StartCoroutine ("WaitForNextCommand", (timeBetweenCommands + delay_short));
 	}
 
 	private Node SortNodes (List<Node> possibleNodes, Ability abil) {

@@ -10,6 +10,12 @@ public class SelectionUnitUI : MonoBehaviour {
         UnitStateHandler.onUnitActing += HideSelectionParser;
     }
 
+    private void OnDestroy () {
+        UnitSelectionHandler.onUnitSelectedByPlayer -= ShowSelection;
+        UnitSelectionHandler.onUnitUnselectedByPlayer -= HideSelection;
+        UnitStateHandler.onUnitActing -= HideSelectionParser;
+    }
+
     void Start () {
 
     }

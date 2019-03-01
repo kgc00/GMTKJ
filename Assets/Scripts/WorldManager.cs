@@ -44,6 +44,14 @@ public class WorldManager : MonoBehaviour {
         AlignUnitsToGrid (allUnits);
     }
 
+    private void OnDestroy () {
+        UnitSelectionHandler.onUnitSelectedByPlayer -= UnitSelectedByPlayer;
+        UnitSelectionHandler.onUnitSelectedByPlayer -= DeselectOtherPlayerUnits;
+        UnitSelectionHandler.onUnitUnselectedByPlayer -= SetNoPlayerUnitsSelected;
+        UnitStateHandler.onUnitActing -= SetNoUnitsSelected;
+        Unit.OnUnitDeath -= RemoveUnitFromList;
+    }
+
     private void AlignUnitsToGrid (List<Unit> allUnits) {
         GameGrid grid = GameGrid.instance;
         foreach (Unit unit in allUnits) {

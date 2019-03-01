@@ -50,7 +50,6 @@ public class Unit : MonoBehaviour, IDamageable {
         colDet.enabled = false;
 
     }
-
     protected void UnitDeath () {
         this.GetComponentInChildren<MeshRenderer> ().enabled = false;
         this.GetComponentInChildren<BoxCollider> ().enabled = false;
@@ -60,6 +59,7 @@ public class Unit : MonoBehaviour, IDamageable {
     }
 
     public void TakeDamage (int incomingDamage) {
+        Debug.Log ("take damage");
         OnDamageTaken (this, currentHealth, maxHealth, incomingDamage);
         currentHealth -= incomingDamage;
         CheckForUnitDeath ();

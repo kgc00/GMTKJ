@@ -8,11 +8,13 @@ public class AI_InputHandler : MonoBehaviour {
 	AbilityTargeting abilityTargeting;
 	GridEffects gridfx;
 	private Dictionary<Unit, Coroutine> currentCoroutines;
+	AI_Manager ai_Manager;
 
 	void Start () {
 		abilityTargeting = FindObjectOfType<AbilityTargeting> ().GetComponentInChildren<AbilityTargeting> ();
 		unitStateHandler = FindObjectOfType<UnitStateHandler> ().GetComponent<UnitStateHandler> ();
 		gridfx = FindObjectOfType<GridEffects> ().GetComponent<GridEffects> ();
+		ai_Manager = FindObjectOfType<AI_Manager> ().GetComponent<AI_Manager> ();
 		currentCoroutines = new Dictionary<Unit, Coroutine> ();
 	}
 
@@ -66,7 +68,11 @@ public class AI_InputHandler : MonoBehaviour {
 			// abilityTargeting.ValidateAbilityAI (ability);
 			CallAbility (unit);
 		} else {
-			Debug.LogError ("Wrong state");
+			Debug.Log ("Wrong state... AI unit may have died while issuing a command");
+			// remove any artifacts such as grid effects
+			gridfx.ClearHighlights (unit);
+			// restart command logic
+			ai_Manager.ResetAICommands ();
 		}
 	}
 

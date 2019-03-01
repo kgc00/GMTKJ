@@ -10,6 +10,12 @@ public class AttackHandler : MonoBehaviour {
         AbilityTargeting.onCommitToMeleeAOEAttack += HandleMeleeAOEAttack;
     }
 
+    private void OnDestroy () {
+        AbilityTargeting.onCommitToMeleeAttack -= HandleCommitToAttack;
+        AbilityTargeting.onCommitToMeleeAOEAttack -= HandleMeleeAOEAttack;
+
+    }
+
     // need to figure out how to handle extremely different cases
     private void HandleCommitToAttack (Node _targetNode, Unit _attackingUnit, Ability _abilityUsed, Unit _targetUnit) {
         if (_targetUnit) {
