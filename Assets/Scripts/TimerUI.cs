@@ -29,7 +29,6 @@ public class TimerUI : MonoBehaviour {
         if (!timerImages.ContainsKey (_unit)) {
             timerImages.Add (_unit, _unit.transform.Find ("Cooldown Canvas/Cooldown Image").GetComponent<Image> ());
         }
-        Debug.Log (fillAmount);
         timerImages[_unit].fillAmount = fillAmount;
     }
 

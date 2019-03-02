@@ -211,21 +211,41 @@ public class GameGrid : MonoBehaviour {
         List<Node> nodesWithinAttackRange = new List<Node> ();
 
         if (targetNode.worldPosition.x != startingNode.worldPosition.x) {
-            // x stuff
-            for (int x = 0; x < range; x++) {
-                int checkX = targetNode.gridX + x;
-                int checkY = targetNode.gridY;
-                if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY) {
-                    nodesWithinAttackRange.Add (grid[checkX, checkY]);
+            if (targetNode.worldPosition.x < startingNode.worldPosition.x) {
+                // x stuff
+                for (int x = 0; x < range; x++) {
+                    int checkX = targetNode.gridX - x;
+                    int checkY = targetNode.gridY;
+                    if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY) {
+                        nodesWithinAttackRange.Add (grid[checkX, checkY]);
+                    }
+                }
+            } else {
+                for (int x = 0; x < range; x++) {
+                    int checkX = targetNode.gridX + x;
+                    int checkY = targetNode.gridY;
+                    if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY) {
+                        nodesWithinAttackRange.Add (grid[checkX, checkY]);
+                    }
                 }
             }
         } else if (targetNode.worldPosition.y != startingNode.worldPosition.y) {
-            // y stuff
-            for (int y = 0; y < range; y++) {
-                int checkX = targetNode.gridX;
-                int checkY = targetNode.gridY + y;
-                if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY) {
-                    nodesWithinAttackRange.Add (grid[checkX, checkY]);
+            if (targetNode.worldPosition.y < startingNode.worldPosition.y) {
+                // y stuff
+                for (int y = 0; y < range; y++) {
+                    int checkX = targetNode.gridX;
+                    int checkY = targetNode.gridY - y;
+                    if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY) {
+                        nodesWithinAttackRange.Add (grid[checkX, checkY]);
+                    }
+                }
+            } else {
+                for (int y = 0; y < range; y++) {
+                    int checkX = targetNode.gridX;
+                    int checkY = targetNode.gridY + y;
+                    if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY) {
+                        nodesWithinAttackRange.Add (grid[checkX, checkY]);
+                    }
                 }
             }
         }

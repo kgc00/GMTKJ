@@ -46,6 +46,7 @@ public class PiercingShot : AttackAbility {
 			targetNode : grid.NodeFromWorldPosition (
 				impactPoint));
 		foreach (Node targetNode in nodesImpacted) {
+			targetNode.GetComponent<SpriteRenderer> ().enabled = false;
 			if (grid.UnitFromNode (targetNode)) {
 				OnAbilityConnected (grid.UnitFromNode (targetNode));
 			}
