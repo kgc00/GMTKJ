@@ -63,7 +63,6 @@ public class ShackleShot : AttackAbility {
 		}
 		OnAbilityConnected (unitsImpacted);
 		// spawns whatever visual special effects
-		OnFinished (owner);
 	}
 	public void OnAbilityConnected (List<Unit> unitsImpacted) {
 		int k = 0;

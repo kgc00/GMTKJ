@@ -249,7 +249,7 @@ Prefab:
     - target: {fileID: 114315249290189484, guid: e388aa35a1812b545aa81d4d21092f24,
         type: 2}
       propertyPath: faction
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1671813127744452, guid: e388aa35a1812b545aa81d4d21092f24, type: 2}
       propertyPath: m_IsActive
