@@ -51,8 +51,7 @@ public class Unit : MonoBehaviour, IDamageable {
 
     }
     protected void UnitDeath () {
-        this.GetComponentInChildren<MeshRenderer> ().enabled = false;
-        this.GetComponentInChildren<BoxCollider> ().enabled = false;
+        this.GetComponentInChildren<SpriteRenderer> ().enabled = false;
         this.isAlive = false;
         OnUnitDeath (this);
         Destroy (gameObject, 2.0f);

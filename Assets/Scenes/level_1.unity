@@ -249,7 +249,7 @@ Prefab:
     - target: {fileID: 114315249290189484, guid: e388aa35a1812b545aa81d4d21092f24,
         type: 2}
       propertyPath: faction
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1671813127744452, guid: e388aa35a1812b545aa81d4d21092f24, type: 2}
       propertyPath: m_IsActive
@@ -1292,7 +1292,7 @@ Prefab:
     - target: {fileID: 114301645335219086, guid: 17d8cb128adf0d3429aee48f39498607,
         type: 2}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114301645335219086, guid: 17d8cb128adf0d3429aee48f39498607,
         type: 2}
