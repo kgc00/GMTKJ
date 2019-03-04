@@ -24,20 +24,29 @@ public class PathRequestManager : MonoBehaviour {
     // Our method which requests to start a new path find from AStar.  For optimization, we use callbacks
     // so that we can process these requests over multiple frames.
     public static void RequestPath (Vector3 pathStart, Vector3 _pathEnd,
-        Action<Vector3[], bool, Unit, Action<Unit>> _callback, MovementHandler _movementHandler, Unit _unit, Action<Unit> onDestReached) {
+        Action<Vector3[], bool, Unit, Action<Unit>> _callback, MovementHandler _movementHandler, Unit _unit, Action<Unit> onDestReached,
+        Action<Unit> commandFailed = null) {
         // When we receive the movement request, we create a new request and process it with enqueue/trynext
         PathRequest _newRequest = new PathRequest (pathStart, _pathEnd, _callback, onDestReached);
         instance.pathRequestQueue.Enqueue (_newRequest);
-        instance.TryProcessNext (_movementHandler, _unit, onDestReached);
+        if (commandFailed != null) {
+            instance.TryProcessNext (_movementHandler, _unit, onDestReached, commandFailed);
+        } else {
+            instance.TryProcessNext (_movementHandler, _unit, onDestReached);
+        }
     }
 
-    void TryProcessNext (MovementHandler movementHandler, Unit _unit, Action<Unit> onDestReached) {
+    void TryProcessNext (MovementHandler movementHandler, Unit _unit, Action<Unit> onDestReached,
+        Action<Unit> commandFailed = null) {
         // if we aren't already processing a request and there is a request to process...
         if (canProcessNewRequest ()) {
             NewPathLogic ();
             movementHandler.GenerateMovementPath (currentPathRequest.pathStart, currentPathRequest.pathEnd, _unit, onDestReached);
         } else {
-            Debug.Log ("cant proccess 2 requests at the same time");
+            Debug.Log ("cant proccess 2 requests at the same time: " + _unit);
+            if (_unit.faction == Unit.Faction.Enemy && commandFailed != null) {
+                commandFailed (_unit);
+            }
         }
     }
 
@@ -68,7 +77,9 @@ public class PathRequestManager : MonoBehaviour {
         public Action<Unit> onDestReached;
         public Action<Vector3[], bool, Unit, Action<Unit>> callback;
 
-        public PathRequest (Vector3 _start, Vector3 _end, Action<Vector3[], bool, Unit, Action<Unit>> _callback = null, Action<Unit> _onDestReached = null) {
+        public PathRequest (Vector3 _start, Vector3 _end,
+            Action<Vector3[], bool, Unit, Action<Unit>> _callback = null, Action<Unit> _onDestReached = null,
+            Action<Unit> commandFailed = null) {
             pathStart = _start;
             pathEnd = _end;
             callback = _callback;

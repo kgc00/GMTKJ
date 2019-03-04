@@ -38,7 +38,10 @@ public class ChargeKnight : MovementAbility {
     public void OnAbilityConnected (Unit unit) {
         attackHandler.DealDamage (unit, owner);
         SetNewUnitPosition (owner);
-        // Debug.Log ("damage has been dealt to: " + unit);
+        movementHandler.OnStopPath (
+            grid.NodeFromWorldPosition (unit.transform.position).transform.position,
+            unit);
+        // WorldManager.AlignUnitsToGrid();
     }
 
     private void SetNewUnitPosition (Unit thisUnit) {
@@ -46,7 +49,11 @@ public class ChargeKnight : MovementAbility {
         OnDestinationReached (thisUnit);
     }
 
-    public override void OnDestinationReached (Unit unit) { }
+    public override void OnDestinationReached (Unit unit) {
+        if (unit.currentUnitState != Unit.UnitState.cooldown) {
+            OnFinished (unit);
+        }
+    }
     public void SetNodesTraveled (List<Node> nodes) {
         // Debug.Log ("charge passed in: " + nodes.Count);
         if (nodes[0]) {

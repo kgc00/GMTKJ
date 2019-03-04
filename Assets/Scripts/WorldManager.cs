@@ -52,7 +52,7 @@ public class WorldManager : MonoBehaviour {
         Unit.OnUnitDeath -= RemoveUnitFromList;
     }
 
-    private void AlignUnitsToGrid (List<Unit> allUnits) {
+    public static void AlignUnitsToGrid (List<Unit> allUnits) {
         GameGrid grid = GameGrid.instance;
         foreach (Unit unit in allUnits) {
             Node unitNode = grid.NodeFromWorldPosition (unit.transform.position);

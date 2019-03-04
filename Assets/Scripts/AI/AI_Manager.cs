@@ -52,11 +52,17 @@ public class AI_Manager : MonoBehaviour {
 		}
 	}
 
+	private void RetryCommand (Unit unit) {
+		StopCoroutine ("WaitForNextCommand");
+		StartCoroutine ("WaitForNextCommand", .25f);
+		unit.currentUnitState = Unit.UnitState.idle;
+	}
+
 	private void QueryForNode (Ability abil, Unit unitToControl, Node targetNode, Unit unit) {
 		grid.ResetNodeCosts ();
 		List<Node> possibleNodes = inputHandler.ReturnPossibleNodes (abil, unitToControl, targetNode);
 		PathRequestManager.PathRequest _newRequest = new PathRequestManager.PathRequest (
-			unitToControl.transform.position, targetNode.transform.position, SomeFakeCallback, SomeFakeMethod);
+			unitToControl.transform.position, targetNode.transform.position, SomeFakeCallback, SomeFakeMethod, RetryCommand);
 		requestManager.pathRequestQueue.Enqueue (_newRequest);
 		if (requestManager.canProcessNewRequest ()) {
 			requestManager.NewPathLogic ();
