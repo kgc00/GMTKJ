@@ -39,10 +39,10 @@ public class Teleport : MovementAbility {
 			unit.transform.position = teleportLocation;
 			GameObject go = Instantiate (teleportation);
 			go.transform.transform.position = grid.NodeFromWorldPosition (abilityInfo.infoTheSecond.startPos).transform.position;
-			Destroy (go, .35f);
+			Destroy (go, .5f);
 			GameObject go2 = Instantiate (teleportation_reverse);
 			go2.transform.transform.position = nodePosition;
-			Destroy (go2, .35f);
+			Destroy (go2, .5f);
 			OnFinished (unit);
 		}
 
