@@ -18,4 +18,17 @@ MonoBehaviour:
     abilityIcon: {fileID: 21300000, guid: 569c55bba58a0c9489860ba916157a8a, type: 3}
     targetingBehavior: 0
     abilityType: 0
-    nodesInAbilityRange: []
+    nodesInAbilityRange:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  arrow: {fileID: 1466701523802072, guid: cf62d85a04e213f48b85af574fea2f9a, type: 2}

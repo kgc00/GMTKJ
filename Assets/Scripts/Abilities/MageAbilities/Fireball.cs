@@ -4,6 +4,8 @@ using UnityEngine;
 
 [CreateAssetMenu (menuName = "Ability/Mage/Fireball")]
 public class Fireball : AttackAbility {
+    [SerializeField]
+    GameObject fireball_GO;
     UnitStateHandler stateHandler;
     AbilityTargeting abilityTargeting;
     GameGrid grid;
@@ -25,15 +27,18 @@ public class Fireball : AttackAbility {
     }
 
     private void CreateProjectile (Unit unit) {
-        GameObject go = new GameObject ("fireball projectile");
-        // go.AddComponent<Sprite>();
+        GameObject go = Instantiate (fireball_GO);
         FireballProjectile fireballProjectile = go.AddComponent<FireballProjectile> ();
         SphereCollider so = go.AddComponent<SphereCollider> ();
         so.isTrigger = true;
         so.radius = .25f;
-        go.transform.transform.position = abilityInfo.infoTheSecond.startPos;
-
+        go.transform.position = abilityInfo.infoTheSecond.startPos;
+        Vector3 diff = abilityInfo.infoTheSecond.targetPos - abilityInfo.infoTheSecond.startPos;
+        diff.Normalize ();
+        float rot_z = Mathf.Atan2 (diff.y, diff.x) * Mathf.Rad2Deg;
+        go.transform.rotation = Quaternion.Euler (0f, 0f, rot_z);
         fireballProjectile.FireProjectile (abilityInfo.infoTheSecond.startPos, abilityInfo.infoTheSecond.targetPos, unit, Explode);
+        OnFinished (owner);
     }
 
     public void Explode (Node node) {
@@ -46,7 +51,7 @@ public class Fireball : AttackAbility {
             }
         }
         // spawns whatever visual special effects
-        OnFinished (owner);
+
     }
 
     public override void OnAbilityConnected (Unit targetedUnit) {

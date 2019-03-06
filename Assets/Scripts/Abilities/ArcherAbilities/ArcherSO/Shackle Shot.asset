@@ -18,7 +18,20 @@ MonoBehaviour:
     abilityIcon: {fileID: 21300004, guid: 569c55bba58a0c9489860ba916157a8a, type: 3}
     targetingBehavior: 0
     abilityType: 0
-    nodesInAbilityRange: []
+    nodesInAbilityRange:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  shackle: {fileID: 1900985217661752, guid: 800d12e46350fb34587cf51c4902f4ce, type: 2}
   targetRadius: 3
   stunLengthFull: 3
   stunLengthShort: 1

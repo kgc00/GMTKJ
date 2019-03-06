@@ -55,9 +55,13 @@ public class GridEffects : MonoBehaviour {
         _pathHighlightGO.transform.localPosition = new Vector3 (0, 0, 0);
         SpriteRenderer _pathSpriteRenderer = _pathHighlightGO.GetComponent<SpriteRenderer> ();
         _pathSpriteRenderer.sprite = this.pathHighlight;
+        _pathSpriteRenderer.color = new Color (
+            _pathSpriteRenderer.color.r,
+            _pathSpriteRenderer.color.g,
+            _pathSpriteRenderer.color.b,
+            .75f);
         _pathSpriteRenderer.sortingOrder = 2;
         _pathHighlightGO.name = pathName;
-        _pathHighlightGO.GetComponent<Animation> ().enabled = false;
 
         _movementHighlightGO.SetActive (false);
         _attackHighlightGO.SetActive (false);

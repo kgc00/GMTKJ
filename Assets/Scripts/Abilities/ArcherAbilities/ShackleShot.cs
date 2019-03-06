@@ -4,7 +4,8 @@ using UnityEngine;
 
 [CreateAssetMenu (menuName = "Ability/Archer/ShackleShot")]
 public class ShackleShot : AttackAbility {
-
+	[SerializeField]
+	GameObject shackle;
 	UnitStateHandler stateHandler;
 	AbilityTargeting abilityTargeting;
 	GameGrid grid;
@@ -34,13 +35,16 @@ public class ShackleShot : AttackAbility {
 		OnFinished (owner);
 	}
 	private void CreateProjectile (Unit unit) {
-		GameObject go = new GameObject ("shackle shot");
-		// go.AddComponent<Sprite>();
+		GameObject go = Instantiate (shackle);
 		ShackleProjectile shackleProjectile = go.AddComponent<ShackleProjectile> ();
 		SphereCollider so = go.AddComponent<SphereCollider> ();
 		so.isTrigger = true;
 		so.radius = .25f;
-		go.transform.transform.position = abilityInfo.infoTheSecond.startPos;
+		go.transform.position = abilityInfo.infoTheSecond.startPos;
+		Vector3 diff = abilityInfo.infoTheSecond.targetPos - abilityInfo.infoTheSecond.startPos;
+		diff.Normalize ();
+		float rot_z = Mathf.Atan2 (diff.y, diff.x) * Mathf.Rad2Deg;
+		go.transform.rotation = Quaternion.Euler (0f, 0f, rot_z);
 
 		shackleProjectile.FireProjectile (abilityInfo.infoTheSecond.startPos, abilityInfo.infoTheSecond.targetPos, unit, Impact);
 	}
