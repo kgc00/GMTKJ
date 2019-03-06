@@ -4,7 +4,10 @@ using UnityEngine;
 
 [CreateAssetMenu (menuName = "Ability/Mage/Teleport")]
 public class Teleport : MovementAbility {
-
+	[SerializeField]
+	GameObject teleportation;
+	[SerializeField]
+	GameObject teleportation_reverse;
 	UnitStateHandler stateHandler;
 	AbilityTargeting abilityTargeting;
 	GameGrid grid;
@@ -19,17 +22,30 @@ public class Teleport : MovementAbility {
 	}
 
 	public override void OnCommited (Unit unit) {
-		unit.SetCurrentAbility (this);
-		stateHandler.SetUnitState (owner, Unit.UnitState.acting);
-		unit.GetComponent<AbilityManager> ().AnimateAbilityUse (abilityInfo.infoTheSecond.slot);
 		var nodePosition = grid.NodeFromWorldPosition (abilityInfo.infoTheSecond.targetPos).transform.position;
 		var teleportLocation = new Vector3 (
 			nodePosition.x,
 			nodePosition.y,
 			unit.transform.position.z);
-		unit.transform.position = teleportLocation;
-		OnFinished (unit);
-		// vfx
+
+		bool nodeHasUnit = grid.UnitFromNode (grid.NodeFromWorldPosition (abilityInfo.infoTheSecond.targetPos));
+		bool nodeIsNotWalkable = !grid.NodeFromWorldPosition (abilityInfo.infoTheSecond.startPos).walkable;
+		if (nodeHasUnit || nodeIsNotWalkable) {
+			return;
+		} else {
+			unit.SetCurrentAbility (this);
+			stateHandler.SetUnitState (owner, Unit.UnitState.acting);
+			unit.GetComponent<AbilityManager> ().AnimateAbilityUse (abilityInfo.infoTheSecond.slot);
+			unit.transform.position = teleportLocation;
+			GameObject go = Instantiate (teleportation);
+			go.transform.transform.position = grid.NodeFromWorldPosition (abilityInfo.infoTheSecond.startPos).transform.position;
+			Destroy (go, .35f);
+			GameObject go2 = Instantiate (teleportation_reverse);
+			go2.transform.transform.position = nodePosition;
+			Destroy (go2, .35f);
+			OnFinished (unit);
+		}
+
 	}
 	public override void OnDestinationReached (Unit unit) {
 

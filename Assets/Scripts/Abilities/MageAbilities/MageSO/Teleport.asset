@@ -31,3 +31,7 @@ MonoBehaviour:
     - {fileID: 0}
     - {fileID: 0}
     - {fileID: 0}
+  teleportation: {fileID: 1518136585594610, guid: 6d7c5ca3fa00ce84684559f24f0e9183,
+    type: 2}
+  teleportation_reverse: {fileID: 1518136585594610, guid: 0599039622a172f439ff18c4917c5cd6,
+    type: 2}
