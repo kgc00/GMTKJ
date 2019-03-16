@@ -41,12 +41,15 @@ public class ShackleShot : AttackAbility {
 		so.isTrigger = true;
 		so.radius = .25f;
 		go.transform.position = abilityInfo.infoTheSecond.startPos;
-		Vector3 diff = abilityInfo.infoTheSecond.targetPos - abilityInfo.infoTheSecond.startPos;
+		Vector3 diff =
+			grid.NodeFromWorldPosition (abilityInfo.infoTheSecond.targetPos).transform.position -
+			abilityInfo.infoTheSecond.startPos;
 		diff.Normalize ();
 		float rot_z = Mathf.Atan2 (diff.y, diff.x) * Mathf.Rad2Deg;
 		go.transform.rotation = Quaternion.Euler (0f, 0f, rot_z);
 
-		shackleProjectile.FireProjectile (abilityInfo.infoTheSecond.startPos, abilityInfo.infoTheSecond.targetPos, unit, Impact);
+		shackleProjectile.FireProjectile (abilityInfo.infoTheSecond.startPos,
+			grid.NodeFromWorldPosition (abilityInfo.infoTheSecond.targetPos).transform.position, unit, Impact);
 	}
 	public void Impact (Vector3 impactPoint) {
 		List<Node> nodesImpacted = grid.GetAOEExtendingRange (
