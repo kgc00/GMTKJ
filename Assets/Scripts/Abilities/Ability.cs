@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu (menuName = "Ability/Ability")]
 public abstract class Ability : ScriptableObject {
     public AbilityInfo abilityInfo;
     public enum TargetingBehavior {

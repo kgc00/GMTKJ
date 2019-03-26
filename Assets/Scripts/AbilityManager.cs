@@ -12,7 +12,6 @@ public class AbilityManager : MonoBehaviour {
     //
     // All logic for the abilities will be on the abilities themselves.
 
-    // private AbilityUI ui;
     [SerializeField]
     List<Ability> equippedAbilities;
     [SerializeField]

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60e13bce4217b3a40bf0dcfc83cbb20c, type: 3}
+  m_Name: Fly
+  m_EditorClassIdentifier: 
+  abilityInfo:
+    attackPower: 0
+    attackRange: 4
+    cooldownTime: 1
+    abilityIcon: {fileID: 0}
+    targetingBehavior: 1
+    abilityType: 0
+    nodesInAbilityRange: []

@@ -1,24 +1,21 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu (menuName = "Ability/Knight/ChargeKnight")]
-public class ChargeKnight : MovementAbility {
+[CreateAssetMenu (menuName = "Ability/Enemy/Bat/Fly")]
+public class Fly : MovementAbility {
+
     UnitStateHandler stateHandler;
     AbilityTargeting abilityTargeting;
     GameGrid grid;
     GridEffects gridFX;
     UnitMovement unitMovement;
-    AttackHandler attackHandler;
     MovementHandler movementHandler;
-    List<Node> nodesTraveled;
-    Node nodeBeforeCollision;
     UnitTimer timer;
     Unit owner;
 
     public override void OnCalled (Unit unit) {
         SetRefs (unit);
-        unit.SetCurrentAbility (this);
         abilityInfo.nodesInAbilityRange = abilityTargeting.InitiateAbilityTargeting (unit, this);
         gridFX.InitiateAbilityHighlights (unit, abilityInfo.nodesInAbilityRange);
     }
@@ -26,54 +23,26 @@ public class ChargeKnight : MovementAbility {
     public override void OnCommited (Unit unit) {
         unit.SetCurrentAbility (this);
         stateHandler.SetUnitState (owner, Unit.UnitState.acting);
-        unitMovement.CommitMovement (abilityInfo.infoTheSecond.startPos,
+        unitMovement.CommitMovement (
+            abilityInfo.infoTheSecond.startPos,
             abilityInfo.infoTheSecond.targetPos,
             owner,
-            OnFinished
+            OnDestinationReached
         );
-        owner.EnableDetWithAlerts (OnAbilityConnected, SetNodesTraveled);
-        unit.GetComponent<AbilityManager> ().AnimateAbilityUse (abilityInfo.infoTheSecond.slot);
-    }
 
-    public void OnAbilityConnected (Unit unit) {
-        attackHandler.DealDamage (unit, owner);
-        SetNewUnitPosition (owner);
-        movementHandler.OnStopPath (
-            grid.NodeFromWorldPosition (unit.transform.position).transform.position,
-            unit);
-        // WorldManager.AlignUnitsToGrid();
-    }
-
-    private void SetNewUnitPosition (Unit thisUnit) {
-        movementHandler.OnStopPath (nodeBeforeCollision.transform.position, thisUnit);
-        OnDestinationReached (thisUnit);
+        // AI only, no need for animation.  Keeping it here just in case
+        // unit.GetComponent<AbilityManager> ().AnimateAbilityUse (abilityInfo.infoTheSecond.slot);
     }
 
     public override void OnDestinationReached (Unit unit) {
-        if (unit.currentUnitState != Unit.UnitState.cooldown) {
-            OnFinished (unit);
-        }
-    }
-    public void SetNodesTraveled (List<Node> nodes) {
-        // Debug.Log ("charge passed in: " + nodes.Count);
-        if (nodes[0]) {
-            nodesTraveled = nodes;
-            if (nodesTraveled.Count >= 2) {
-                // Debug.Log ("charge passed in: " + nodesTraveled.Count);
-                nodeBeforeCollision = nodesTraveled[nodesTraveled.Count - 2];
-            } else {
-                // Debug.Log ("nodes count: " + nodesTraveled.Count + ".  0: " + nodesTraveled[0]);
-                nodeBeforeCollision = nodesTraveled[0];
-            }
-        }
+        OnFinished (unit);
     }
 
     public override void OnFinished (Unit unit) {
         unit.SetCurrentAbility (null);
-        unit.DisableDet (this);
         stateHandler.SetUnitState (unit, Unit.UnitState.cooldown);
         timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
-        // Debug.Log ("onFinished was called");
+        Debug.Log ("onFinished was called");
     }
 
     private void SetRefs (Unit unit) {
@@ -82,9 +51,6 @@ public class ChargeKnight : MovementAbility {
         }
         if (!abilityTargeting) {
             abilityTargeting = FindObjectOfType<AbilityTargeting> ().GetComponent<AbilityTargeting> ();
-        }
-        if (!attackHandler) {
-            attackHandler = FindObjectOfType<AttackHandler> ().GetComponent<AttackHandler> ();
         }
         if (!unitMovement) {
             unitMovement = FindObjectOfType<UnitMovement> ().GetComponent<UnitMovement> ();

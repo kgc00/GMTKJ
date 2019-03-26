@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 // Generates and stores all nodes
@@ -355,9 +356,13 @@ public class GameGrid : MonoBehaviour {
 
     public Unit UnitFromNode (Node _selectedNode) {
         Unit affectedUnit = null;
-        Collider[] hitColliders = Physics.OverlapSphere (_selectedNode.worldPosition, nodeRadius / 2, allyMask);
+        Collider[] allyColliders = Physics.OverlapSphere (_selectedNode.worldPosition, nodeRadius / 2, allyMask);
+        Collider[] enemyColliders = Physics.OverlapSphere (_selectedNode.worldPosition, nodeRadius / 2, enemyMask);
+        var hitColliders = allyColliders.Select (x => x).Concat (enemyColliders.Select (x => x));
         foreach (Collider collider in hitColliders) {
+
             affectedUnit = collider.gameObject.GetComponentInParent<Unit> ();
+            Debug.Log (collider.transform.parent);
             if (affectedUnit != null) {
                 return affectedUnit;
             }

@@ -88,7 +88,7 @@ public class AI_Manager : MonoBehaviour {
 	}
 
 	private void FinishExecution (Ability abil, Unit unitToControl, Node targetNode, Node newTarget) {
-		if (newTarget != null) {
+		if (newTarget != null && unitToControl.isAlive) {
 			// newTarget.GetComponent<SpriteRenderer> ().enabled = false;
 			ExecuteMovementRequest (unitToControl, newTarget, abil);
 		}

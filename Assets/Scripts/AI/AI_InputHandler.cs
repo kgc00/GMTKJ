@@ -64,7 +64,7 @@ public class AI_InputHandler : MonoBehaviour {
 	}
 
 	public void InitiateAbility (Unit unit, Ability ability) {
-		if (unit.currentUnitState == Unit.UnitState.planningAction) {
+		if (unit.currentUnitState == Unit.UnitState.planningAction && unit.isAlive) {
 			// abilityTargeting.ValidateAbilityAI (ability);
 			CallAbility (unit);
 		} else {
