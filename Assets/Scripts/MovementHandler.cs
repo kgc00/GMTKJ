@@ -13,9 +13,10 @@ public class MovementHandler : MonoBehaviour {
     private Dictionary<Unit, Vector3[]> pathDictionary;
     UnitStateHandler unitStateHandler;
     UnitMovement unitMovement;
-    private int targetIndex;
+    private Dictionary<Unit, int> targetIndexDictionary;
     private float speed = 5f;
-    private Dictionary<Unit, Coroutine> currentCoroutines;
+    private Dictionary<Unit, Coroutine> currentGeneratePathCoroutines;
+    private Dictionary<Unit, Coroutine> currentFollowPathCoroutines;
 
     void Start () {
         grid = GameGrid.instance;
@@ -25,23 +26,25 @@ public class MovementHandler : MonoBehaviour {
         unitMovement = FindObjectOfType<UnitMovement> ().GetComponent<UnitMovement> ();
         inputHandler = FindObjectOfType<InputHandler> ().GetComponent<InputHandler> ();
         unitStateHandler = FindObjectOfType<UnitStateHandler> ().GetComponent<UnitStateHandler> ();
-        currentCoroutines = new Dictionary<Unit, Coroutine> ();
+        currentGeneratePathCoroutines = new Dictionary<Unit, Coroutine> ();
+        currentFollowPathCoroutines = new Dictionary<Unit, Coroutine> ();
         pathDictionary = new Dictionary<Unit, Vector3[]> ();
+        targetIndexDictionary = new Dictionary<Unit, int> ();
     }
 
     public void StartMovementPathLogic (Unit _unit,
         Action<Unit> onDestReached
     ) {
-        if (currentCoroutines.ContainsKey (_unit)) {
-            StopCoroutine (currentCoroutines[_unit]);
-            currentCoroutines.Remove (_unit);
+        if (currentGeneratePathCoroutines.ContainsKey (_unit)) {
+            StopCoroutine (currentGeneratePathCoroutines[_unit]);
+            currentGeneratePathCoroutines.Remove (_unit);
         }
         targetInfo = unitMovement.PassTargetInfo ();
         Coroutine currentRoutine = StartCoroutine (
             GenerateMovementPath (targetInfo.startingPoint,
                 targetInfo.targetPoint, _unit, onDestReached)
         );
-        currentCoroutines.Add (_unit, currentRoutine);
+        currentGeneratePathCoroutines.Add (_unit, currentRoutine);
         MoveUnit (_unit, onDestReached);
     }
 
@@ -120,30 +123,40 @@ public class MovementHandler : MonoBehaviour {
             }
             pathDictionary.Add (_unit, newPath);
 
-            targetIndex = 0;
-            if (currentCoroutines.ContainsKey (_unit)) {
+            if (targetIndexDictionary.ContainsKey (_unit)) {
+                targetIndexDictionary.Remove (_unit);
+            }
+            targetIndexDictionary.Add (_unit, 0);
+
+            if (currentFollowPathCoroutines.ContainsKey (_unit)) {
                 StopCoroutine ("FollowPathAbil");
-                currentCoroutines.Remove (_unit);
+                currentFollowPathCoroutines.Remove (_unit);
             }
             Coroutine currentRoutine = StartCoroutine (FollowPathAbil (_unit, onDestReached));
-            currentCoroutines.Add (_unit, currentRoutine);
+            currentFollowPathCoroutines.Add (_unit, currentRoutine);
         }
     }
 
     public void OnStopPath (Vector3 dest, Unit _unit, Action<Unit> onDestReached = null) {
-        if (currentCoroutines.ContainsKey (_unit)) {
+        if (currentFollowPathCoroutines.ContainsKey (_unit)) {
             StopCoroutine ("FollowPathAbil");
-            currentCoroutines.Remove (_unit);
+            currentFollowPathCoroutines.Remove (_unit);
         }
+
         if (pathDictionary.ContainsKey (_unit)) {
             pathDictionary[_unit] = new Vector3[] { dest };
         } else {
             Debug.LogError ("idk");
         }
-        targetIndex = 0;
+
+        if (targetIndexDictionary.ContainsKey (_unit)) {
+            targetIndexDictionary.Remove (_unit);
+        }
+        targetIndexDictionary.Add (_unit, 0);
+
         Debug.Log ("onStopPath called by: " + _unit);
         Coroutine currentRoutine = StartCoroutine (FollowPathAbil (_unit, onDestReached));
-        currentCoroutines.Add (_unit, currentRoutine);
+        currentFollowPathCoroutines.Add (_unit, currentRoutine);
     }
 
     IEnumerator FollowPathAbil (Unit _unit, Action<Unit> onDestReached = null) {
@@ -153,21 +166,22 @@ public class MovementHandler : MonoBehaviour {
             currentWaypoint = pathDictionary[_unit][0];
         } else {
             Debug.LogError ("idk");
-            yield break;;
+            yield break;
         }
 
         while (true) {
             if (_unit.transform.position == currentWaypoint) {
-                targetIndex++;
-                if (targetIndex >= pathDictionary[_unit].Length) {
+                targetIndexDictionary[_unit]++;
+                if (targetIndexDictionary[_unit] >= pathDictionary[_unit].Length) {
                     if (onDestReached != null) {
                         onDestReached (_unit);
+                        Debug.Log ("destination reached: " + _unit);
                         yield break;
                     } else {
                         yield break;
                     }
                 }
-                currentWaypoint = pathDictionary[_unit][targetIndex];
+                currentWaypoint = pathDictionary[_unit][targetIndexDictionary[_unit]];
             }
             _unit.transform.position = Vector3.MoveTowards (_unit.transform.position, currentWaypoint, speed * Time.deltaTime);
             yield return null;
