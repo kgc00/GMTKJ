@@ -30,7 +30,6 @@ public class SpinKnight : AttackAbility {
         thisUnit.SetCurrentAbility (null);
         stateHandler.SetUnitState (thisUnit, Unit.UnitState.cooldown);
         timer.AddTimeToTimerAbil (thisUnit, abilityInfo.cooldownTime);
-        Debug.Log ("onFinished was called");
     }
     private void SetRefs (Unit thisUnit) {
         if (!stateHandler) {

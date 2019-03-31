@@ -19,9 +19,10 @@ public class Firebolt : AttackAbility {
     }
 
     public override void OnCommited (Unit unit) {
-        unit.SetCurrentAbility (this);
+        owner.SetCurrentAbility (this);
         stateHandler.SetUnitState (owner, Unit.UnitState.acting);
-        CreateProjectile (unit);
+        stateHandler.SetAttackDataAI (this.abilityInfo);
+        CreateProjectile (owner);
 
         // AI only, no need for animation.  Keeping it here just in case
         // unit.GetComponent<AbilityManager> ().AnimateAbilityUse (abilityInfo.infoTheSecond.slot);
@@ -54,9 +55,9 @@ public class Firebolt : AttackAbility {
     }
 
     public override void OnFinished (Unit unit) {
-        unit.SetCurrentAbility (null);
-        stateHandler.SetUnitState (unit, Unit.UnitState.cooldown);
-        timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
+        owner.SetCurrentAbility (null);
+        stateHandler.SetUnitState (owner, Unit.UnitState.cooldown);
+        timer.AddTimeToTimerAbil (owner, abilityInfo.cooldownTime);
         Debug.Log ("onFinished was called");
     }
 

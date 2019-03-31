@@ -32,6 +32,7 @@ public class AI_InputHandler : MonoBehaviour {
 
 	public void PrepActionData (Unit _unit, Ability _ability, Node _targetNode) {
 		unitStateHandler.SetAttackDataAI (_unit.GetComponent<AbilityManager> ().ReturnAbilityInfo ());
+		// Debug.Log (unitStateHandler.currentAIAbilityInfo);
 		unitStateHandler.SetAbilAI (_ability);
 		unitStateHandler.SetUnitState (_unit, Unit.UnitState.planningAction);
 		unitStateHandler.SetAbilSlotAI (_unit, _unit.GetComponent<AbilityManager> ().ReturnCurrentAttack ());

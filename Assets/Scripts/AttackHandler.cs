@@ -19,7 +19,7 @@ public class AttackHandler : MonoBehaviour {
     // need to figure out how to handle extremely different cases
     private void HandleCommitToAttack (Node _targetNode, Unit _attackingUnit, Ability _abilityUsed, Unit _targetUnit) {
         if (_targetUnit) {
-            DealDamage (_targetUnit, _attackingUnit);
+            // DealDamage (_targetUnit, _attackingUnit);
             if (_abilityUsed is AttackAbility) {
                 AttackAbility _attackAbility = (AttackAbility) _abilityUsed;
                 _attackAbility.OnAbilityConnected (_targetUnit);

@@ -21,8 +21,10 @@ public class Spread : MovementAbility {
     }
 
     public override void OnCommited (Unit unit) {
-        unit.SetCurrentAbility (this);
+        owner.SetCurrentAbility (this);
         stateHandler.SetUnitState (owner, Unit.UnitState.acting);
+        abilityInfo.infoTheSecond.slot = owner.GetComponent<AbilityManager> ().GetSlotFromAbility (this);
+        stateHandler.SetAttackDataAI (this.abilityInfo);
         unitMovement.CommitMovement (
             abilityInfo.infoTheSecond.startPos,
             abilityInfo.infoTheSecond.targetPos,
@@ -42,7 +44,6 @@ public class Spread : MovementAbility {
         unit.SetCurrentAbility (null);
         stateHandler.SetUnitState (unit, Unit.UnitState.cooldown);
         timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
-        Debug.Log ("onFinished was called");
     }
 
     private void SetRefs (Unit unit) {

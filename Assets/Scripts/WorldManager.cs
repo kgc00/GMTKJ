@@ -14,6 +14,8 @@ public class WorldManager : MonoBehaviour {
     [SerializeField]
     private bool anyUnitSelectedByPlayer = false;
     public static event Func<bool> onRequestGridState;
+    public static event Action<Unit> AddUnitToAIList = delegate { };
+    public static event Action<Unit> RemoveUnitFromAIList = delegate { };
 
     void Start () {
         if (instance == null) {
@@ -30,18 +32,35 @@ public class WorldManager : MonoBehaviour {
         allUnits = new List<Unit> (FindObjectsOfType<Unit> ());
         allPlayerUnits = new List<Unit> ();
         allAIUnits = new List<Unit> ();
-        foreach (Unit unit in allUnits) {
-            if (unit.faction == Unit.Faction.Player) {
-                allPlayerUnits.Add (unit);
-            } else {
-                allAIUnits.Add (unit);
-            }
-        }
+        SortUnitsIntoSeparateLists ();
         if (allAIUnits != null && AI_Manager != null) {
             AI_Manager.Store_AI_Units (allAIUnits);
         }
         // Debug.Log (allPlayerUnits.Count + " " + allAIUnits.Count);
         AlignUnitsToGrid (allUnits);
+    }
+
+    private void SortUnitsIntoSeparateLists () {
+        foreach (Unit unit in allUnits) {
+            if (unit.faction == Unit.Faction.Player && !allPlayerUnits.Contains (unit)) {
+                allPlayerUnits.Add (unit);
+            } else if (unit.faction == Unit.Faction.Enemy && !allAIUnits.Contains (unit)) {
+                allAIUnits.Add (unit);
+            }
+        }
+    }
+
+    public void AddUnitToMasterList (Unit unit) {
+        if (!allUnits.Contains (unit)) { allUnits.Add (unit); }
+    }
+
+    public void PlaceUnitIntoCorrectSubList (Unit unit) {
+        if (unit.faction == Unit.Faction.Player && !allPlayerUnits.Contains (unit)) {
+            allPlayerUnits.Add (unit);
+        } else if (unit.faction == Unit.Faction.Enemy && !allAIUnits.Contains (unit)) {
+            allAIUnits.Add (unit);
+            AddUnitToAIList (unit);
+        }
     }
 
     private void OnDestroy () {
@@ -60,13 +79,10 @@ public class WorldManager : MonoBehaviour {
         }
     }
 
-    public void AddUnitToList (Unit unit) {
-        if (!allUnits.Contains (unit)) { allUnits.Add (unit); }
-    }
     public void RemoveUnitFromList (Unit unit) {
         if (allUnits.Contains (unit)) { allUnits.Remove (unit); }
         if (allPlayerUnits.Contains (unit)) { allPlayerUnits.Remove (unit); }
-        if (allAIUnits.Contains (unit)) { allAIUnits.Remove (unit); }
+        if (allAIUnits.Contains (unit)) { allAIUnits.Remove (unit); RemoveUnitFromAIList (unit); }
     }
     private void UnitSelectedByPlayer (Unit _selectedUnit) {
         _selectedUnit.currentSelectionState = Unit.SelectionState.selected;

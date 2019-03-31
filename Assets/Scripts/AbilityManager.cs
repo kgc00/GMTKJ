@@ -28,9 +28,11 @@ public class AbilityManager : MonoBehaviour {
     }
 
     private List<Ability> UpdateAbilities () {
-        if (GetComponentsInChildren<Ability> () != null) {
-            foreach (Ability ability in GetComponentsInChildren<Ability> ()) {
+        Debug.Log (equippedAbilities);
+        if (equippedAbilities != null && equippedAbilities.Count > 0) {
+            foreach (Ability ability in GetComponents<Ability> ()) {
                 equippedAbilities.Add (ability);
+                Debug.Log (ability + " " + equippedAbilities.Count);
             }
             return equippedAbilities;
         }
@@ -74,7 +76,16 @@ public class AbilityManager : MonoBehaviour {
         return equippedAbilities[currentAttackSlot];
     }
 
-    public Ability GetCurrentAbility (int v) {
+    public int GetSlotFromAbility (Ability abil) {
+        for (int i = 0; i < equippedAbilities.Count; i++) {
+            if (equippedAbilities[i] == abil) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public Ability GetAbilityFromSlot (int v) {
         return equippedAbilities[v];
     }
 }

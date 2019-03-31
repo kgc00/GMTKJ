@@ -89,7 +89,6 @@ public class ShackleShot : AttackAbility {
 		unit.SetCurrentAbility (null);
 		stateHandler.SetUnitState (unit, Unit.UnitState.cooldown);
 		timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
-		Debug.Log ("onFinished was called");
 	}
 
 	public override void OnAbilityConnected (Unit unit) { }

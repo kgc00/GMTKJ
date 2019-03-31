@@ -20,7 +20,11 @@ public class Bite : AttackAbility {
     public override void OnCommited (Unit unit) {
         unit.SetCurrentAbility (this);
         stateHandler.SetUnitState (unit, Unit.UnitState.acting);
-        abilityTargeting.CommitToAttack (
+        // somehow if we don't set the slot here it stays as 0 no matter the actual position
+        abilityInfo.infoTheSecond.slot = unit.GetComponent<AbilityManager> ().GetSlotFromAbility (this);
+        stateHandler.SetAttackDataAI (this.abilityInfo);
+        // Debug.Log (abilityInfo.infoTheSecond.slot);
+        abilityTargeting.CommitToAttackAI (
             abilityInfo.infoTheSecond.startPos, abilityInfo.infoTheSecond.targetPos, abilityInfo.infoTheSecond.slot
         );
 
@@ -34,10 +38,9 @@ public class Bite : AttackAbility {
     }
 
     public override void OnFinished (Unit unit) {
-        unit.SetCurrentAbility (null);
-        stateHandler.SetUnitState (unit, Unit.UnitState.cooldown);
-        timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
-        Debug.Log ("onFinished was called");
+        owner.SetCurrentAbility (null);
+        stateHandler.SetUnitState (owner, Unit.UnitState.cooldown);
+        timer.AddTimeToTimerAbil (owner, abilityInfo.cooldownTime);
     }
     private void SetRefs (Unit unit) {
         if (!stateHandler) {

@@ -8,7 +8,13 @@ public class EnemySpawner : MonoBehaviour {
 
     void Start () {
         foreach (var spawn in wave.spawnData) {
-            Instantiate (spawn.enemy, spawn.spawnPosition, Quaternion.identity);
+            try {
+                Unit currentSpawn = Instantiate (spawn.enemy, spawn.spawnPosition, Quaternion.identity).GetComponent<Unit> ();
+                WorldManager.instance.AddUnitToMasterList (currentSpawn);
+                WorldManager.instance.PlaceUnitIntoCorrectSubList (currentSpawn);
+            } catch (System.Exception e) {
+                Debug.LogError (e);
+            }
         }
     }
 }

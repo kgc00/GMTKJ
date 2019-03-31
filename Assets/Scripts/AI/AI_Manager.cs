@@ -15,66 +15,147 @@ public class AI_Manager : MonoBehaviour {
 	GameGrid grid;
 	public MovementHandler movementHandler;
 	PathRequestManager requestManager;
+	[SerializeField]
+	bool waitingForCommand = false;
+	[SerializeField]
+	bool waitingForNull = false;
+	[SerializeField]
+	bool givingCommands = false;
 
 	private void Start () {
 		grid = GameGrid.instance;
 		worldManager = WorldManager.instance;
+		WorldManager.AddUnitToAIList += AddUnitToAIList;
+		WorldManager.RemoveUnitFromAIList += RemoveUnitFromAIList;
 		pathfinding = FindObjectOfType<AStar> ().GetComponent<AStar> ();
 		inputHandler = FindObjectOfType<AI_InputHandler> ().GetComponent<AI_InputHandler> ();
 		movementHandler = FindObjectOfType<MovementHandler> ().GetComponent<MovementHandler> ();
 		requestManager = FindObjectOfType<PathRequestManager> ().GetComponent<PathRequestManager> ();
 		if (ai_units.Count > 0) {
-			StartCoroutine ("WaitForNextCommand", timeBetweenCommands);
+			SortWaitCommands (timeBetweenCommands);
+		} else {
+			Debug.Log ("no enemies");
 		}
+	}
+
+	private void OnDestroy () {
+		WorldManager.AddUnitToAIList -= AddUnitToAIList;
+		WorldManager.RemoveUnitFromAIList -= RemoveUnitFromAIList;
 	}
 	internal void Store_AI_Units (List<Unit> inc_ai_units) {
 		ai_units = inc_ai_units;
 	}
-	internal void StartManagerCommands () {
+
+	internal void AddUnitToAIList (Unit unit) {
+		if (!ai_units.Contains (unit)) {
+			ai_units.Add (unit);
+		}
 		if (currentCommand == null) {
-			Unit unitToControl = GetRandomUnit ();
-			if (unitToControl != null) {
-				Node targetNode = grid.NodeFromWorldPosition (SelectClosestTarget (unitToControl).transform.position);
-				Ability abil = DetermineAbility (unitToControl, targetNode);
-				unitToControl.SetCurrentAbility (abil);
-				if (abil is MovementAbility) {
-					QueryForNode (abil, unitToControl, targetNode, unitToControl);
-					return;
-				} else {
-					currentCommand = new AI_Ability_Command ();
-					currentCommand.execute (abil, unitToControl, targetNode, inputHandler, timeBetweenCommands);
-					StartCoroutine ("WaitForNextCommand", timeBetweenCommands);
-				}
-			} else {
-				Debug.Log ("No units available");
-				StartCoroutine ("WaitForNextCommand", timeBetweenCommands);
-			}
+			SortWaitCommands (timeBetweenCommands);
 		}
 	}
 
-	private void RetryCommand (Unit unit) {
-		StopCoroutine ("WaitForNextCommand");
-		StartCoroutine ("WaitForNextCommand", .25f);
+	internal void RemoveUnitFromAIList (Unit unit) {
+		if (ai_units.Contains (unit)) {
+			ai_units.Remove (unit);
+		}
+	}
+
+	internal void StartManagerCommands () {
+		if (currentCommand == null) {
+			if (worldManager.GetAllPlayerUnits ().Count > 0) {
+
+				givingCommands = true;
+				Unit unitToControl = GetRandomUnit ();
+				if (unitToControl != null) {
+					Node targetNode = grid.NodeFromWorldPosition (SelectClosestTarget (unitToControl).transform.position);
+					Ability abil = DetermineAbility (unitToControl, targetNode);
+					unitToControl.SetCurrentAbility (abil);
+					if (abil is MovementAbility) {
+						QueryForNode (abil, unitToControl, targetNode, unitToControl);
+						return;
+					} else {
+						currentCommand = new AI_Ability_Command ();
+						currentCommand.execute (abil, unitToControl, targetNode, inputHandler, timeBetweenCommands);
+						givingCommands = false;
+						SortWaitCommands (timeBetweenCommands);
+					}
+				} else {
+					Debug.Log ("No units available");
+					SortWaitCommands (timeBetweenCommands);
+				}
+			} else {
+				Debug.Log ("probably messed up in the wait for commands loop");
+				// CycleCommands ();
+			}
+		} else {
+			Debug.Log ("all players died");
+		}
+	}
+
+	// private void CycleCommands () {
+	// 	if (waitingForNull) {
+
+	// 	} else {
+	// 		StartCoroutine ("WaitForNoCommands");
+	// 	}
+	// }
+
+	// IEnumerator WaitForNoCommands () {
+	// 	waitingForNull = true;
+	// 	while (currentCommand != null) {
+	// 		yield return new WaitForSeconds (.1f);
+	// 	}
+	// 	waitingForNull = false;
+	// 	if (waitingForCommand) {
+	// 		Debug.Log ("still waiting on command");
+	// 	}
+	// 	SortWaitCommands (timeBetweenCommands);
+	// }
+
+	private void RetryCommandUnit (Unit unit) {
+		SortWaitCommands (.1f);
 		unit.currentUnitState = Unit.UnitState.idle;
 	}
 
 	private void QueryForNode (Ability abil, Unit unitToControl, Node targetNode, Unit unit) {
 		grid.ResetNodeCosts ();
 		List<Node> possibleNodes = inputHandler.ReturnPossibleNodes (abil, unitToControl, targetNode);
+
+		// Action<Ability, Unit, Node, List<Node>> test = AIPathTestFunc;
+		// (abil, unitToControl, targetNode, possibleNodes)
+
 		PathRequestManager.PathRequest _newRequest = new PathRequestManager.PathRequest (
-			unitToControl.transform.position, targetNode.transform.position, SomeFakeCallback, SomeFakeMethod, RetryCommand);
-		requestManager.pathRequestQueue.Enqueue (_newRequest);
-		if (requestManager.canProcessNewRequest ()) {
-			requestManager.NewPathLogic ();
-			StartCoroutine (
-				movementHandler.GeneratePathForAI (unitToControl.transform.position,
-					targetNode.transform.position, abil, unitToControl, targetNode,
-					possibleNodes, PathRequestFinishedForAI)
-			);
-		} else {
-			Debug.LogError ("i dont know what to do here");
-			StartCoroutine ("WaitForNextCommand", timeBetweenCommands);
-		}
+			unitToControl.transform.position,
+			targetNode.transform.position,
+			SomeFakeCallback,
+			SomeFakeMethod,
+			RetryCommandUnit);
+
+		PathRequestManager.RequestPath (
+			unitToControl.transform.position,
+			targetNode.transform.position,
+			SomeFakeCallback,
+			movementHandler,
+			unit,
+			SomeFakeMethod,
+			RetryCommandUnit,
+			PathRequestFinishedForAI,
+			abil,
+			possibleNodes);
+
+		// requestManager.pathRequestQueue.Enqueue (_newRequest);
+		// if (requestManager.canProcessNewRequest ()) {
+		// 	requestManager.NewPathLogic ();
+		// 	StartCoroutine (
+		// 		movementHandler.GeneratePathForAI (unitToControl.transform.position,
+		// 			targetNode.transform.position, abil, unitToControl, targetNode,
+		// 			possibleNodes, PathRequestFinishedForAI)
+		// 	);
+		// } else {
+		// 	Debug.LogError ("i dont know what to do here");
+		// 	SortWaitCommands(timeBetweenCommands);
+		// }
 	}
 
 	private void PathRequestFinishedForAI (
@@ -87,9 +168,18 @@ public class AI_Manager : MonoBehaviour {
 		grid.ResetNodeCosts ();
 	}
 
+	// private void AIPathTestFunc (
+	// 	Ability abil,
+	// 	Unit unitToControl,
+	// 	Node targetNode,
+	// 	List<Node> possibleNodes) {
+	// 	Node newTarget = SortNodes (possibleNodes, abil);
+	// 	FinishExecution (abil, unitToControl, targetNode, newTarget);
+	// 	grid.ResetNodeCosts ();
+	// }
+
 	private void FinishExecution (Ability abil, Unit unitToControl, Node targetNode, Node newTarget) {
 		if (newTarget != null && unitToControl.isAlive) {
-			// newTarget.GetComponent<SpriteRenderer> ().enabled = false;
 			ExecuteMovementRequest (unitToControl, newTarget, abil);
 		}
 	}
@@ -97,12 +187,13 @@ public class AI_Manager : MonoBehaviour {
 	private void ExecuteMovementRequest (Unit unitToControl, Node targetNode, Ability abil) {
 		currentCommand = new AI_Ability_Command ();
 		currentCommand.execute (abil, unitToControl, targetNode, inputHandler, delay);
-		StartCoroutine ("WaitForNextCommand", (timeBetweenCommands + delay));
+		givingCommands = false;
+		SortWaitCommands (timeBetweenCommands + delay);
 	}
 
 	public void ResetAICommands () {
 		currentCommand = new AI_Ability_Command ();
-		StartCoroutine ("WaitForNextCommand", (timeBetweenCommands + delay_short));
+		SortWaitCommands (timeBetweenCommands + delay_short);
 	}
 
 	private Node SortNodes (List<Node> possibleNodes, Ability abil) {
@@ -121,9 +212,19 @@ public class AI_Manager : MonoBehaviour {
 		return correctNode;
 	}
 
+	private void SortWaitCommands (float timeToWait) {
+		if (waitingForCommand) {
+
+		} else {
+			waitingForCommand = true;
+			StartCoroutine ("WaitForNextCommand", timeToWait);
+		}
+	}
+
 	IEnumerator WaitForNextCommand (float timeToWait) {
 		yield return new WaitForSeconds (timeToWait);
 		currentCommand = null;
+		waitingForCommand = false;
 		StartManagerCommands ();
 		yield break;
 	}

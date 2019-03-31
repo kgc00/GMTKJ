@@ -57,6 +57,14 @@ public class AbilityTargeting : MonoBehaviour {
         onCommitToMeleeAttack (_selectedNode, _attackingUnit, _ability, _target);
     }
 
+    public void CommitToAttackAI (Vector3 _startPos, Vector3 _targetPos, int slot) {
+        Node _selectedNode = grid.NodeFromWorldPosition (_targetPos);
+        Unit _target = UnitFromNode.SingleUnitFromNode (_selectedNode);
+        Unit _attackingUnit = UnitFromNode.SingleUnitFromNode (grid.NodeFromWorldPosition (_startPos));
+        Ability _ability = _attackingUnit.GetComponent<AbilityManager> ().GetAbilityFromSlot (slot);
+        onCommitToMeleeAttack (_selectedNode, _attackingUnit, _ability, _target);
+    }
+
     internal void CommitToAoEAttack (List<Node> nodesInAbilityRange, Unit attackingUnit, int slot, Action<Unit> callback = null) {
         List<Unit> unitsAffected = new List<Unit> ();
         foreach (Node node in nodesInAbilityRange) {

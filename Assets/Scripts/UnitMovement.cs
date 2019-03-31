@@ -29,10 +29,10 @@ public class UnitMovement : MonoBehaviour {
     }
 
     public void CommitMovement (Vector3 startPos,
-        Vector3 targetPos, Unit _unit, Action<Unit> onDestReached) {
-        StoreTargetInfo (startPos, targetPos);
+        Vector3 destination, Unit _unit, Action<Unit> onDestReached) {
+        StoreTargetInfo (startPos, destination);
         gridShoulDisplay = false;
-        movementHandler.StartMovementPathLogic (_unit, onDestReached);
+        movementHandler.StartMovementPathLogic (_unit, onDestReached, destination);
     }
 
     private void StoreTargetInfo (Vector3 startingPos, Vector3 targetPos) {

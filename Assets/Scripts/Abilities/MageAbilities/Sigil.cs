@@ -47,7 +47,6 @@ public class Sigil : AttackAbility {
 		unit.SetCurrentAbility (null);
 		stateHandler.SetUnitState (unit, Unit.UnitState.cooldown);
 		timer.AddTimeToTimerAbil (unit, abilityInfo.cooldownTime);
-		Debug.Log ("onFinished was called");
 	}
 	private void SetRefs (Unit unit) {
 		if (!stateHandler) {
