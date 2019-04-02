@@ -99,8 +99,7 @@ public class PathRequestManager : MonoBehaviour {
                                 currentPathRequest.pathStart,
                                 currentPathRequest.pathEnd,
                                 _unit,
-                                onDestReached,
-                                currentMovementCoroutines));
+                                onDestReached));
                         currentMovementCoroutines.Add (_unit, routine);
                         // Debug.Log (currentMovementCoroutines[_unit]);
                     } else {

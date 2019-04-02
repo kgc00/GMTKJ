@@ -58,8 +58,7 @@ public class MovementHandler : MonoBehaviour {
         Vector3 _startPos,
         Vector3 _targetPos,
         Unit _unit,
-        Action<Unit> onDestReached,
-        Dictionary<Unit, Coroutine> pathRequestCoroutines = null) {
+        Action<Unit> onDestReached) {
         Vector3[] waypoints = new Vector3[0];
         bool pathSuccess = false;
 

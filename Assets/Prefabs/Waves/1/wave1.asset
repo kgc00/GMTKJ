@@ -9,10 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: f20b79dd3697c174fb94651af78020cb, type: 3}
   m_Name: wave1
   m_EditorClassIdentifier: Assembly-CSharp::Wave
   waveNumber: 1
   spawnData:
   - {fileID: 11400000, guid: 021c12f6c83f31f44907428985f37d9c, type: 2}
-  - {fileID: 11400000, guid: 809e5d18522397e41a307aa9c28c3a20, type: 2}
